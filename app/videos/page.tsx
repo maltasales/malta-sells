@@ -70,7 +70,7 @@ const propertyVideos = [
     beds: 3,
     baths: 2,
     area: 150,
-    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
+    videoUrl: 'https://www.learningcontainer.com/wp-content/uploads/2020/05/sample-mp4-file.mp4',
     description: 'Charming villa by the sea in the picturesque fishing village of Marsaxlokk. Features a private garden and stunning sea views.',
     agent: {
       name: 'Maria Santos',
