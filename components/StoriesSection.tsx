@@ -100,8 +100,8 @@ export default function StoriesSection() {
     try {
       console.log('Fetching property videos from Supabase...');
       
-      // Fetch properties with videos and their seller profiles
-      const { data: properties, error } = await supabase
+      // First, try to fetch properties with videos
+      const { data: properties, error: propertiesError } = await supabase
         .from('properties')
         .select(`
           id,
@@ -115,15 +115,31 @@ export default function StoriesSection() {
           video_url,
           images,
           description,
-          seller_id,
-          profiles!properties_seller_id_fkey (
-            id,
-            full_name,
-            avatar_url
-          )
+          seller_id
         `)
         .not('video_url', 'is', null)
         .order('created_at', { ascending: false });
+
+      if (propertiesError) {
+        console.error('Error fetching properties:', propertiesError);
+        setLoading(false);
+        return;
+      }
+
+      // Then fetch profiles separately to avoid foreign key issues
+      const sellerIds = properties?.map(p => p.seller_id).filter(Boolean) || [];
+      let profiles: any[] = [];
+      
+      if (sellerIds.length > 0) {
+        const { data: profilesData, error: profilesError } = await supabase
+          .from('profiles')
+          .select('id, full_name, avatar_url')
+          .in('id', sellerIds);
+
+        if (!profilesError && profilesData) {
+          profiles = profilesData;
+        }
+      }
 
       if (error) {
         console.error('Error fetching properties:', error);
