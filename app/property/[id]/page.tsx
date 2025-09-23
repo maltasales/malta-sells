@@ -85,24 +85,13 @@ async function getProperty(id: string) {
   }
 }
 
-// Generate static params for properties
+// Force dynamic rendering for all property pages
+export const dynamic = 'force-dynamic';
+
+// Generate static params for properties (empty array for fully dynamic)
 export async function generateStaticParams() {
-  try {
-    // Try to fetch property IDs from Supabase
-    const { data: properties } = await supabase
-      .from('properties')
-      .select('id')
-      .limit(50); // Limit to prevent too many static pages
-    
-    if (properties && properties.length > 0) {
-      return properties.map((property: any) => ({ id: property.id }));
-    }
-  } catch (error) {
-    console.error('Error generating static params:', error);
-  }
-  
-  // Fallback to mock data IDs
-  return Object.keys(propertyData).map((id) => ({ id }));
+  // Return empty array to make all routes dynamic
+  return [];
 }
 
 // Generate metadata for SEO
