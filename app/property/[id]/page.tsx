@@ -129,14 +129,39 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
 }
 
 export default async function PropertyDetailPage({ params }: { params: { id: string } }) {
-  const property = await getProperty(params.id);
+  try {
+    const property = await getProperty(params.id);
 
-  if (!property) {
+    if (!property) {
+      return (
+        <div className="min-h-screen bg-white">
+          <div className="p-6 text-center">
+            <h1 className="text-2xl font-bold text-gray-900 mb-4">Property not found</h1>
+            <p className="text-gray-600 mb-6">The property you're looking for doesn't exist or has been removed.</p>
+            <a 
+              href="/"
+              className="inline-block bg-[#D12C1D] text-white px-6 py-3 rounded-lg hover:bg-[#B8241A] transition-colors"
+            >
+              Back to Home
+            </a>
+          </div>
+        </div>
+      );
+    }
+
+    // Delegate to a client component for UI interactions
+    return (
+      <PropertyDetailClient property={property} />
+    );
+  } catch (error) {
+    console.error('Error in PropertyDetailPage:', error);
+    
+    // Error fallback
     return (
       <div className="min-h-screen bg-white">
         <div className="p-6 text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Property not found</h1>
-          <p className="text-gray-600 mb-6">The property you're looking for doesn't exist or has been removed.</p>
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">Something went wrong</h1>
+          <p className="text-gray-600 mb-6">We're having trouble loading this property. Please try again later.</p>
           <a 
             href="/"
             className="inline-block bg-[#D12C1D] text-white px-6 py-3 rounded-lg hover:bg-[#B8241A] transition-colors"
@@ -147,9 +172,4 @@ export default async function PropertyDetailPage({ params }: { params: { id: str
       </div>
     );
   }
-
-  // Delegate to a client component for UI interactions
-  return (
-    <PropertyDetailClient property={property} />
-  );
 }
