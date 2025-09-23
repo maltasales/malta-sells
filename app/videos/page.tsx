@@ -16,7 +16,7 @@ const propertyVideos = [
     beds: 2,
     baths: 1,
     area: 85,
-    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
+    videoUrl: 'https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_1mb.mp4',
     description: 'Beautiful modern apartment for sale located in the heart of Sliema. This stylish property features contemporary design and is just minutes from the seafront.',
     agent: {
       name: 'Caio Ferraz',
