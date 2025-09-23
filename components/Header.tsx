@@ -49,6 +49,7 @@ export default function Header() {
         <div className="flex items-center space-x-3">
           <Link
             href="/search"
+            data-testid="search-button"
             className="flex items-center space-x-1 text-[#d8171e] hover:text-[#B8241A] transition-colors text-sm font-medium"
           >
             <Search className="w-4 h-4" />
