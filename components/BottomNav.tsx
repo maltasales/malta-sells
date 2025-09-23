@@ -26,6 +26,7 @@ export default function BottomNav() {
             <Link
               key={item.name}
               href={item.href}
+              data-testid={`bottom-nav-${item.name.toLowerCase()}`}
               className={`flex flex-col items-center py-2 px-3 rounded-lg transition-colors ${
                 isActive
                   ? 'text-[#D12C1D] bg-red-50'
