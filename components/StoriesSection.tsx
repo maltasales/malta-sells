@@ -181,7 +181,7 @@ export default function StoriesSection() {
   };
 
   return (
-    <div>
+    <div data-testid="property-videos-section">
       <h2 className="text-xl font-semibold text-gray-900 mb-4">Property Videos</h2>
       {loading ? (
         <div className="flex items-center justify-center py-8">
