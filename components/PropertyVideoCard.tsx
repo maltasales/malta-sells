@@ -29,6 +29,7 @@ export default function PropertyVideoCard({ video }: PropertyVideoCardProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+  const [videoError, setVideoError] = useState(false);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
