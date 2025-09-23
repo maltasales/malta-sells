@@ -32,7 +32,7 @@ const mockListings = [
     image: 'https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?w=800&h=600&fit=crop',
     availableFrom: 'Available Now',
     type: 'Penthouse',
-    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4'
+    videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4'
   },
   {
     id: 3,
@@ -88,7 +88,7 @@ const mockListings = [
     image: 'https://images.pexels.com/photos/2724749/pexels-photo-2724749.jpeg?w=800&h=600&fit=crop',
     availableFrom: 'Available Now',
     type: 'Loft',
-    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4'
+    videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4'
   },
   {
     id: 7,
