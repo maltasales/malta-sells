@@ -71,7 +71,7 @@ export const propertyData = {
       'https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?w=800&h=600&fit=crop',
       'https://images.pexels.com/photos/1918291/pexels-photo-1918291.jpeg?w=800&h=600&fit=crop',
     ],
-    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+    videoUrl: 'https://sample-videos.com/zip/10/mp4/SampleVideo_640x360_1mb.mp4',
     description: 'Perfect starter home in the vibrant St. Julians area. Close to restaurants, nightlife, and public transport.',
     amenities: ['WiFi', 'Air Conditioning', 'Compact Design', 'Central Location', 'Modern Appliances', 'Security'],
     owner: {
