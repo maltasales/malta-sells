@@ -21,7 +21,7 @@ const propertyVideos = [
     agent: {
       name: 'Caio Ferraz',
       avatar: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?w=100&h=100&fit=crop&crop=face',
-      phone: '+356 9999 1234'
+      phone: '+356 9999 1234',
       id: '1'
     }
   },
