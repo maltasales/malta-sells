@@ -85,6 +85,29 @@ async function getProperty(id: string) {
   }
 }
 
+// Generate metadata for SEO
+export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
+  const property = await getProperty(params.id);
+
+  if (!property) {
+    return {
+      title: 'Property Not Found - Malta Sells',
+      description: 'The property you are looking for could not be found.',
+    };
+  }
+
+  return {
+    title: `${property.title} - ${property.location} | Malta Sells`,
+    description: property.description || `${property.title} in ${property.location} for ${property.currency}${property.price?.toLocaleString()}`,
+    openGraph: {
+      title: property.title,
+      description: property.description,
+      images: property.images?.slice(0, 1) || [],
+      type: 'website',
+    },
+  };
+}
+
 export default async function PropertyDetailPage({ params }: { params: { id: string } }) {
   const property = await getProperty(params.id);
 
