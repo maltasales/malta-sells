@@ -57,7 +57,7 @@ const propertyVideos = [
     agent: {
       name: 'Cristiano Ronaldo',
       avatar: 'https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?w=100&h=100&fit=crop&crop=face',
-      phone: '+356 9999 9999'
+      phone: '+356 9999 9999',
       id: '3'
     }
   },
