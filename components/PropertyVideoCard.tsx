@@ -59,6 +59,10 @@ export default function PropertyVideoCard({ video }: PropertyVideoCardProps) {
     setIsHovered(false);
   };
 
+  const handleSellerClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+  };
+
   return (
     <div className="flex-shrink-0 w-32">
       <Link href={`/videos?start=${video.id}`}>
@@ -100,16 +104,34 @@ export default function PropertyVideoCard({ video }: PropertyVideoCardProps) {
             {/* Content overlay */}
             <div className="absolute bottom-0 left-0 right-0 p-3 pointer-events-none">
               <div className="flex items-center mb-2">
-                <Link href={`/seller/${video.agent.id}`} className="pointer-events-auto">
+                <div 
+                  className="pointer-events-auto cursor-pointer"
+                  onClick={handleSellerClick}
+                >
                   <img
                     src={video.agent.avatar}
                     alt={video.agent.name}
                     className="w-6 h-6 rounded-full border-2 border-white hover:scale-110 transition-transform"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      window.location.href = `/seller/${video.agent.id}`;
+                    }}
                   />
-                </Link>
+                </div>
               </div>
-              <Link href={`/seller/${video.agent.id}`} className="pointer-events-auto">
-                <div className="flex items-center space-x-1 mb-1">
+              <div 
+                className="pointer-events-auto cursor-pointer"
+                onClick={handleSellerClick}
+              >
+                <div 
+                  className="flex items-center space-x-1 mb-1"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    window.location.href = `/seller/${video.agent.id}`;
+                  }}
+                >
                   <p className="text-white text-xs font-medium truncate hover:text-blue-300 transition-colors">
                     {video.agent.name}
                   </p>
@@ -117,7 +139,7 @@ export default function PropertyVideoCard({ video }: PropertyVideoCardProps) {
                     <BadgeCheck className="w-2 h-2 text-white" />
                   </span>
                 </div>
-              </Link>
+              </div>
               <p className="text-white text-sm font-bold">
                 {video.currency}{video.price.toLocaleString()}
               </p>
