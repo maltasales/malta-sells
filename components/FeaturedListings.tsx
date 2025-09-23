@@ -186,7 +186,7 @@ export default function FeaturedListings() {
   };
 
   return (
-    <div>
+    <div data-testid="featured-properties-section">
       <h2 className="text-xl font-semibold text-gray-900 mb-4">Featured Properties</h2>
       {loading ? (
         <div className="flex items-center justify-center py-8">
