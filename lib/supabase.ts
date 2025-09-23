@@ -13,8 +13,7 @@ export type Database = {
         Row: {
           id: string;
           full_name: string | null;
-          role: 'user' | 'admin' | null;
-          role: 'buyer' | 'seller' | null;
+          role: 'user' | 'admin' | 'buyer' | 'seller' | null;
           avatar_url: string | null;
           banner_url: string | null;
           phone: string | null;
@@ -24,8 +23,7 @@ export type Database = {
         Insert: {
           id: string;
           full_name?: string | null;
-          role?: 'user' | 'admin' | null;
-          role?: 'buyer' | 'seller' | null;
+          role?: 'user' | 'admin' | 'buyer' | 'seller' | null;
           avatar_url?: string | null;
           banner_url?: string | null;
           phone?: string | null;
@@ -35,8 +33,7 @@ export type Database = {
         Update: {
           id?: string;
           full_name?: string | null;
-          role?: 'user' | 'admin' | null;
-          role?: 'buyer' | 'seller' | null;
+          role?: 'user' | 'admin' | 'buyer' | 'seller' | null;
           avatar_url?: string | null;
           banner_url?: string | null;
           phone?: string | null;
