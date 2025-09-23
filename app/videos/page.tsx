@@ -75,7 +75,7 @@ const propertyVideos = [
     agent: {
       name: 'Maria Santos',
       avatar: 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?w=100&h=100&fit=crop&crop=face',
-      phone: '+356 9999 4321'
+      phone: '+356 9999 4321',
       id: '4'
     }
   },
