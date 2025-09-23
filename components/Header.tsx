@@ -70,6 +70,7 @@ export default function Header() {
               </span>
               <button
                 onClick={handleDashboard}
+                data-testid="dashboard-button"
                 className="bg-[#D12C1D] text-white px-4 py-2 rounded-lg hover:bg-[#B8241A] transition-colors text-xs font-medium whitespace-nowrap"
               >
                 Dashboard
