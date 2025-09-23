@@ -39,7 +39,7 @@ const propertyVideos = [
     agent: {
       name: 'Anhoch',
       avatar: 'https://images.pexels.com/photos/697509/pexels-photo-697509.jpeg?w=100&h=100&fit=crop&crop=face',
-      phone: '+356 9999 5678'
+      phone: '+356 9999 5678',
       id: '2'
     }
   },
