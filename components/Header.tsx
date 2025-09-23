@@ -79,12 +79,14 @@ export default function Header() {
             <>
               <button
                 onClick={handleSignIn}
+                data-testid="sign-in-button"
                 className="text-[#D12C1D] hover:text-[#B8241A] hover:scale-105 transition-all duration-200 ease-in-out text-sm font-medium"
               >
                 Sign In
               </button>
               <Link
                 href="/auth/signup"
+                data-testid="sign-up-button"
                 className="bg-[#D12C1D] text-white px-4 py-2 rounded-lg hover:bg-[#B8241A] transition-colors text-sm font-medium"
               >
                 Sign Up
