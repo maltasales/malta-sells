@@ -141,35 +141,32 @@ export default function StoriesSection() {
         }
       }
 
-      if (error) {
-        console.error('Error fetching properties:', error);
-        setLoading(false);
-        return;
-      }
-
       console.log('Fetched properties:', properties);
 
       // Transform the data to match the expected format
-      const transformedVideos = properties.map((property: any) => ({
-        id: property.id,
-        title: property.title,
-        location: property.location,
-        price: property.price,
-        currency: property.currency,
-        beds: property.beds,
-        baths: property.baths,
-        area: property.area,
-        seller_id: property.seller_id,
-        videoUrl: property.video_url,
-        thumbnail: property.images?.[0] || 'https://images.pexels.com/photos/1918291/pexels-photo-1918291.jpeg?w=200&h=300&fit=crop',
-        description: property.description,
-        agent: {
-          name: property.profiles?.full_name || 'Property Seller',
-          avatar: property.profiles?.avatar_url || 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?w=100&h=100&fit=crop&crop=face',
-          phone: '+356 9999 1234', // Default phone
-          id: property.seller_id,
-        }
-      }));
+      const transformedVideos = properties?.map((property: any) => {
+        const profile = profiles.find(p => p.id === property.seller_id);
+        return {
+          id: property.id,
+          title: property.title,
+          location: property.location,
+          price: property.price,
+          currency: property.currency,
+          beds: property.beds,
+          baths: property.baths,
+          area: property.area,
+          seller_id: property.seller_id,
+          videoUrl: property.video_url,
+          thumbnail: property.images?.[0] || 'https://images.pexels.com/photos/1918291/pexels-photo-1918291.jpeg?w=200&h=300&fit=crop',
+          description: property.description,
+          agent: {
+            name: profile?.full_name || 'Property Seller',
+            avatar: profile?.avatar_url || 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?w=100&h=100&fit=crop&crop=face',
+            phone: '+356 9999 1234', // Default phone
+            id: property.seller_id,
+          }
+        };
+      }) || [];
 
       console.log('Transformed videos:', transformedVideos);
 
