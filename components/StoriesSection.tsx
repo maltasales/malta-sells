@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import PropertyVideoCard from './PropertyVideoCard';
 import { supabase } from '@/lib/supabase';
 
-// Mock data as fallback
+// Mock data as fallback with working video URLs
 const mockPropertyVideos = [
   {
     id: 1,
@@ -16,7 +16,7 @@ const mockPropertyVideos = [
     baths: 1,
     area: 85,
     seller_id: '1',
-    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
+    videoUrl: 'https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_1mb.mp4',
     thumbnail: 'https://images.pexels.com/photos/1918291/pexels-photo-1918291.jpeg?w=200&h=300&fit=crop',
     description: 'Beautiful modern apartment for sale located in the heart of Sliema. This stylish property features contemporary design and is just minutes from the seafront.',
     agent: {
@@ -36,7 +36,7 @@ const mockPropertyVideos = [
     beds: 3,
     baths: 2,
     area: 120,
-    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
+    videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
     thumbnail: 'https://images.pexels.com/photos/323780/pexels-photo-323780.jpeg?w=200&h=300&fit=crop',
     description: 'Stunning penthouse with panoramic views of Valletta harbor. Features luxury finishes and a private terrace perfect for entertaining.',
     agent: {
@@ -56,7 +56,7 @@ const mockPropertyVideos = [
     beds: 1,
     baths: 1,
     area: 45,
-    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+    videoUrl: 'https://sample-videos.com/zip/10/mp4/SampleVideo_640x360_1mb.mp4',
     thumbnail: 'https://images.pexels.com/photos/1571460/pexels-photo-1571460.jpeg?w=200&h=300&fit=crop',
     description: 'Perfect starter home in the vibrant St. Julians area. Close to restaurants, nightlife, and public transport.',
     agent: {
@@ -76,7 +76,7 @@ const mockPropertyVideos = [
     beds: 3,
     baths: 2,
     area: 150,
-    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
+    videoUrl: 'https://www.learningcontainer.com/wp-content/uploads/2020/05/sample-mp4-file.mp4',
     thumbnail: 'https://images.pexels.com/photos/1918291/pexels-photo-1918291.jpeg?w=200&h=300&fit=crop',
     description: 'Charming villa by the sea in the picturesque fishing village of Marsaxlokk. Features a private garden and stunning sea views.',
     agent: {
