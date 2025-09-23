@@ -74,17 +74,26 @@ export default function PropertyVideoCard({ video }: PropertyVideoCardProps) {
         >
           {/* 9:16 aspect ratio container */}
           <div className="w-28 h-[200px] rounded-xl overflow-hidden shadow-lg bg-black relative">
-            <video
-              ref={videoRef}
-              src={video.videoUrl}
-              poster={video.thumbnail}
-              className="w-full h-full object-cover"
-              muted
-              loop
-              playsInline
-              onPlay={() => setIsPlaying(true)}
-              onPause={() => setIsPlaying(false)}
-            />
+            {!videoError ? (
+              <video
+                ref={videoRef}
+                src={video.videoUrl}
+                poster={video.thumbnail}
+                className="w-full h-full object-cover"
+                muted
+                loop
+                playsInline
+                onPlay={() => setIsPlaying(true)}
+                onPause={() => setIsPlaying(false)}
+                onError={() => setVideoError(true)}
+              />
+            ) : (
+              <img
+                src={video.thumbnail}
+                alt={video.title}
+                className="w-full h-full object-cover"
+              />
+            )}
             
             {/* Hover overlay with subtle animation */}
             <div className={`absolute inset-0 bg-black/20 transition-opacity duration-300 ${
