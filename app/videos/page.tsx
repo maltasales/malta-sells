@@ -234,7 +234,6 @@ export default function VideosPage() {
               {/* Right side actions */}
               <div className="absolute right-4 bottom-40 flex flex-col space-y-8 z-20">
                 <button
-                  onClick={() => setIsLiked(!isLiked)}
                   onClick={(e) => {
                     e.stopPropagation();
                     setIsLiked(!isLiked);
