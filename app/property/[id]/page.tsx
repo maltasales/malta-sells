@@ -2,6 +2,7 @@
 import { createClient } from '@supabase/supabase-js';
 import { propertyData } from '@/lib/propertyData';
 import PropertyDetailClient from '@/components/PropertyDetailClient';
+import type { Metadata } from 'next';
 
 // Supabase client for server-side operations
 const supabaseUrl = 'https://qopnwgmmvfdopdtxiqbb.supabase.co';
