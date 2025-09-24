@@ -26,6 +26,32 @@ export default function SellerProfileCard({ user }: SellerProfileCardProps) {
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
   const [currentBannerUrl, setCurrentBannerUrl] = useState(user.banner_url);
   const [currentAvatarUrl, setCurrentAvatarUrl] = useState(user.avatar_url);
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Fetch latest profile data on mount
+  useEffect(() => {
+    const fetchLatestProfile = async () => {
+      setIsLoading(true);
+      try {
+        const { data: profile, error } = await supabase
+          .from('profiles')
+          .select('avatar_url, banner_url')
+          .eq('id', user.id)
+          .single();
+
+        if (!error && profile) {
+          setCurrentAvatarUrl(profile.avatar_url);
+          setCurrentBannerUrl(profile.banner_url);
+        }
+      } catch (error) {
+        console.error('Error fetching profile:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchLatestProfile();
+  }, [user.id]);
 
   const handleBannerClick = () => {
     bannerInputRef.current?.click();
