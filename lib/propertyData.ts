@@ -98,7 +98,7 @@ export const propertyData = {
       'https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?w=800&h=600&fit=crop',
       'https://images.pexels.com/photos/1918291/pexels-photo-1918291.jpeg?w=800&h=600&fit=crop',
     ],
-    videoUrl: 'https://media.w3.org/2010/05/video/movie_300.mp4',
+    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
     description: 'Charming villa by the sea in the picturesque fishing village of Marsaxlokk. Features a private garden and stunning sea views.',
     amenities: ['WiFi', 'Sea View', 'Private Garden', 'Parking', 'Traditional Architecture', 'Peaceful Location'],
     owner: {
