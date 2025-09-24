@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { getCurrentUser, onAuthStateChange } from '@/lib/auth';
+import { supabase } from '@/lib/supabase';
 
 export interface User {
   id: string;
