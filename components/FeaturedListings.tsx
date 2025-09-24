@@ -130,50 +130,39 @@ export default function FeaturedListings() {
 
   const fetchFeaturedListings = async () => {
     try {
-      console.log('Fetching featured listings from Supabase...');
-      
-      const { data: properties, error } = await supabase
-        .from('properties')
-        .select(`
-          id,
-          title,
-          location,
-          price,
-          currency,
-          beds,
-          baths,
-          property_type,
-          images,
-          video_url,
-          available_from,
-          created_at
-        `)
-        .order('created_at', { ascending: false })
-        .limit(8);
+      // Use synchronized function to get listings with current seller profiles
+      const { data: syncedListings, error: syncError } = await supabase
+        .rpc('get_listings_with_current_seller_profile');
 
-      if (error) {
-        console.error('Error fetching featured listings:', error);
+      if (syncError) {
+        console.error('Error fetching synchronized featured listings:', syncError);
         setLoading(false);
         return;
       }
 
-      console.log('Fetched featured listings:', properties);
+      console.log('Fetched synchronized featured listings:', syncedListings);
 
-      // Transform the data to match the expected format
-      const transformedListings = properties.map((property: any) => ({
-        id: property.id,
-        title: property.title,
-        location: property.location,
-        price: property.price,
-        currency: property.currency,
+      // Transform the synchronized data to match expected format
+      const transformedListings = syncedListings?.slice(0, 8).map((listing: any) => ({
+        id: listing.listing_id,
+        title: listing.listing_title,
+        location: listing.listing_location,
+        price: listing.listing_price,
+        currency: listing.listing_currency || '€',
         period: '',
-        beds: property.beds,
-        baths: property.baths,
-        image: property.images?.[0] || 'https://images.pexels.com/photos/1918291/pexels-photo-1918291.jpeg?w=800&h=600&fit=crop',
-        availableFrom: property.available_from || 'Available Now',
-        type: property.property_type,
-        videoUrl: property.video_url,
-      }));
+        beds: listing.listing_beds,
+        baths: listing.listing_baths,
+        image: listing.listing_images?.[0] || 'https://images.pexels.com/photos/1918291/pexels-photo-1918291.jpeg?w=800&h=600&fit=crop',
+        availableFrom: 'Available Now',
+        type: listing.property_type || 'Property',
+        videoUrl: listing.listing_video_url,
+        seller: {
+          name: listing.seller_name,
+          avatar: listing.seller_avatar_url,
+          phone: listing.seller_phone,
+          id: listing.seller_id
+        }
+      })) || [];
 
       if (transformedListings && transformedListings.length > 0) {
         // Map video URLs to unique reliable ones based on property characteristics
