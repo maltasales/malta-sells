@@ -60,7 +60,7 @@ const mockPropertyVideos = [
     thumbnail: 'https://images.pexels.com/photos/1571460/pexels-photo-1571460.jpeg?w=200&h=300&fit=crop',
     description: 'Perfect starter home in the vibrant St. Julians area. Close to restaurants, nightlife, and public transport.',
     agent: {
-      name: 'Cristiano Ronaldo',
+      name: 'Cristiano Malta Homes',
       avatar: 'https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?w=100&h=100&fit=crop&crop=face',
       phone: '+356 9999 9999',
       id: '3'
