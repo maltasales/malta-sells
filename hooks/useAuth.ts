@@ -35,12 +35,29 @@ export const useAuth = () => {
   const updateUserProfile = async (updates: Partial<User>) => {
     if (!user) return;
     
-    const updatedUser = { ...user, ...updates };
-    setUser(updatedUser);
-    
-    // Update localStorage
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+    try {
+      // Update in Supabase
+      const { error } = await supabase
+        .from('profiles')
+        .update(updates)
+        .eq('id', user.id);
+
+      if (error) {
+        console.error('Error updating profile in database:', error);
+        throw error;
+      }
+
+      // Update local state
+      const updatedUser = { ...user, ...updates };
+      setUser(updatedUser);
+      
+      // Update localStorage
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+      }
+    } catch (error) {
+      console.error('Failed to update user profile:', error);
+      throw error;
     }
   };
   return {
