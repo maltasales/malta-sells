@@ -49,22 +49,57 @@ export default function SellerProfileCard({ user }: SellerProfileCardProps) {
       alert('Image must be less than 5MB');
       return;
     }
+    
     setIsUploadingBanner(true);
     try {
-      // Create a URL for the uploaded file
-      const imageUrl = URL.createObjectURL(file);
+      // Create a temporary preview URL for immediate UI feedback
+      const tempUrl = URL.createObjectURL(file);
+      setCurrentBannerUrl(tempUrl);
       
-      // Update the banner URL in state immediately for UI feedback
-      setCurrentBannerUrl(imageUrl);
-      
-      // Update the user profile
-      if (updateUserProfile) {
-        await updateUserProfile({ banner_url: imageUrl });
+      // Upload to Supabase Storage
+      const fileName = `banner_${user.id}_${Date.now()}.${file.name.split('.').pop()}`;
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('profile-images')
+        .upload(fileName, file, {
+          cacheControl: '3600',
+          upsert: true
+        });
+
+      if (uploadError) {
+        console.error('Upload error:', uploadError);
+        throw new Error('Failed to upload image');
       }
+
+      // Get the public URL
+      const { data: urlData } = supabase.storage
+        .from('profile-images')
+        .getPublicUrl(fileName);
+
+      const publicUrl = urlData.publicUrl;
+
+      // Update the user profile in database via Supabase
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ banner_url: publicUrl })
+        .eq('id', user.id);
+
+      if (updateError) {
+        console.error('Profile update error:', updateError);
+        throw new Error('Failed to update profile');
+      }
+
+      // Update local auth state
+      if (updateUserProfile) {
+        await updateUserProfile({ banner_url: publicUrl });
+      }
+      
+      // Clean up temp URL and set permanent URL
+      URL.revokeObjectURL(tempUrl);
+      setCurrentBannerUrl(publicUrl);
       
     } catch (error) {
       console.error('Error uploading banner:', error);
-      alert('Failed to upload banner image');
+      alert('Failed to upload banner image. Please try again.');
       // Revert on error
       setCurrentBannerUrl(user.banner_url);
     } finally {
