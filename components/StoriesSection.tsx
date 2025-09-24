@@ -100,9 +100,20 @@ export default function StoriesSection() {
     try {
       console.log('Fetching property videos from Supabase...');
       
+      // First try direct property fetch to see what's available
+      console.log('Fetching properties directly from database...');
+      const { data: allProperties, error: directError } = await supabase
+        .from('properties')
+        .select('id, title, seller_id, video_url')
+        .limit(5);
+      
+      console.log('Direct properties fetch result:', { allProperties, directError });
+      
       // Use the new synchronized function to get listings with current seller profiles
       const { data: listingsWithProfiles, error: syncError } = await supabase
         .rpc('get_listings_with_current_seller_profile');
+
+      console.log('Synchronized function result:', { listingsWithProfiles, syncError });
 
       if (syncError) {
         console.error('Error fetching synchronized listings:', syncError);
