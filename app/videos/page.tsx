@@ -305,6 +305,30 @@ export default function VideosPage() {
     { name: 'Account', icon: User, href: isAuthenticated ? '/account' : '/auth/signin' },
   ];
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <div className="text-white text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
+          <p>Loading property videos...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (propertyVideos.length === 0) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <div className="text-white text-center">
+          <p className="text-lg mb-4">No property videos available</p>
+          <Link href="/" className="text-blue-400 underline">
+            Go back to home
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="fixed inset-0 bg-black">
       {/* Header */}
