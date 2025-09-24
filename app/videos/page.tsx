@@ -216,15 +216,15 @@ export default function VideosPage() {
   }, []);
 
   useEffect(() => {
-    if (startId) {
-      const index = mockPropertyVideos.findIndex(video => video.id === startId);
+    if (startId && propertyVideos.length > 0) {
+      const index = propertyVideos.findIndex(video => video.id === startId);
       if (index !== -1) {
         setCurrentIndex(index);
         setIsPaused(false);
         setShowPlayOverlay(false);
       }
     }
-  }, [startId]);
+  }, [startId, propertyVideos]);
 
   useEffect(() => {
     // Play current video and pause others
