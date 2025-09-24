@@ -100,75 +100,38 @@ export default function StoriesSection() {
     try {
       console.log('Fetching property videos from Supabase...');
       
-      // First, try to fetch properties with videos
-      const { data: properties, error: propertiesError } = await supabase
-        .from('properties')
-        .select(`
-          id,
-          title,
-          location,
-          price,
-          currency,
-          beds,
-          baths,
-          area,
-          video_url,
-          images,
-          description,
-          seller_id
-        `)
-        .not('video_url', 'is', null)
-        .order('created_at', { ascending: false });
+      // Use the new synchronized function to get listings with current seller profiles
+      const { data: listingsWithProfiles, error: syncError } = await supabase
+        .rpc('get_listings_with_current_seller_profile');
 
-      if (propertiesError) {
-        console.error('Error fetching properties:', propertiesError);
+      if (syncError) {
+        console.error('Error fetching synchronized listings:', syncError);
         setLoading(false);
         return;
       }
 
-      // Then fetch profiles separately to avoid foreign key issues
-      const sellerIds = properties?.map(p => p.seller_id).filter(Boolean) || [];
-      let profiles: any[] = [];
-      
-      if (sellerIds.length > 0) {
-        try {
-          const { data: profilesData, error: profilesError } = await supabase
-            .from('profiles')
-            .select('id, full_name, avatar_url')
-            .in('id', sellerIds);
+      console.log('Fetched synchronized listings:', listingsWithProfiles);
 
-          if (!profilesError && profilesData) {
-            profiles = profilesData;
-          }
-        } catch (profileError) {
-          console.error('Error fetching profiles:', profileError);
-        }
-      }
-
-      console.log('Fetched properties:', properties);
-      console.log('Fetched profiles:', profiles);
-
-      // Transform the data to match the expected format
-      const transformedVideos = properties?.map((property: any) => {
-        const profile = profiles.find(p => p.id === property.seller_id);
+      // Transform the synchronized data to match the expected format
+      const transformedVideos = listingsWithProfiles?.map((listing: any) => {
         return {
-          id: property.id,
-          title: property.title,
-          location: property.location,
-          price: property.price,
-          currency: property.currency,
-          beds: property.beds,
-          baths: property.baths,
-          area: property.area,
-          seller_id: property.seller_id,
-          videoUrl: property.video_url,
-          thumbnail: property.images?.[0] || 'https://images.pexels.com/photos/1918291/pexels-photo-1918291.jpeg?w=200&h=300&fit=crop',
-          description: property.description,
+          id: listing.listing_id,
+          title: listing.listing_title,
+          location: listing.listing_location,
+          price: listing.listing_price,
+          currency: listing.listing_currency,
+          beds: listing.listing_beds,
+          baths: listing.listing_baths,
+          area: listing.listing_area,
+          seller_id: listing.seller_id,
+          videoUrl: listing.listing_video_url,
+          thumbnail: listing.listing_images?.[0] || 'https://images.pexels.com/photos/1918291/pexels-photo-1918291.jpeg?w=200&h=300&fit=crop',
+          description: listing.listing_description,
           agent: {
-            name: profile?.full_name || 'Property Seller',
-            avatar: profile?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(profile?.full_name || 'Property Seller')}&background=D12C1D&color=fff&size=100`,
-            phone: '+356 9999 1234', // Default phone
-            id: property.seller_id,
+            name: listing.seller_name || 'Property Seller',
+            avatar: listing.seller_avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(listing.seller_name || 'Property Seller')}&background=D12C1D&color=fff&size=100`,
+            phone: listing.seller_phone || '+356 9999 1234',
+            id: listing.seller_id,
           }
         };
       }) || [];
