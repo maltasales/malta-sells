@@ -96,7 +96,7 @@ export default function VideosPage() {
 
   useEffect(() => {
     if (startId) {
-      const index = propertyVideos.findIndex(video => video.id === startId);
+      const index = mockPropertyVideos.findIndex(video => video.id === startId);
       if (index !== -1) {
         setCurrentIndex(index);
         setIsPaused(false);
