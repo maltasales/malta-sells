@@ -330,7 +330,7 @@ export default function VideosPage() {
             display: none;
           }
         `}</style>
-        {mockPropertyVideos.map((video, index) => (
+        {propertyVideos.map((video, index) => (
           <div key={video.id} className="h-screen snap-start snap-always relative flex items-center justify-center">
             <video
               ref={(el) => (videoRefs.current[index] = el)}
