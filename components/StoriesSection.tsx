@@ -80,7 +80,7 @@ const mockPropertyVideos = [
     thumbnail: 'https://images.pexels.com/photos/1918291/pexels-photo-1918291.jpeg?w=200&h=300&fit=crop',
     description: 'Charming villa by the sea in the picturesque fishing village of Marsaxlokk. Features a private garden and stunning sea views.',
     agent: {
-      name: 'Maria Santos',
+      name: 'Maria Santos Realty',
       avatar: 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?w=100&h=100&fit=crop&crop=face',
       phone: '+356 9999 4321',
       id: '4'
