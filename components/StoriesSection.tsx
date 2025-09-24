@@ -40,7 +40,7 @@ const mockPropertyVideos = [
     thumbnail: 'https://images.pexels.com/photos/323780/pexels-photo-323780.jpeg?w=200&h=300&fit=crop',
     description: 'Stunning penthouse with panoramic views of Valletta harbor. Features luxury finishes and a private terrace perfect for entertaining.',
     agent: {
-      name: 'Anhoch',
+      name: 'Anhoch Property Agent',
       avatar: 'https://images.pexels.com/photos/697509/pexels-photo-697509.jpeg?w=100&h=100&fit=crop&crop=face',
       phone: '+356 9999 5678',
       id: '2'
