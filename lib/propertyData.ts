@@ -44,7 +44,7 @@ export const propertyData = {
       'https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?w=800&h=600&fit=crop',
       'https://images.pexels.com/photos/1571460/pexels-photo-1571460.jpeg?w=800&h=600&fit=crop',
     ],
-    videoUrl: 'https://media.w3.org/2010/05/sintel/trailer_hd.mp4',
+    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
     description: 'Stunning penthouse with panoramic views of Valletta harbor. Features luxury finishes and a private terrace perfect for entertaining.',
     amenities: ['WiFi', 'Air Conditioning', 'Private Terrace', 'Sea View', 'Elevator', 'Premium Finishes'],
     owner: {
