@@ -52,7 +52,7 @@ const propertyVideos = [
     beds: 1,
     baths: 1,
     area: 45,
-    videoUrl: 'https://sample-videos.com/zip/10/mp4/SampleVideo_640x360_1mb.mp4',
+    videoUrl: 'https://media.w3.org/2010/05/bunny/trailer.mp4',
     description: 'Perfect starter home in the vibrant St. Julians area. Close to restaurants, nightlife, and public transport.',
     agent: {
       name: 'Cristiano Ronaldo',
