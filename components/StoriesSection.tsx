@@ -146,6 +146,7 @@ export default function StoriesSection() {
       }
 
       console.log('Fetched properties:', properties);
+      console.log('Fetched profiles:', profiles);
 
       // Transform the data to match the expected format
       const transformedVideos = properties?.map((property: any) => {
