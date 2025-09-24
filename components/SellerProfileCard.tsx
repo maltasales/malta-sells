@@ -70,7 +70,7 @@ export default function SellerProfileCard({ user }: SellerProfileCardProps) {
       // Update the user profile in database via Supabase
       const { error: updateError } = await supabase
         .from('profiles')
-        .update({ banner_url: publicUrl })
+        .update({ banner_url: base64Url })
         .eq('id', user.id);
 
       if (updateError) {
@@ -80,12 +80,12 @@ export default function SellerProfileCard({ user }: SellerProfileCardProps) {
 
       // Update local auth state
       if (updateUserProfile) {
-        await updateUserProfile({ banner_url: publicUrl });
+        await updateUserProfile({ banner_url: base64Url });
       }
       
       // Clean up temp URL and set permanent URL
       URL.revokeObjectURL(tempUrl);
-      setCurrentBannerUrl(publicUrl);
+      setCurrentBannerUrl(base64Url);
       
     } catch (error) {
       console.error('Error uploading banner:', error);
