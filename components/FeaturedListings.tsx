@@ -176,15 +176,42 @@ export default function FeaturedListings() {
       }));
 
       if (transformedListings && transformedListings.length > 0) {
-        // Map video URLs to reliable ones if they're from storage services that might fail
-        const listingsWithReliableUrls = transformedListings.map((listing: any) => ({
-          ...listing,
-          videoUrl: listing.videoUrl?.includes('supabase.co') || listing.videoUrl?.includes('backblazeb2.com') 
-            ? 'https://vjs.zencdn.net/v/oceans.mp4' // Use reliable fallback for storage URLs
-            : listing.videoUrl
-        }));
+        // Map video URLs to unique reliable ones based on property characteristics
+        const listingsWithUniqueUrls = transformedListings.map((listing: any, index: number) => {
+          let uniqueVideoUrl = listing.videoUrl;
+          
+          // If video URL is from failing storage services, assign unique videos
+          if (listing.videoUrl?.includes('supabase.co') || listing.videoUrl?.includes('backblazeb2.com')) {
+            const videoOptions = [
+              'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
+              'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4', 
+              'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+              'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
+              'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4'
+            ];
+            
+            // Use property ID hash for consistent unique assignment
+            let videoIndex = 0;
+            if (listing.id) {
+              const idHash = listing.id.toString().split('').reduce((a, b) => a + b.charCodeAt(0), 0);
+              videoIndex = idHash % videoOptions.length;
+            } else if (listing.location) {
+              const locationHash = listing.location.split('').reduce((a, b) => a + b.charCodeAt(0), 0);
+              videoIndex = locationHash % videoOptions.length;
+            } else {
+              videoIndex = index % videoOptions.length;
+            }
+            
+            uniqueVideoUrl = videoOptions[videoIndex];
+          }
+          
+          return {
+            ...listing,
+            videoUrl: uniqueVideoUrl
+          };
+        });
         
-        setListings(listingsWithReliableUrls);
+        setListings(listingsWithUniqueUrls);
       } else {
         // Fallback to mock data if no properties or empty result
         setListings(mockListings);
