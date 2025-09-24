@@ -16,7 +16,7 @@ const propertyVideos = [
     beds: 2,
     baths: 1,
     area: 85,
-    videoUrl: 'https://vjs.zencdn.net/v/oceans.mp4',
+    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
     description: 'Beautiful modern apartment for sale located in the heart of Sliema. This stylish property features contemporary design and is just minutes from the seafront.',
     agent: {
       name: 'Caio Ferraz',
@@ -34,10 +34,10 @@ const propertyVideos = [
     beds: 3,
     baths: 2,
     area: 120,
-    videoUrl: 'https://media.w3.org/2010/05/sintel/trailer_hd.mp4',
+    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
     description: 'Stunning penthouse with panoramic views of Valletta harbor. Features luxury finishes and a private terrace perfect for entertaining.',
     agent: {
-      name: 'Anhoch',
+      name: 'Anhoch Property Agent',
       avatar: 'https://images.pexels.com/photos/697509/pexels-photo-697509.jpeg?w=100&h=100&fit=crop&crop=face',
       phone: '+356 9999 5678',
       id: '2'
@@ -52,10 +52,10 @@ const propertyVideos = [
     beds: 1,
     baths: 1,
     area: 45,
-    videoUrl: 'https://media.w3.org/2010/05/bunny/trailer.mp4',
+    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
     description: 'Perfect starter home in the vibrant St. Julians area. Close to restaurants, nightlife, and public transport.',
     agent: {
-      name: 'Cristiano Ronaldo',
+      name: 'Cristiano Malta Homes',
       avatar: 'https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?w=100&h=100&fit=crop&crop=face',
       phone: '+356 9999 9999',
       id: '3'
@@ -70,10 +70,10 @@ const propertyVideos = [
     beds: 3,
     baths: 2,
     area: 150,
-    videoUrl: 'https://media.w3.org/2010/05/video/movie_300.mp4',
+    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
     description: 'Charming villa by the sea in the picturesque fishing village of Marsaxlokk. Features a private garden and stunning sea views.',
     agent: {
-      name: 'Maria Santos',
+      name: 'Maria Santos Realty',
       avatar: 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?w=100&h=100&fit=crop&crop=face',
       phone: '+356 9999 4321',
       id: '4'
