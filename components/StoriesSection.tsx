@@ -16,7 +16,7 @@ const mockPropertyVideos = [
     baths: 1,
     area: 85,
     seller_id: '1',
-    videoUrl: 'https://vjs.zencdn.net/v/oceans.mp4',
+    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
     thumbnail: 'https://images.pexels.com/photos/1918291/pexels-photo-1918291.jpeg?w=200&h=300&fit=crop',
     description: 'Beautiful modern apartment for sale located in the heart of Sliema. This stylish property features contemporary design and is just minutes from the seafront.',
     agent: {
