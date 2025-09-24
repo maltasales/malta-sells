@@ -7,7 +7,8 @@ import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/lib/supabase';
 
-const propertyVideos = [
+// Mock data as fallback - same format as the home page
+const mockPropertyVideos = [
   {
     id: '1',
     title: 'Modern Apartment in Sliema',
@@ -20,8 +21,8 @@ const propertyVideos = [
     videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
     description: 'Beautiful modern apartment for sale located in the heart of Sliema. This stylish property features contemporary design and is just minutes from the seafront.',
     agent: {
-      name: 'Caio Ferraz',
-      avatar: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?w=100&h=100&fit=crop&crop=face',
+      name: 'Zoran Talevski',
+      avatar: 'https://ui-avatars.com/api/?name=Zoran%20Talevski&background=D12C1D&color=fff&size=100',
       phone: '+356 9999 1234',
       id: '1'
     }
@@ -38,8 +39,8 @@ const propertyVideos = [
     videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
     description: 'Stunning penthouse with panoramic views of Valletta harbor. Features luxury finishes and a private terrace perfect for entertaining.',
     agent: {
-      name: 'Anhoch Property Agent',
-      avatar: 'https://images.pexels.com/photos/697509/pexels-photo-697509.jpeg?w=100&h=100&fit=crop&crop=face',
+      name: 'Maria Santos Realty',
+      avatar: 'https://ui-avatars.com/api/?name=Maria%20Santos%20Realty&background=D12C1D&color=fff&size=100',
       phone: '+356 9999 5678',
       id: '2'
     }
@@ -57,7 +58,7 @@ const propertyVideos = [
     description: 'Perfect starter home in the vibrant St. Julians area. Close to restaurants, nightlife, and public transport.',
     agent: {
       name: 'Cristiano Malta Homes',
-      avatar: 'https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?w=100&h=100&fit=crop&crop=face',
+      avatar: 'https://ui-avatars.com/api/?name=Cristiano%20Malta%20Homes&background=D12C1D&color=fff&size=100',
       phone: '+356 9999 9999',
       id: '3'
     }
@@ -74,8 +75,8 @@ const propertyVideos = [
     videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
     description: 'Charming villa by the sea in the picturesque fishing village of Marsaxlokk. Features a private garden and stunning sea views.',
     agent: {
-      name: 'Maria Santos Realty',
-      avatar: 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?w=100&h=100&fit=crop&crop=face',
+      name: 'John Doe Properties',
+      avatar: 'https://ui-avatars.com/api/?name=John%20Doe%20Properties&background=D12C1D&color=fff&size=100',
       phone: '+356 9999 4321',
       id: '4'
     }
