@@ -106,6 +106,73 @@ export default function StoriesSection() {
 
       if (syncError) {
         console.error('Error fetching synchronized listings:', syncError);
+        console.log('Falling back to direct property fetch due to sync error...');
+        
+        // Fallback to direct fetch if RPC function fails
+        const { data: properties, error: propertiesError } = await supabase
+          .from('properties')
+          .select(`
+            id,
+            title,
+            location,
+            price,
+            currency,
+            beds,
+            baths,
+            area,
+            video_url,
+            images,
+            description,
+            seller_id
+          `)
+          .not('video_url', 'is', null)
+          .order('created_at', { ascending: false });
+
+        if (propertiesError) {
+          console.error('Error fetching properties fallback:', propertiesError);
+          setLoading(false);
+          return;
+        }
+
+        // Fetch profiles for fallback
+        const sellerIds = properties?.map(p => p.seller_id).filter(Boolean) || [];
+        let profiles: any[] = [];
+        
+        if (sellerIds.length > 0) {
+          const { data: profilesData } = await supabase
+            .from('profiles')
+            .select('id, full_name, avatar_url, phone')
+            .in('id', sellerIds);
+          profiles = profilesData || [];
+        }
+
+        // Transform fallback data
+        const fallbackVideos = properties?.map((property: any) => {
+          const profile = profiles.find(p => p.id === property.seller_id);
+          return {
+            id: property.id,
+            title: property.title,
+            location: property.location,
+            price: property.price,
+            currency: property.currency,
+            beds: property.beds,
+            baths: property.baths,
+            area: property.area,
+            seller_id: property.seller_id,
+            videoUrl: property.video_url,
+            thumbnail: property.images?.[0] || 'https://images.pexels.com/photos/1918291/pexels-photo-1918291.jpeg?w=200&h=300&fit=crop',
+            description: property.description,
+            agent: {
+              name: profile?.full_name || 'Property Seller',
+              avatar: profile?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(profile?.full_name || 'Property Seller')}&background=D12C1D&color=fff&size=100`,
+              phone: profile?.phone || '+356 9999 1234',
+              id: property.seller_id,
+            }
+          };
+        }) || [];
+
+        console.log('Using fallback data:', fallbackVideos);
+        setPropertyVideos(fallbackVideos.length > 0 ? fallbackVideos : mockPropertyVideos);
         setLoading(false);
         return;
       }
