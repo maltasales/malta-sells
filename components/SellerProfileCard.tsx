@@ -122,22 +122,57 @@ export default function SellerProfileCard({ user }: SellerProfileCardProps) {
       alert('Image must be less than 5MB');
       return;
     }
+    
     setIsUploadingAvatar(true);
     try {
-      // Create a URL for the uploaded file
-      const imageUrl = URL.createObjectURL(file);
+      // Create a temporary preview URL for immediate UI feedback
+      const tempUrl = URL.createObjectURL(file);
+      setCurrentAvatarUrl(tempUrl);
       
-      // Update the avatar URL in state immediately for UI feedback
-      setCurrentAvatarUrl(imageUrl);
-      
-      // Update the user profile
-      if (updateUserProfile) {
-        await updateUserProfile({ avatar_url: imageUrl });
+      // Upload to Supabase Storage
+      const fileName = `avatar_${user.id}_${Date.now()}.${file.name.split('.').pop()}`;
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('profile-images')
+        .upload(fileName, file, {
+          cacheControl: '3600',
+          upsert: true
+        });
+
+      if (uploadError) {
+        console.error('Upload error:', uploadError);
+        throw new Error('Failed to upload image');
       }
+
+      // Get the public URL
+      const { data: urlData } = supabase.storage
+        .from('profile-images')
+        .getPublicUrl(fileName);
+
+      const publicUrl = urlData.publicUrl;
+
+      // Update the user profile in database via Supabase
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ avatar_url: publicUrl })
+        .eq('id', user.id);
+
+      if (updateError) {
+        console.error('Profile update error:', updateError);
+        throw new Error('Failed to update profile');
+      }
+
+      // Update local auth state
+      if (updateUserProfile) {
+        await updateUserProfile({ avatar_url: publicUrl });
+      }
+      
+      // Clean up temp URL and set permanent URL
+      URL.revokeObjectURL(tempUrl);
+      setCurrentAvatarUrl(publicUrl);
       
     } catch (error) {
       console.error('Error uploading avatar:', error);
-      alert('Failed to upload avatar image');
+      alert('Failed to upload avatar image. Please try again.');
       // Revert on error
       setCurrentAvatarUrl(user.avatar_url);
     } finally {
