@@ -228,6 +228,7 @@ export default function SellerProfileCard({ user }: SellerProfileCardProps) {
         <div className="relative -mt-12 mb-4">
           <div 
             onClick={handleAvatarClick}
+            data-testid="avatar-upload-area"
             className="w-24 h-24 rounded-full border-4 border-white bg-white shadow-lg overflow-hidden cursor-pointer group relative"
           >
             {currentAvatarUrl ? (
