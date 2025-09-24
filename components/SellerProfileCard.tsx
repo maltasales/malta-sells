@@ -4,6 +4,7 @@ import { User, ExternalLink, BadgeCheck } from 'lucide-react';
 import Link from 'next/link';
 import { useRef, useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/lib/supabase';
 
 interface SellerProfileCardProps {
   user: {
