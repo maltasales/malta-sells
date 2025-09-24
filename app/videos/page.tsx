@@ -300,9 +300,9 @@ export default function VideosPage() {
 
   const navItems = [
     { name: 'Explore', icon: Search, href: '/' },
-    { name: 'Wishlists', icon: Heart, href: isAuthenticated ? '/wishlists' : '/auth/signin' },
+    { name: 'Wishlists', icon: Heart, href: user ? '/wishlists' : '/auth/signin' },
     { name: 'Services', icon: Settings, href: '/services' },
-    { name: 'Account', icon: User, href: isAuthenticated ? '/account' : '/auth/signin' },
+    { name: 'Account', icon: User, href: user ? '/account' : '/auth/signin' },
   ];
 
   if (loading) {
