@@ -131,13 +131,17 @@ export default function StoriesSection() {
       let profiles: any[] = [];
       
       if (sellerIds.length > 0) {
-        const { data: profilesData, error: profilesError } = await supabase
-          .from('profiles')
-          .select('id, full_name, avatar_url')
-          .in('id', sellerIds);
+        try {
+          const { data: profilesData, error: profilesError } = await supabase
+            .from('profiles')
+            .select('id, full_name, avatar_url')
+            .in('id', sellerIds);
 
-        if (!profilesError && profilesData) {
-          profiles = profilesData;
+          if (!profilesError && profilesData) {
+            profiles = profilesData;
+          }
+        } catch (profileError) {
+          console.error('Error fetching profiles:', profileError);
         }
       }
 
