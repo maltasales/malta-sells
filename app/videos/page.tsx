@@ -84,15 +84,17 @@ const mockPropertyVideos = [
 ];
 
 export default function VideosPage() {
-  const searchParams = useSearchParams();
-  const { isAuthenticated } = useAuth();
-  const startId = searchParams.get('start');
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [showPlayOverlay, setShowPlayOverlay] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
+  const [propertyVideos, setPropertyVideos] = useState(mockPropertyVideos);
+  const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
+  const searchParams = useSearchParams();
+  const startId = searchParams?.get('start');
 
   useEffect(() => {
     if (startId) {
