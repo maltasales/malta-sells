@@ -36,7 +36,7 @@ const mockPropertyVideos = [
     beds: 3,
     baths: 2,
     area: 120,
-    videoUrl: 'https://media.w3.org/2010/05/sintel/trailer_hd.mp4',
+    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
     thumbnail: 'https://images.pexels.com/photos/323780/pexels-photo-323780.jpeg?w=200&h=300&fit=crop',
     description: 'Stunning penthouse with panoramic views of Valletta harbor. Features luxury finishes and a private terrace perfect for entertaining.',
     agent: {
