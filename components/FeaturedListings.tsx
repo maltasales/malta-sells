@@ -210,6 +210,30 @@ export default function FeaturedListings() {
 
       console.log('Fetched synchronized featured listings:', syncedListings);
 
+      if (!syncedListings || syncedListings.length === 0) {
+        console.log('No synchronized featured listings found, using mock data...');
+        
+        // Use mock data with proper seller information
+        const updatedMockListings = mockListings.map((listing, index) => {
+          const sellerNames = ['Zoran Talevski', 'Maria Santos Realty', 'Anhoch Property Agent', 'Cristiano Malta Homes'];
+          const sellerName = sellerNames[index % sellerNames.length];
+          
+          return {
+            ...listing,
+            seller: {
+              name: sellerName,
+              avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(sellerName)}&background=D12C1D&color=fff&size=100`,
+              phone: '+356 9999 1234',
+              id: `seller-${index + 1}`
+            }
+          };
+        });
+        
+        setListings(updatedMockListings);
+        setLoading(false);
+        return;
+      }
+
       // Transform the synchronized data to match expected format
       const transformedListings = syncedListings?.slice(0, 8).map((listing: any) => ({
         id: listing.listing_id,
