@@ -34,7 +34,7 @@ const propertyVideos = [
     beds: 3,
     baths: 2,
     area: 120,
-    videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
+    videoUrl: 'https://media.w3.org/2010/05/sintel/trailer_hd.mp4',
     description: 'Stunning penthouse with panoramic views of Valletta harbor. Features luxury finishes and a private terrace perfect for entertaining.',
     agent: {
       name: 'Anhoch',
