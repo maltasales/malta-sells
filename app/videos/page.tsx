@@ -296,7 +296,7 @@ export default function VideosPage() {
     }
   };
 
-  const currentVideo = mockPropertyVideos[currentIndex];
+  const currentVideo = propertyVideos[currentIndex];
 
   const navItems = [
     { name: 'Explore', icon: Search, href: '/' },
