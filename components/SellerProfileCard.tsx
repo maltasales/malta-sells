@@ -191,6 +191,7 @@ export default function SellerProfileCard({ user }: SellerProfileCardProps) {
       <div className="relative h-32 group">
         <div 
           onClick={handleBannerClick}
+          data-testid="banner-upload-area"
           className="w-full h-full cursor-pointer relative overflow-hidden"
         >
           {currentBannerUrl ? (
