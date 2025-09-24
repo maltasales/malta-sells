@@ -75,7 +75,7 @@ export const propertyData = {
     description: 'Perfect starter home in the vibrant St. Julians area. Close to restaurants, nightlife, and public transport.',
     amenities: ['WiFi', 'Air Conditioning', 'Compact Design', 'Central Location', 'Modern Appliances', 'Security'],
     owner: {
-      name: 'Cristiano Ronaldo',
+      name: 'Cristiano Malta Homes',
       avatar: 'https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?w=100&h=100&fit=crop&crop=face',
       phone: '+356 9999 9999',
       email: 'cristiano@example.com'
