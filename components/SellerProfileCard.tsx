@@ -132,7 +132,7 @@ export default function SellerProfileCard({ user }: SellerProfileCardProps) {
       // Update the user profile in database via Supabase
       const { error: updateError } = await supabase
         .from('profiles')
-        .update({ avatar_url: publicUrl })
+        .update({ avatar_url: base64Url })
         .eq('id', user.id);
 
       if (updateError) {
@@ -142,12 +142,12 @@ export default function SellerProfileCard({ user }: SellerProfileCardProps) {
 
       // Update local auth state
       if (updateUserProfile) {
-        await updateUserProfile({ avatar_url: publicUrl });
+        await updateUserProfile({ avatar_url: base64Url });
       }
       
       // Clean up temp URL and set permanent URL
       URL.revokeObjectURL(tempUrl);
-      setCurrentAvatarUrl(publicUrl);
+      setCurrentAvatarUrl(base64Url);
       
     } catch (error) {
       console.error('Error uploading avatar:', error);
