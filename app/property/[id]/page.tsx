@@ -14,7 +14,40 @@ async function getProperty(id: string) {
   try {
     console.log('Fetching property:', id);
     
-    // First, try to fetch from Supabase
+    // First, try to get synchronized listing with profile data
+    const { data: listingsWithProfiles } = await supabase
+      .rpc('get_listings_with_current_seller_profile');
+
+    // Find the specific property in synchronized results
+    const syncedProperty = listingsWithProfiles?.find((listing: any) => listing.listing_id === id);
+
+    if (syncedProperty) {
+      // Use synchronized data with current seller profile
+      return {
+        id: syncedProperty.listing_id,
+        title: syncedProperty.listing_title,
+        location: syncedProperty.listing_location,
+        price: syncedProperty.listing_price,
+        currency: syncedProperty.listing_currency,
+        beds: syncedProperty.listing_beds,
+        baths: syncedProperty.listing_baths,
+        area: syncedProperty.listing_area,
+        type: syncedProperty.property_type || 'Apartment',
+        description: syncedProperty.listing_description,
+        images: syncedProperty.listing_images || [],
+        videoUrl: syncedProperty.listing_video_url,
+        availableFrom: 'Available Now',
+        amenities: ['WiFi', 'Air Conditioning', 'Parking', 'Modern Appliances'],
+        owner: {
+          name: syncedProperty.seller_name || 'Property Owner',
+          avatar: syncedProperty.seller_avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(syncedProperty.seller_name || 'Property Owner')}&background=D12C1D&color=fff&size=100`,
+          phone: syncedProperty.seller_phone || '+356 9999 0000',
+          email: 'owner@maltasells.com'
+        }
+      };
+    }
+
+    // Fallback: try direct property fetch
     const { data: property, error: propertyError } = await supabase
       .from('properties')
       .select(`
@@ -68,7 +101,7 @@ async function getProperty(id: string) {
         amenities: ['WiFi', 'Air Conditioning', 'Parking', 'Modern Appliances'], // Default amenities
         owner: {
           name: profile?.full_name || 'Property Owner',
-          avatar: profile?.avatar_url || 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?w=100&h=100&fit=crop&crop=face',
+          avatar: profile?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(profile?.full_name || 'Property Owner')}&background=D12C1D&color=fff&size=100`,
           phone: profile?.phone || '+356 9999 0000',
           email: 'owner@maltasells.com'
         }
