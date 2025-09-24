@@ -96,6 +96,125 @@ export default function VideosPage() {
   const searchParams = useSearchParams();
   const startId = searchParams?.get('start');
 
+  // Fetch real property videos from Supabase
+  const fetchPropertyVideos = async () => {
+    try {
+      console.log('Fetching property videos for full-screen player...');
+      
+      // Try to use the synchronized function first
+      const { data: syncedListings, error: syncError } = await supabase
+        .rpc('get_listings_with_current_seller_profile');
+
+      if (!syncError && syncedListings && syncedListings.length > 0) {
+        console.log('Using synchronized property data:', syncedListings);
+        
+        // Transform synchronized data to match expected format
+        const transformedVideos = syncedListings.map((listing: any) => ({
+          id: listing.listing_id,
+          title: listing.listing_title,
+          location: listing.listing_location,
+          price: listing.listing_price,
+          currency: listing.listing_currency,
+          beds: listing.listing_beds,
+          baths: listing.listing_baths,
+          area: listing.listing_area,
+          videoUrl: listing.listing_video_url,
+          description: listing.listing_description,
+          agent: {
+            name: listing.seller_name || 'Property Seller',
+            avatar: listing.seller_avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(listing.seller_name || 'Property Seller')}&background=D12C1D&color=fff&size=100`,
+            phone: listing.seller_phone || '+356 9999 1234',
+            id: listing.seller_id,
+          }
+        }));
+        
+        setPropertyVideos(transformedVideos);
+        setLoading(false);
+        return;
+      }
+
+      // Fallback to direct property fetch
+      console.log('Falling back to direct property fetch...');
+      const { data: properties, error: directError } = await supabase
+        .from('properties')
+        .select(`
+          id,
+          title,
+          location,
+          price,
+          currency,
+          beds,
+          baths,
+          area,
+          video_url,
+          images,
+          description,
+          seller_id
+        `)
+        .not('video_url', 'is', null)
+        .order('created_at', { ascending: false });
+
+      if (directError) {
+        console.error('Error fetching properties:', directError);
+        console.log('Using mock data as final fallback...');
+        setLoading(false);
+        return;
+      }
+
+      if (properties && properties.length > 0) {
+        // Fetch seller profiles
+        const sellerIds = properties.map(p => p.seller_id).filter(Boolean);
+        let profiles: any[] = [];
+        
+        if (sellerIds.length > 0) {
+          const { data: profilesData } = await supabase
+            .from('profiles')
+            .select('id, full_name, avatar_url, phone')
+            .in('id', sellerIds);
+          profiles = profilesData || [];
+        }
+
+        // Transform direct fetch data
+        const transformedVideos = properties.map((property: any) => {
+          const profile = profiles.find(p => p.id === property.seller_id);
+          return {
+            id: property.id,
+            title: property.title,
+            location: property.location,
+            price: property.price,
+            currency: property.currency,
+            beds: property.beds,
+            baths: property.baths,
+            area: property.area,
+            videoUrl: property.video_url,
+            description: property.description,
+            agent: {
+              name: profile?.full_name || 'Property Seller',
+              avatar: profile?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(profile?.full_name || 'Property Seller')}&background=D12C1D&color=fff&size=100`,
+              phone: profile?.phone || '+356 9999 1234',
+              id: property.seller_id,
+            }
+          };
+        });
+
+        console.log('Using direct property fetch data:', transformedVideos);
+        setPropertyVideos(transformedVideos);
+      } else {
+        console.log('No properties found, keeping mock data...');
+      }
+
+    } catch (error) {
+      console.error('Error in fetchPropertyVideos:', error);
+      console.log('Using mock data due to error...');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchPropertyVideos();
+  }, []);
+
   useEffect(() => {
     if (startId) {
       const index = mockPropertyVideos.findIndex(video => video.id === startId);
