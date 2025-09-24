@@ -83,16 +83,30 @@ export default function PropertyVideoCard({ video }: PropertyVideoCardProps) {
                 muted
                 loop
                 playsInline
+                preload="metadata"
                 onPlay={() => setIsPlaying(true)}
                 onPause={() => setIsPlaying(false)}
-                onError={() => setVideoError(true)}
+                onError={(e) => {
+                  console.error('Video error:', e);
+                  setVideoError(true);
+                }}
+                onLoadStart={() => console.log('Video loading started:', video.videoUrl)}
+                onCanPlay={() => console.log('Video can play:', video.videoUrl)}
               />
             ) : (
-              <img
-                src={video.thumbnail}
-                alt={video.title}
-                className="w-full h-full object-cover"
-              />
+              <div className="relative w-full h-full">
+                <img
+                  src={video.thumbnail}
+                  alt={video.title}
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 flex items-center justify-center bg-black/50">
+                  <div className="text-white text-center">
+                    <Play className="w-8 h-8 mx-auto mb-2" />
+                    <p className="text-xs">Video unavailable</p>
+                  </div>
+                </div>
+              </div>
             )}
             
             {/* Hover overlay with subtle animation */}
