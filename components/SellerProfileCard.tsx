@@ -119,26 +119,15 @@ export default function SellerProfileCard({ user }: SellerProfileCardProps) {
       const tempUrl = URL.createObjectURL(file);
       setCurrentAvatarUrl(tempUrl);
       
-      // Upload to Supabase Storage
-      const fileName = `avatar_${user.id}_${Date.now()}.${file.name.split('.').pop()}`;
-      const { data: uploadData, error: uploadError } = await supabase.storage
-        .from('profile-images')
-        .upload(fileName, file, {
-          cacheControl: '3600',
-          upsert: true
-        });
-
-      if (uploadError) {
-        console.error('Upload error:', uploadError);
-        throw new Error('Failed to upload image');
-      }
-
-      // Get the public URL
-      const { data: urlData } = supabase.storage
-        .from('profile-images')
-        .getPublicUrl(fileName);
-
-      const publicUrl = urlData.publicUrl;
+      // Convert to base64 for storage
+      const reader = new FileReader();
+      const base64Promise = new Promise<string>((resolve, reject) => {
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+      
+      const base64Url = await base64Promise;
 
       // Update the user profile in database via Supabase
       const { error: updateError } = await supabase
