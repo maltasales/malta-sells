@@ -48,7 +48,7 @@ export const propertyData = {
     description: 'Stunning penthouse with panoramic views of Valletta harbor. Features luxury finishes and a private terrace perfect for entertaining.',
     amenities: ['WiFi', 'Air Conditioning', 'Private Terrace', 'Sea View', 'Elevator', 'Premium Finishes'],
     owner: {
-      name: 'Anhoch',
+      name: 'Anhoch Property Agent',
       avatar: 'https://images.pexels.com/photos/697509/pexels-photo-697509.jpeg?w=100&h=100&fit=crop&crop=face',
       phone: '+356 9999 5678',
       email: 'anhoch@example.com'
