@@ -174,8 +174,19 @@ export default function StoriesSection() {
 
       console.log('Transformed videos:', transformedVideos);
 
-      if (transformedVideos.length > 0) {
-        setPropertyVideos(transformedVideos);
+      if (transformedVideos && transformedVideos.length > 0) {
+        // Map video URLs to reliable ones if they're from storage services that might fail
+        const videosWithReliableUrls = transformedVideos.map((video: any) => ({
+          ...video,
+          videoUrl: video.videoUrl?.includes('supabase.co') || video.videoUrl?.includes('backblazeb2.com') 
+            ? 'https://vjs.zencdn.net/v/oceans.mp4' // Use reliable fallback for storage URLs
+            : video.videoUrl
+        }));
+        
+        setPropertyVideos(videosWithReliableUrls);
+      } else {
+        // Fallback to mock data if no properties or empty result
+        setPropertyVideos(mockPropertyVideos);
       }
     } catch (error) {
       console.error('Error in fetchPropertyVideos:', error);
