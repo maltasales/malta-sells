@@ -136,6 +136,74 @@ export default function FeaturedListings() {
 
       if (syncError) {
         console.error('Error fetching synchronized featured listings:', syncError);
+        console.log('Falling back to direct property fetch for featured listings...');
+        
+        // Fallback to direct fetch if RPC function fails
+        const { data: properties, error: propertiesError } = await supabase
+          .from('properties')
+          .select(`
+            id,
+            title,
+            location,
+            price,
+            currency,
+            beds,
+            baths,
+            property_type,
+            images,
+            video_url,
+            available_from,
+            created_at,
+            seller_id
+          `)
+          .order('created_at', { ascending: false })
+          .limit(8);
+
+        if (propertiesError) {
+          console.error('Error fetching properties fallback:', propertiesError);
+          setLoading(false);
+          return;
+        }
+
+        // Fetch profiles for fallback
+        const sellerIds = properties?.map(p => p.seller_id).filter(Boolean) || [];
+        let profiles: any[] = [];
+        
+        if (sellerIds.length > 0) {
+          const { data: profilesData } = await supabase
+            .from('profiles')
+            .select('id, full_name, avatar_url, phone')
+            .in('id', sellerIds);
+          profiles = profilesData || [];
+        }
+
+        // Transform fallback data
+        const fallbackListings = properties?.map((property: any) => {
+          const profile = profiles.find(p => p.id === property.seller_id);
+          return {
+            id: property.id,
+            title: property.title,
+            location: property.location,
+            price: property.price,
+            currency: property.currency || '€',
+            beds: property.beds,
+            baths: property.baths,
+            type: property.property_type,
+            images: property.images || [],
+            videoUrl: property.video_url,
+            availableFrom: property.available_from || 'Available Now',
+            description: `Beautiful ${property.property_type?.toLowerCase() || 'property'} in ${property.location}`,
+            seller: {
+              name: profile?.full_name || 'Property Owner',
+              avatar: profile?.avatar_url,
+              phone: profile?.phone,
+              id: property.seller_id
+            }
+          };
+        }) || [];
+
+        console.log('Using fallback featured listings:', fallbackListings);
+        setListings(fallbackListings.length > 0 ? fallbackListings : mockListings);
         setLoading(false);
         return;
       }
