@@ -179,7 +179,7 @@ export default function StoriesSection() {
         const videosWithReliableUrls = transformedVideos.map((video: any) => ({
           ...video,
           videoUrl: video.videoUrl?.includes('supabase.co') || video.videoUrl?.includes('backblazeb2.com') 
-            ? 'https://vjs.zencdn.net/v/oceans.mp4' // Use reliable fallback for storage URLs
+            ? 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4' // Use reliable fallback for storage URLs
             : video.videoUrl
         }));
         
