@@ -216,6 +216,10 @@ export default function VideosPage() {
               muted
               loop
               playsInline
+              preload="metadata"
+              crossOrigin="anonymous"
+              onError={(e) => console.error('Video error in full screen:', e)}
+              onLoadStart={() => console.log('Full screen video loading:', video.videoUrl)}
             />
             
             {/* Video overlay content */}
