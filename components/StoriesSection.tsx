@@ -183,7 +183,28 @@ export default function StoriesSection() {
         }) || [];
 
         console.log('Using fallback data:', fallbackVideos);
-        setPropertyVideos(fallbackVideos.length > 0 ? fallbackVideos : mockPropertyVideos);
+        
+        if (fallbackVideos.length === 0) {
+          console.log('No database properties found, using mock data with seller updates...');
+          // Use mock data but with proper seller information
+          const updatedMockData = mockPropertyVideos.map((video, index) => {
+            const sellerNames = ['Zoran Talevski', 'Maria Santos Realty', 'John Doe Properties', 'Sarah Wilson Homes'];
+            const sellerName = sellerNames[index % sellerNames.length];
+            
+            return {
+              ...video,
+              agent: {
+                ...video.agent,
+                name: sellerName,
+                avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(sellerName)}&background=D12C1D&color=fff&size=100`,
+              }
+            };
+          });
+          setPropertyVideos(updatedMockData);
+        } else {
+          setPropertyVideos(fallbackVideos);
+        }
+        
         setLoading(false);
         return;
       }
