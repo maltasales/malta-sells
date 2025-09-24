@@ -17,7 +17,7 @@ export const propertyData = {
       'https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?w=800&h=600&fit=crop',
       'https://images.pexels.com/photos/1571460/pexels-photo-1571460.jpeg?w=800&h=600&fit=crop',
     ],
-    videoUrl: 'https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_1mb.mp4',
+    videoUrl: 'https://vjs.zencdn.net/v/oceans.mp4',
     description: 'Beautiful modern apartment for sale located in the heart of Sliema. This stylish property features contemporary design, a spacious living area, and is just minutes away from the seafront. Perfect for first-time buyers or investors.',
     amenities: ['WiFi', 'Air Conditioning', 'Parking', 'Balcony', 'Washing Machine', 'Fully Equipped Kitchen'],
     owner: {
