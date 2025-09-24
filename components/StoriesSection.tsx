@@ -76,7 +76,7 @@ const mockPropertyVideos = [
     beds: 3,
     baths: 2,
     area: 150,
-    videoUrl: 'https://media.w3.org/2010/05/video/movie_300.mp4',
+    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
     thumbnail: 'https://images.pexels.com/photos/1918291/pexels-photo-1918291.jpeg?w=200&h=300&fit=crop',
     description: 'Charming villa by the sea in the picturesque fishing village of Marsaxlokk. Features a private garden and stunning sea views.',
     agent: {
