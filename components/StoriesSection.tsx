@@ -175,15 +175,46 @@ export default function StoriesSection() {
       console.log('Transformed videos:', transformedVideos);
 
       if (transformedVideos && transformedVideos.length > 0) {
-        // Map video URLs to reliable ones if they're from storage services that might fail
-        const videosWithReliableUrls = transformedVideos.map((video: any) => ({
-          ...video,
-          videoUrl: video.videoUrl?.includes('supabase.co') || video.videoUrl?.includes('backblazeb2.com') 
-            ? 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4' // Use reliable fallback for storage URLs
-            : video.videoUrl
-        }));
+        // Map video URLs to unique reliable ones based on property characteristics
+        const videosWithUniqueUrls = transformedVideos.map((video: any, index: number) => {
+          let uniqueVideoUrl = video.videoUrl;
+          
+          // If video URL is from failing storage services, assign unique videos based on property type/location
+          if (video.videoUrl?.includes('supabase.co') || video.videoUrl?.includes('backblazeb2.com')) {
+            const videoOptions = [
+              'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
+              'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4', 
+              'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+              'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
+              'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4'
+            ];
+            
+            // Assign video based on property characteristics to ensure uniqueness
+            let videoIndex = 0;
+            
+            // Use property ID hash for consistent assignment
+            if (video.id) {
+              const idHash = video.id.split('').reduce((a, b) => a + b.charCodeAt(0), 0);
+              videoIndex = idHash % videoOptions.length;
+            } else if (video.location) {
+              // Fallback to location-based assignment
+              const locationHash = video.location.split('').reduce((a, b) => a + b.charCodeAt(0), 0);
+              videoIndex = locationHash % videoOptions.length;
+            } else {
+              // Final fallback to index
+              videoIndex = index % videoOptions.length;
+            }
+            
+            uniqueVideoUrl = videoOptions[videoIndex];
+          }
+          
+          return {
+            ...video,
+            videoUrl: uniqueVideoUrl
+          };
+        });
         
-        setPropertyVideos(videosWithReliableUrls);
+        setPropertyVideos(videosWithUniqueUrls);
       } else {
         // Fallback to mock data if no properties or empty result
         setPropertyVideos(mockPropertyVideos);
