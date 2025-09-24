@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import PropertyVideoCard from './PropertyVideoCard';
 import { supabase } from '@/lib/supabase';
 
-// Mock data as fallback with reliable video URLs
+// Mock data as fallback with unique videos for each property
 const mockPropertyVideos = [
   {
     id: 1,
