@@ -249,7 +249,7 @@ export default function VideosPage() {
     const itemHeight = container.clientHeight;
     const newIndex = Math.round(scrollTop / itemHeight);
     
-    if (newIndex !== currentIndex && newIndex >= 0 && newIndex < mockPropertyVideos.length) {
+    if (newIndex !== currentIndex && newIndex >= 0 && newIndex < propertyVideos.length) {
       setCurrentIndex(newIndex);
       setIsPaused(false);
       setShowPlayOverlay(false);
