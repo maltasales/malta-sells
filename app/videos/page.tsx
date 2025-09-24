@@ -5,6 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import { ArrowLeft, Heart, ArrowUpRight, Bed, Bath, MapPin, Play, Search, Settings, User, BadgeCheck } from 'lucide-react';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/lib/supabase';
 
 const propertyVideos = [
   {
