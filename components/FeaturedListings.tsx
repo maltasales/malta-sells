@@ -60,7 +60,7 @@ const mockListings = [
     image: 'https://images.pexels.com/photos/323780/pexels-photo-323780.jpeg?w=800&h=600&fit=crop',
     availableFrom: 'Available Now',
     type: 'Villa',
-    videoUrl: 'https://www.learningcontainer.com/wp-content/uploads/2020/05/sample-mp4-file.mp4'
+    videoUrl: 'https://media.w3.org/2010/05/video/movie_300.mp4'
   },
   {
     id: 5,
@@ -116,7 +116,7 @@ const mockListings = [
     image: 'https://images.pexels.com/photos/1396132/pexels-photo-1396132.jpeg?w=800&h=600&fit=crop',
     availableFrom: 'Available Now',
     type: 'Maisonette',
-    videoUrl: 'https://www.learningcontainer.com/wp-content/uploads/2020/05/sample-mp4-file.mp4'
+    videoUrl: 'https://media.w3.org/2010/05/video/movie_300.mp4'
   }
 ];
 
