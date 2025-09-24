@@ -56,7 +56,7 @@ const mockPropertyVideos = [
     beds: 1,
     baths: 1,
     area: 45,
-    videoUrl: 'https://media.w3.org/2010/05/bunny/trailer.mp4',
+    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
     thumbnail: 'https://images.pexels.com/photos/1571460/pexels-photo-1571460.jpeg?w=200&h=300&fit=crop',
     description: 'Perfect starter home in the vibrant St. Julians area. Close to restaurants, nightlife, and public transport.',
     agent: {
