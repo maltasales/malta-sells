@@ -276,7 +276,7 @@ export default function VideosPage() {
     }
   };
 
-  const handleShare = async (video: typeof mockPropertyVideos[0]) => {
+  const handleShare = async (video: typeof propertyVideos[0]) => {
     const shareData = {
       title: video.title,
       text: `Check out this ${video.title} in ${video.location} for ${video.currency}${video.price.toLocaleString()}`,
