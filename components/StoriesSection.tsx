@@ -166,7 +166,7 @@ export default function StoriesSection() {
           description: property.description,
           agent: {
             name: profile?.full_name || 'Property Seller',
-            avatar: profile?.avatar_url || 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?w=100&h=100&fit=crop&crop=face',
+            avatar: profile?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(profile?.full_name || 'Property Seller')}&background=D12C1D&color=fff&size=100`,
             phone: '+356 9999 1234', // Default phone
             id: property.seller_id,
           }
