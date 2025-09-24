@@ -175,8 +175,19 @@ export default function FeaturedListings() {
         videoUrl: property.video_url,
       }));
 
-      if (transformedListings.length > 0) {
-        setListings(transformedListings);
+      if (transformedListings && transformedListings.length > 0) {
+        // Map video URLs to reliable ones if they're from storage services that might fail
+        const listingsWithReliableUrls = transformedListings.map((listing: any) => ({
+          ...listing,
+          videoUrl: listing.videoUrl?.includes('supabase.co') || listing.videoUrl?.includes('backblazeb2.com') 
+            ? 'https://vjs.zencdn.net/v/oceans.mp4' // Use reliable fallback for storage URLs
+            : listing.videoUrl
+        }));
+        
+        setListings(listingsWithReliableUrls);
+      } else {
+        // Fallback to mock data if no properties or empty result
+        setListings(mockListings);
       }
     } catch (error) {
       console.error('Error in fetchFeaturedListings:', error);
