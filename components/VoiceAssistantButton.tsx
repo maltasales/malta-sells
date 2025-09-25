@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { BarChart3 } from 'lucide-react';
+import { Mic } from 'lucide-react';
 import VoiceAssistant from './VoiceAssistant';
 
 export default function VoiceAssistantButton() {
