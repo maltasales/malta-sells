@@ -174,7 +174,7 @@ export default function VoiceAssistant({ isOpen, onClose }: VoiceAssistantProps)
           {/* Main visualization circle - same size as ChatGPT */}
           <div className="relative">
             <div 
-              className={`w-64 h-32 rounded-full transition-all duration-500 ${
+              className={`w-48 h-48 rounded-full transition-all duration-500 ${
                 isListening 
                   ? 'bg-gradient-to-b from-red-300 to-red-600' 
                   : 'bg-gradient-to-b from-red-200 to-red-500'
