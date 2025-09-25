@@ -20,8 +20,32 @@ export default function BottomNav() {
 
   return (
     <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-2 py-2 md:hidden">
-      <div className="flex justify-around">
-        {navItems.map((item) => {
+      <div className="flex justify-around items-center relative">
+        {navItems.slice(0, 2).map((item) => {
+          const isActive = pathname === item.href;
+          return (
+            <Link
+              key={item.name}
+              href={item.href}
+              data-testid={`bottom-nav-${item.name.toLowerCase()}`}
+              className={`flex flex-col items-center py-2 px-3 rounded-lg transition-colors ${
+                isActive
+                  ? 'text-[#D12C1D] bg-red-50'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              <item.icon className="w-5 h-5 mb-1" />
+              <span className="text-xs font-medium">{item.name}</span>
+            </Link>
+          );
+        })}
+
+        {/* Voice Assistant Button - Floating between nav items */}
+        <div className="relative">
+          <VoiceAssistantButton />
+        </div>
+
+        {navItems.slice(2).map((item) => {
           const isActive = pathname === item.href;
           return (
             <Link
