@@ -4,6 +4,7 @@ import { Home, Heart, Settings, User } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
+import VoiceAssistantButton from './VoiceAssistantButton';
 
 
 export default function BottomNav() {
