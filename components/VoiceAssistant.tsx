@@ -171,10 +171,10 @@ export default function VoiceAssistant({ isOpen, onClose }: VoiceAssistantProps)
         {/* Main content area */}
         <div className="flex-1 flex items-center justify-center">
           
-          {/* Main visualization circle - exactly like ChatGPT */}
+          {/* Main visualization circle - same size as ChatGPT */}
           <div className="relative">
             <div 
-              className={`w-96 h-96 rounded-full transition-all duration-500 ${
+              className={`w-64 h-32 rounded-full transition-all duration-500 ${
                 isListening 
                   ? 'bg-gradient-to-b from-red-300 to-red-600' 
                   : 'bg-gradient-to-b from-red-200 to-red-500'
@@ -182,8 +182,8 @@ export default function VoiceAssistant({ isOpen, onClose }: VoiceAssistantProps)
               style={{
                 transform: isListening ? `scale(${1 + audioLevel * 0.1})` : 'scale(1)',
                 boxShadow: isListening 
-                  ? `0 0 ${50 + audioLevel * 100}px rgba(239, 68, 68, 0.3)`
-                  : '0 20px 60px rgba(239, 68, 68, 0.2)'
+                  ? `0 0 ${30 + audioLevel * 50}px rgba(239, 68, 68, 0.3)`
+                  : '0 10px 30px rgba(239, 68, 68, 0.2)'
               }}
             />
             
