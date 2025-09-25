@@ -156,121 +156,89 @@ export default function VoiceAssistant({ isOpen, onClose }: VoiceAssistantProps)
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm">
-      <div className="flex items-center justify-center min-h-screen p-4">
-        <div className="relative w-full max-w-md">
+    <div className="fixed inset-0 z-50 bg-white">
+      <div className="flex flex-col items-center justify-center min-h-screen relative">
+        
+        {/* Close button - top right */}
+        <button
+          onClick={onClose}
+          className="absolute top-6 right-6 p-3 text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
+          data-testid="voice-assistant-close"
+        >
+          <X className="w-6 h-6" />
+        </button>
+
+        {/* Main content area */}
+        <div className="flex-1 flex items-center justify-center">
           
-          {/* Close button */}
-          <button
-            onClick={onClose}
-            className="absolute top-4 right-4 z-10 p-2 text-white hover:bg-white/10 rounded-full transition-colors"
-            data-testid="voice-assistant-close"
-          >
-            <X className="w-6 h-6" />
-          </button>
-
-          {/* Volume indicator */}
-          {isListening && (
-            <div className="absolute top-4 right-16 z-10 flex items-center space-x-2 text-white">
-              <Volume2 className="w-5 h-5" />
-              <div className="flex space-x-1">
-                {[...Array(5)].map((_, i) => (
-                  <div
-                    key={i}
-                    className={`w-1 h-4 rounded-full transition-colors ${
-                      audioLevel * 5 > i ? 'bg-red-400' : 'bg-gray-600'
-                    }`}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Main visualization circle */}
-          <div className="relative w-80 h-80 mx-auto mb-8">
+          {/* Main visualization circle - exactly like ChatGPT */}
+          <div className="relative">
             <div 
-              className={`w-full h-full rounded-full transition-all duration-300 ${
+              className={`w-96 h-96 rounded-full transition-all duration-500 ${
                 isListening 
-                  ? 'bg-gradient-to-t from-red-500 to-red-200 animate-pulse' 
-                  : 'bg-gradient-to-t from-red-600 to-red-300'
+                  ? 'bg-gradient-to-b from-red-300 to-red-600' 
+                  : 'bg-gradient-to-b from-red-200 to-red-500'
               }`}
               style={{
-                transform: isListening ? `scale(${1 + audioLevel * 0.3})` : 'scale(1)',
-                filter: isListening ? `blur(${audioLevel * 2}px)` : 'blur(0px)'
+                transform: isListening ? `scale(${1 + audioLevel * 0.1})` : 'scale(1)',
+                boxShadow: isListening 
+                  ? `0 0 ${50 + audioLevel * 100}px rgba(239, 68, 68, 0.3)`
+                  : '0 20px 60px rgba(239, 68, 68, 0.2)'
               }}
             />
             
-            {/* Inner ripple effects when listening */}
+            {/* Subtle inner glow when listening */}
             {isListening && (
-              <>
-                <div className="absolute inset-4 rounded-full bg-red-400/30 animate-ping" />
-                <div className="absolute inset-8 rounded-full bg-red-300/20 animate-pulse" />
-              </>
+              <div 
+                className="absolute inset-0 rounded-full bg-gradient-to-b from-red-100 to-transparent opacity-30 animate-pulse"
+              />
             )}
+          </div>
+        </div>
 
-            {/* Microphone icon in center */}
-            <div className="absolute inset-0 flex items-center justify-center">
-              {isListening ? (
-                <Mic className="w-12 h-12 text-white animate-pulse" />
-              ) : (
-                <MicOff className="w-12 h-12 text-white/80" />
-              )}
+        {/* Bottom section with microphone button */}
+        <div className="pb-16 space-y-6">
+          
+          {/* Status text */}
+          {isProcessing && (
+            <div className="text-center">
+              <p className="text-gray-600 text-lg">Processing...</p>
             </div>
-          </div>
-
-          {/* Transcript and response area */}
-          <div className="text-center text-white mb-8 space-y-4">
-            {transcript && (
-              <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
-                <p className="text-sm font-medium mb-2">You said:</p>
-                <p className="text-lg">{transcript}</p>
-              </div>
-            )}
-            
-            {response && (
-              <div className="bg-red-500/20 backdrop-blur-sm rounded-lg p-4">
-                <p className="text-sm font-medium mb-2">Assistant:</p>
-                <p className="text-lg">{response}</p>
-              </div>
-            )}
-          </div>
-
-          {/* Control buttons */}
-          <div className="flex justify-center items-center space-x-8">
-            
-            {/* Main mic button */}
+          )}
+          
+          {/* Microphone button - bottom center like ChatGPT */}
+          <div className="flex justify-center">
             <button
               onClick={handleMicClick}
               disabled={isProcessing}
-              className={`w-16 h-16 rounded-full flex items-center justify-center transition-all duration-200 ${
+              className={`w-16 h-16 rounded-full flex items-center justify-center transition-all duration-200 shadow-lg ${
                 isListening
-                  ? 'bg-red-500 hover:bg-red-600 animate-pulse'
-                  : 'bg-gray-700 hover:bg-gray-600'
+                  ? 'bg-red-500 hover:bg-red-600'
+                  : 'bg-gray-800 hover:bg-gray-700'
               } ${isProcessing ? 'opacity-50 cursor-not-allowed' : ''}`}
               data-testid="voice-assistant-mic"
             >
               {isProcessing ? (
                 <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white" />
               ) : isListening ? (
-                <MicOff className="w-6 h-6 text-white" />
+                <div className="w-6 h-6 bg-white rounded-full animate-pulse" />
               ) : (
                 <Mic className="w-6 h-6 text-white" />
               )}
             </button>
           </div>
-
-          {/* Instructions */}
-          <div className="text-center text-white/60 mt-6">
-            <p className="text-sm">
+          
+          {/* Simple status indicator */}
+          <div className="text-center">
+            <p className="text-gray-500 text-sm">
               {isListening 
-                ? 'Listening... Tap to stop'
+                ? 'Listening...'
                 : isProcessing 
-                ? 'Processing your request...'
-                : 'Tap the microphone to ask about properties'
+                ? 'Processing...'
+                : 'Tap to speak'
               }
             </p>
           </div>
-
         </div>
       </div>
     </div>
