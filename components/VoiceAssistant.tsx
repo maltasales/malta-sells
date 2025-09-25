@@ -104,18 +104,42 @@ export default function VoiceAssistant({ isOpen, onClose }: VoiceAssistantProps)
     setTranscript('Processing...');
     
     try {
-      // Here you would integrate with OpenAI's Whisper API for speech-to-text
-      // and GPT for generating responses
+      // First, transcribe the audio
+      const formData = new FormData();
+      formData.append('audio', audioBlob, 'recording.webm');
       
-      // Mock processing for now
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      const transcribeResponse = await fetch('/api/voice/transcribe', {
+        method: 'POST',
+        body: formData,
+      });
       
-      setTranscript('How can I help you find your dream property in Malta?');
-      setResponse('I\'m your AI assistant for Malta Sells. I can help you search for properties, get market insights, or answer questions about real estate in Malta.');
+      if (!transcribeResponse.ok) {
+        throw new Error('Transcription failed');
+      }
+      
+      const { transcript } = await transcribeResponse.json();
+      setTranscript(transcript);
+      
+      // Then, get AI response
+      const chatResponse = await fetch('/api/voice/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ message: transcript }),
+      });
+      
+      if (!chatResponse.ok) {
+        throw new Error('Chat response failed');
+      }
+      
+      const { response: aiResponse } = await chatResponse.json();
+      setResponse(aiResponse);
       
     } catch (error) {
       console.error('Error processing audio:', error);
       setTranscript('Sorry, I couldn\'t process that. Please try again.');
+      setResponse('Please try speaking again. Make sure your microphone is working properly.');
     } finally {
       setIsProcessing(false);
     }
