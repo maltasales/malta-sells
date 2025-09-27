@@ -5,6 +5,16 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 
+// Custom AI Voice Assistant Icon Component
+const VoiceAssistantIcon = ({ className }: { className?: string }) => (
+  <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
+    <circle cx="12" cy="12" r="10" fill="currentColor"/>
+    <rect x="9" y="8" width="1.5" height="8" fill="white" rx="0.75"/>
+    <rect x="11.25" y="6" width="1.5" height="12" fill="white" rx="0.75"/>
+    <rect x="13.5" y="8" width="1.5" height="8" fill="white" rx="0.75"/>
+  </svg>
+);
+
 
 export default function BottomNav() {
   const pathname = usePathname();
