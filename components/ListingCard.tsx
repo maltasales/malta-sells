@@ -3,6 +3,7 @@
 import { Heart, Bed, Bath, MapPin, Calendar, ArrowUpRight } from 'lucide-react';
 import { useState } from 'react';
 import Link from 'next/link';
+import { formatPrice } from '@/utils/priceUtils';
 
 interface Listing {
   id: number;
@@ -31,7 +32,7 @@ export default function ListingCard({ listing }: ListingCardProps) {
     
     const shareData = {
       title: listing.title,
-      text: `Check out this ${listing.title} in ${listing.location} for ${listing.currency}${listing.price.toLocaleString()}`,
+      text: `Check out this ${listing.title} in ${listing.location} for ${formatPrice(listing.price, listing.currency)}`,
       url: `${window.location.origin}/property/${listing.id}`
     };
 
