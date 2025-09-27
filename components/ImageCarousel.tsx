@@ -154,30 +154,27 @@ export default function ImageCarousel({ images, title }: ImageCarouselProps) {
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseUp}
     >
-      <div className="relative w-full" style={{ minHeight: '300px', maxHeight: '500px' }}>
-        <div className="overflow-hidden bg-gray-100 rounded-lg">
-          <div 
-            className="flex transition-transform duration-300 ease-out"
-            style={{ 
-              transform: `translateX(-${currentImageIndex * 100}%)`,
-              width: `${displayImages.length * 100}%`
-            }}
-          >
-            {displayImages.map((image, index) => (
-              <div key={index} className="w-full flex-shrink-0 bg-gray-50 flex items-center justify-center" style={{ minHeight: '300px' }}>
-                <img
-                  src={image}
-                  alt={`${title} - Image ${index + 1}`}
-                  className="max-w-full max-h-full object-contain rounded-lg"
-                  style={{ maxHeight: '500px' }}
-                  onError={(e) => {
-                    e.currentTarget.src = 'https://images.pexels.com/photos/1918291/pexels-photo-1918291.jpeg?w=800&h=600&fit=crop';
-                  }}
-                  draggable={false}
-                />
-              </div>
-            ))}
-          </div>
+      <div className="relative w-full bg-gray-100 rounded-lg overflow-hidden" style={{ aspectRatio: '16/10' }}>
+        <div 
+          className="flex transition-transform duration-300 ease-out h-full"
+          style={{ 
+            transform: `translateX(-${currentImageIndex * 100}%)`,
+            width: `${displayImages.length * 100}%`
+          }}
+        >
+          {displayImages.map((image, index) => (
+            <div key={index} className="w-full h-full flex-shrink-0 bg-gray-50 flex items-center justify-center p-2">
+              <img
+                src={image}
+                alt={`${title} - Image ${index + 1}`}
+                className="max-w-full max-h-full object-contain rounded-md shadow-sm"
+                onError={(e) => {
+                  e.currentTarget.src = 'https://images.pexels.com/photos/1918291/pexels-photo-1918291.jpeg?w=800&h=600&fit=crop';
+                }}
+                draggable={false}
+              />
+            </div>
+          ))}
         </div>
       </div>
       
