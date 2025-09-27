@@ -1,6 +1,6 @@
 'use client';
 
-import { Heart, Bed, Bath, MapPin, Calendar, Play, ArrowUpRight } from 'lucide-react';
+import { Heart, Bed, Bath, MapPin, Calendar, ArrowUpRight } from 'lucide-react';
 import { useState } from 'react';
 import Link from 'next/link';
 
