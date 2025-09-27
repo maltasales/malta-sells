@@ -180,6 +180,10 @@ export default function FeaturedListings() {
         // Transform fallback data
         const fallbackListings = properties?.map((property: any) => {
           const profile = profiles.find(p => p.id === property.seller_id);
+          const firstImage = (property.images && Array.isArray(property.images) && property.images.length > 0) 
+            ? property.images[0] 
+            : 'https://images.pexels.com/photos/1918291/pexels-photo-1918291.jpeg?w=800&h=600&fit=crop';
+            
           return {
             id: property.id,
             title: property.title,
@@ -189,8 +193,7 @@ export default function FeaturedListings() {
             beds: property.beds,
             baths: property.baths,
             type: property.property_type,
-            images: property.images || [],
-            videoUrl: property.video_url,
+            image: firstImage,
             availableFrom: property.available_from || 'Available Now',
             description: `Beautiful ${property.property_type?.toLowerCase() || 'property'} in ${property.location}`,
             seller: {
