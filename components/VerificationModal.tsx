@@ -115,8 +115,9 @@ export default function VerificationModal({
     setLoading(true);
     
     try {
-      // Get current user ID from localStorage or props if needed
-      const userId = localStorage.getItem('user_id') || 'current-user-id';
+      if (!userId) {
+        throw new Error('User ID is required for verification');
+      }
       
       // Update the user's profile in Supabase
       const { error } = await supabase.from('profiles').upsert({
