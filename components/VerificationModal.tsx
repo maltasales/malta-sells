@@ -94,7 +94,7 @@ export default function VerificationModal({
       }));
     }
 
-    // Auto-update WhatsApp number when "same as mobile" is checked
+    // Auto-update WhatsApp number when "same as mobile" is checked or when mobile number changes
     if (field === 'usesameMobile' && value === true) {
       setFormData(prev => ({
         ...prev,
