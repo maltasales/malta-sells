@@ -259,26 +259,31 @@ export default function FeaturedListings() {
       }
 
       // Transform the synchronized data to match expected format
-      const transformedListings = syncedListings?.slice(0, 8).map((listing: any) => ({
-        id: listing.listing_id,
-        title: listing.listing_title,
-        location: listing.listing_location,
-        price: listing.listing_price,
-        currency: listing.listing_currency || '€',
-        period: '',
-        beds: listing.listing_beds,
-        baths: listing.listing_baths,
-        image: listing.listing_images?.[0] || 'https://images.pexels.com/photos/1918291/pexels-photo-1918291.jpeg?w=800&h=600&fit=crop',
-        availableFrom: 'Available Now',
-        type: listing.property_type || 'Property',
-        videoUrl: listing.listing_video_url,
-        seller: {
-          name: listing.seller_name,
-          avatar: listing.seller_avatar_url,
-          phone: listing.seller_phone,
-          id: listing.seller_id
-        }
-      })) || [];
+      const transformedListings = syncedListings?.slice(0, 8).map((listing: any) => {
+        const firstImage = (listing.listing_images && Array.isArray(listing.listing_images) && listing.listing_images.length > 0) 
+          ? listing.listing_images[0] 
+          : 'https://images.pexels.com/photos/1918291/pexels-photo-1918291.jpeg?w=800&h=600&fit=crop';
+          
+        return {
+          id: listing.listing_id,
+          title: listing.listing_title,
+          location: listing.listing_location,
+          price: listing.listing_price,
+          currency: listing.listing_currency || '€',
+          period: '',
+          beds: listing.listing_beds,
+          baths: listing.listing_baths,
+          image: firstImage,
+          availableFrom: 'Available Now',
+          type: listing.property_type || 'Property',
+          seller: {
+            name: listing.seller_name,
+            avatar: listing.seller_avatar_url,
+            phone: listing.seller_phone,
+            id: listing.seller_id
+          }
+        };
+      }) || [];
 
       if (transformedListings && transformedListings.length > 0) {
         // Map video URLs to unique reliable ones based on property characteristics
