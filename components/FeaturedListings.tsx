@@ -17,8 +17,7 @@ const mockListings = [
     baths: 1,
     image: 'https://images.pexels.com/photos/1918291/pexels-photo-1918291.jpeg?w=800&h=600&fit=crop',
     availableFrom: 'Available Now',
-    type: 'Apartment',
-    videoUrl: 'https://vjs.zencdn.net/v/oceans.mp4'
+    type: 'Apartment'
   },
   {
     id: 2,
@@ -31,8 +30,7 @@ const mockListings = [
     baths: 2,
     image: 'https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?w=800&h=600&fit=crop',
     availableFrom: 'Available Now',
-    type: 'Penthouse',
-    videoUrl: 'https://media.w3.org/2010/05/sintel/trailer_hd.mp4'
+    type: 'Penthouse'
   },
   {
     id: 3,
@@ -45,8 +43,7 @@ const mockListings = [
     baths: 1,
     image: 'https://images.pexels.com/photos/1571460/pexels-photo-1571460.jpeg?w=800&h=600&fit=crop',
     availableFrom: 'Available Now',
-    type: 'Studio',
-    videoUrl: 'https://media.w3.org/2010/05/bunny/trailer.mp4'
+    type: 'Studio'
   },
   {
     id: 4,
@@ -59,8 +56,7 @@ const mockListings = [
     baths: 2,
     image: 'https://images.pexels.com/photos/323780/pexels-photo-323780.jpeg?w=800&h=600&fit=crop',
     availableFrom: 'Available Now',
-    type: 'Villa',
-    videoUrl: 'https://media.w3.org/2010/05/video/movie_300.mp4'
+    type: 'Villa'
   },
   {
     id: 5,
@@ -73,8 +69,7 @@ const mockListings = [
     baths: 2,
     image: 'https://images.pexels.com/photos/1029599/pexels-photo-1029599.jpeg?w=800&h=600&fit=crop',
     availableFrom: 'Available Now',
-    type: 'Townhouse',
-    videoUrl: 'https://vjs.zencdn.net/v/oceans.mp4'
+    type: 'Townhouse'
   },
   {
     id: 6,
@@ -87,8 +82,7 @@ const mockListings = [
     baths: 1,
     image: 'https://images.pexels.com/photos/2724749/pexels-photo-2724749.jpeg?w=800&h=600&fit=crop',
     availableFrom: 'Available Now',
-    type: 'Loft',
-    videoUrl: 'https://media.w3.org/2010/05/sintel/trailer_hd.mp4'
+    type: 'Loft'
   },
   {
     id: 7,
@@ -101,8 +95,7 @@ const mockListings = [
     baths: 1,
     image: 'https://images.pexels.com/photos/1643383/pexels-photo-1643383.jpeg?w=800&h=600&fit=crop',
     availableFrom: 'Available Now',
-    type: 'Apartment',
-    videoUrl: 'https://media.w3.org/2010/05/bunny/trailer.mp4'
+    type: 'Apartment'
   },
   {
     id: 8,
@@ -115,8 +108,7 @@ const mockListings = [
     baths: 2,
     image: 'https://images.pexels.com/photos/1396132/pexels-photo-1396132.jpeg?w=800&h=600&fit=crop',
     availableFrom: 'Available Now',
-    type: 'Maisonette',
-    videoUrl: 'https://media.w3.org/2010/05/video/movie_300.mp4'
+    type: 'Maisonette'
   }
 ];
 
