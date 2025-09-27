@@ -1,11 +1,12 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import { Plus, Home, Edit, Trash2, Eye, ArrowLeft } from 'lucide-react';
+import { Plus, Home, Edit, Eye, ArrowLeft, CheckCircle } from 'lucide-react';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'next/navigation';
 import SellerProfileCard from '@/components/SellerProfileCard';
+import VerificationModal from '@/components/VerificationModal';
 import { supabase } from '@/lib/supabase';
 
 interface Property {
@@ -27,6 +28,9 @@ export default function SellerDashboard() {
   const router = useRouter();
   const [properties, setProperties] = useState<Property[]>([]);
   const [loadingProperties, setLoadingProperties] = useState(true);
+  const [isVerified, setIsVerified] = useState(false);
+  const [showVerificationModal, setShowVerificationModal] = useState(false);
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
 
   const fetchSellerProperties = useCallback(async () => {
     if (!user) return;
@@ -54,6 +58,31 @@ export default function SellerDashboard() {
     }
   }, [user]);
 
+  const checkVerificationStatus = useCallback(async () => {
+    if (!user) return;
+
+    try {
+      // Check if user has phone number in profile (indicates verification)
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('phone, full_name')
+        .eq('id', user.id)
+        .single();
+
+      if (error) {
+        console.log('Error checking verification:', error);
+        setIsVerified(false);
+        return;
+      }
+
+      // Consider verified if phone number exists
+      setIsVerified(!!data?.phone);
+    } catch (error) {
+      console.error('Error checking verification status:', error);
+      setIsVerified(false);
+    }
+  }, [user]);
+
   useEffect(() => {
     if (!loading && !isAuthenticated) {
       router.push('/auth/signin');
@@ -65,9 +94,33 @@ export default function SellerDashboard() {
   useEffect(() => {
     if (user && user.role === 'seller') {
       fetchSellerProperties();
+      checkVerificationStatus();
     }
-  }, [user, fetchSellerProperties]);
+  }, [user, fetchSellerProperties, checkVerificationStatus]);
 
+  const handleAddPropertyClick = () => {
+    if (isVerified) {
+      // If verified, go directly to create property page
+      router.push('/dashboard/seller/create');
+    } else {
+      // If not verified, show verification modal
+      setShowVerificationModal(true);
+    }
+  };
+
+  const handleVerificationComplete = () => {
+    setShowVerificationModal(false);
+    setIsVerified(true);
+    setShowSuccessMessage(true);
+    
+    // Hide success message after 3 seconds
+    setTimeout(() => {
+      setShowSuccessMessage(false);
+    }, 3000);
+    
+    // Update verification status
+    checkVerificationStatus();
+  };
 
   if (loading) {
     return (
@@ -83,6 +136,16 @@ export default function SellerDashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Success Message */}
+      {showSuccessMessage && (
+        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-40 animate-in slide-in-from-top-5 duration-300">
+          <div className="bg-green-50 border border-green-200 rounded-lg px-4 py-3 flex items-center space-x-3 shadow-lg">
+            <CheckCircle className="w-5 h-5 text-green-600" />
+            <p className="text-green-800 font-medium">Profile verified successfully!</p>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <div className="bg-white border-b border-gray-200">
         <div className="flex items-center justify-between p-4 max-w-7xl mx-auto">
@@ -103,13 +166,16 @@ export default function SellerDashboard() {
             <h2 className="text-xl font-semibold text-gray-900">
               Your Properties ({properties.length})
             </h2>
-            <Link
-              href="/dashboard/seller/create"
-              className="inline-flex items-center space-x-2 px-4 py-2 bg-[#D12C1D] text-white rounded-lg hover:bg-[#B8241A] transition-colors text-sm"
-            >
-              <Plus className="w-4 h-4" />
-              <span>Add Property</span>
-            </Link>
+            {/* Only show top Add Property button if user has properties */}
+            {properties.length > 0 && (
+              <button
+                onClick={handleAddPropertyClick}
+                className="inline-flex items-center space-x-2 px-4 py-2 bg-[#D12C1D] text-white rounded-lg hover:bg-[#B8241A] transition-colors text-sm"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Add Property</span>
+              </button>
+            )}
           </div>
           
           {loadingProperties ? (
@@ -126,6 +192,9 @@ export default function SellerDashboard() {
                         src={property.images[0]}
                         alt={property.title}
                         className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.currentTarget.src = 'https://images.pexels.com/photos/1918291/pexels-photo-1918291.jpeg?w=400&h=250&fit=crop';
+                        }}
                       />
                     ) : (
                       <div className="w-full h-full bg-gray-200 flex items-center justify-center">
@@ -184,20 +253,29 @@ export default function SellerDashboard() {
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
                 No properties listed yet
               </h3>
-              <p className="text-gray-600 mb-4">
+              <p className="text-gray-600 mb-6">
                 Create your first property listing to get started
               </p>
-              <Link
-                href="/dashboard/seller/create"
+              <button
+                onClick={handleAddPropertyClick}
                 className="inline-flex items-center space-x-2 px-6 py-3 bg-[#D12C1D] text-white rounded-lg hover:bg-[#B8241A] transition-colors"
               >
                 <Plus className="w-4 h-4" />
-                <span>Add Your First Property</span>
-              </Link>
+                <span>{isVerified ? 'Add Property' : 'Add Your First Property'}</span>
+              </button>
             </div>
           )}
         </div>
       </div>
+
+      {/* Verification Modal */}
+      <VerificationModal
+        isOpen={showVerificationModal}
+        onClose={() => setShowVerificationModal(false)}
+        onVerificationComplete={handleVerificationComplete}
+        userEmail={user?.email || ''}
+        userName={user?.name || ''}
+      />
     </div>
   );
 }
