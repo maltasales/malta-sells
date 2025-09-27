@@ -23,6 +23,7 @@ export default function BottomNav() {
   const navItems = [
     { name: 'Explore', icon: Home, href: '/' },
     { name: 'Wishlists', icon: Heart, href: isAuthenticated ? '/wishlists' : '/auth/signin' },
+    { name: 'AI Voice', icon: VoiceAssistantIcon, href: '/ai-assistant', isSpecial: true },
     { name: 'Services', icon: Settings, href: '/services' },
     { name: 'Account', icon: User, href: isAuthenticated ? '/account' : '/auth/signin' },
   ];
