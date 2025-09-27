@@ -163,11 +163,11 @@ export default function ImageCarousel({ images, title }: ImageCarouselProps) {
           }}
         >
           {displayImages.map((image, index) => (
-            <div key={index} className="w-full h-full flex-shrink-0">
+            <div key={index} className="w-full h-full flex-shrink-0 bg-gray-50 flex items-center justify-center">
               <img
                 src={image}
                 alt={`${title} - Image ${index + 1}`}
-                className="w-full h-full object-cover"
+                className="max-w-full max-h-full object-contain"
                 onError={(e) => {
                   e.currentTarget.src = 'https://images.pexels.com/photos/1918291/pexels-photo-1918291.jpeg?w=800&h=600&fit=crop';
                 }}
