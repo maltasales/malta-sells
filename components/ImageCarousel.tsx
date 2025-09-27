@@ -154,7 +154,7 @@ export default function ImageCarousel({ images, title }: ImageCarouselProps) {
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseUp}
     >
-      <div className="relative w-full bg-gray-100 rounded-lg overflow-hidden" style={{ aspectRatio: '16/10' }}>
+      <div className="relative w-full bg-white border border-gray-200 rounded-lg overflow-hidden" style={{ aspectRatio: '16/10' }}>
         <div 
           className="flex transition-transform duration-300 ease-out h-full"
           style={{ 
@@ -163,11 +163,11 @@ export default function ImageCarousel({ images, title }: ImageCarouselProps) {
           }}
         >
           {displayImages.map((image, index) => (
-            <div key={index} className="w-full h-full flex-shrink-0 bg-gray-50 flex items-center justify-center p-2">
+            <div key={index} className="w-full h-full flex-shrink-0 bg-white flex items-center justify-center p-1">
               <img
                 src={image}
                 alt={`${title} - Image ${index + 1}`}
-                className="max-w-full max-h-full object-contain rounded-md shadow-sm"
+                className="max-w-full max-h-full object-contain rounded"
                 onError={(e) => {
                   e.currentTarget.src = 'https://images.pexels.com/photos/1918291/pexels-photo-1918291.jpeg?w=800&h=600&fit=crop';
                 }}
