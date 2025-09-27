@@ -112,17 +112,27 @@ export default function VerificationModal({
     setLoading(true);
     
     try {
-      // Simulate API call - replace with actual Supabase update
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Get current user ID from localStorage or props if needed
+      const userId = localStorage.getItem('user_id') || 'current-user-id';
       
-      // Here you would update the user's profile in Supabase
-      // await supabase.from('profiles').update({
-      //   full_name: `${formData.firstName} ${formData.lastName}`,
-      //   phone: `${selectedCountryCode.code}${formData.mobileNumber}`,
-      //   whatsapp: formData.usesameMobile ? `${selectedCountryCode.code}${formData.mobileNumber}` : `${whatsappCountryCode.code}${formData.whatsappNumber}`,
-      //   verified: true
-      // }).eq('id', user.id);
+      // Update the user's profile in Supabase
+      const { error } = await supabase.from('profiles').upsert({
+        id: userId,
+        full_name: `${formData.firstName} ${formData.lastName}`,
+        phone: `${selectedCountryCode.code}${formData.mobileNumber}`,
+        whatsapp: formData.usesameMobile 
+          ? `${selectedCountryCode.code}${formData.mobileNumber}` 
+          : `${whatsappCountryCode.code}${formData.whatsappNumber}`,
+        verified: true,
+        updated_at: new Date().toISOString()
+      });
 
+      if (error) {
+        console.error('Supabase error:', error);
+        throw error;
+      }
+
+      console.log('Profile verification saved successfully');
       onVerificationComplete();
     } catch (error) {
       console.error('Verification error:', error);
