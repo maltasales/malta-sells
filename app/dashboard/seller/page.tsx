@@ -62,21 +62,38 @@ export default function SellerDashboard() {
     if (!user) return;
 
     try {
-      // Check if user has phone number in profile (indicates verification)
+      // Check if user has phone number and verified status in profile
       const { data, error } = await supabase
         .from('profiles')
-        .select('phone, full_name')
+        .select('phone, full_name, verified')
         .eq('id', user.id)
         .single();
 
       if (error) {
         console.log('Error checking verification:', error);
+        // If profile doesn't exist, create a basic one
+        if (error.code === 'PGRST116') {
+          const { error: insertError } = await supabase
+            .from('profiles')
+            .insert([
+              {
+                id: user.id,
+                full_name: user.name || '',
+                verified: false,
+                created_at: new Date().toISOString()
+              }
+            ]);
+          
+          if (insertError) {
+            console.error('Error creating profile:', insertError);
+          }
+        }
         setIsVerified(false);
         return;
       }
 
-      // Consider verified if phone number exists
-      setIsVerified(!!data?.phone);
+      // Consider verified if phone number exists OR verified flag is true
+      setIsVerified(!!(data?.phone || data?.verified));
     } catch (error) {
       console.error('Error checking verification status:', error);
       setIsVerified(false);
@@ -108,7 +125,7 @@ export default function SellerDashboard() {
     }
   };
 
-  const handleVerificationComplete = () => {
+  const handleVerificationComplete = async () => {
     setShowVerificationModal(false);
     setIsVerified(true);
     setShowSuccessMessage(true);
@@ -118,8 +135,8 @@ export default function SellerDashboard() {
       setShowSuccessMessage(false);
     }, 3000);
     
-    // Update verification status
-    checkVerificationStatus();
+    // Update verification status in component state immediately
+    // The database update happens in the VerificationModal component
   };
 
   if (loading) {
