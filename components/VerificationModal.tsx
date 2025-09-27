@@ -36,7 +36,8 @@ export default function VerificationModal({
   onClose, 
   onVerificationComplete, 
   userEmail, 
-  userName = '' 
+  userName = '',
+  userId
 }: VerificationModalProps) {
   const [formData, setFormData] = useState<FormData>({
     firstName: userName.split(' ')[0] || '',
