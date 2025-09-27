@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { X, Phone, Mail, Check } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
 
 interface VerificationModalProps {
   isOpen: boolean;
@@ -9,6 +10,7 @@ interface VerificationModalProps {
   onVerificationComplete: () => void;
   userEmail: string;
   userName?: string;
+  userId?: string;
 }
 
 interface FormData {
