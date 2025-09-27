@@ -52,27 +52,11 @@ export default function ListingCard({ listing }: ListingCardProps) {
       <div className="relative">
         <Link href={`/property/${listing.id}`}>
           <div className="aspect-[16/9] overflow-hidden">
-            {listing.videoUrl ? (
-              <div className="relative">
-                <video
-                  src={listing.videoUrl}
-                  poster={listing.image}
-                  className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                  muted
-                  loop
-                  onMouseEnter={(e) => e.currentTarget.play()}
-                  onMouseLeave={(e) => e.currentTarget.pause()}
-                />
-                <div className="absolute inset-0 opacity-0 hover:opacity-100 transition-opacity bg-black/20">
-                </div>
-              </div>
-            ) : (
-              <img
-                src={listing.image}
-                alt={listing.title}
-                className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-              />
-            )}
+            <img
+              src={listing.image}
+              alt={listing.title}
+              className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+            />
           </div>
         </Link>
         
