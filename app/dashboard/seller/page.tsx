@@ -292,6 +292,7 @@ export default function SellerDashboard() {
         onVerificationComplete={handleVerificationComplete}
         userEmail={user?.email || ''}
         userName={user?.name || ''}
+        userId={user?.id || ''}
       />
     </div>
   );
