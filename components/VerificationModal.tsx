@@ -68,12 +68,12 @@ export default function VerificationModal({
 
     if (!formData.mobileNumber.trim()) {
       newErrors.mobileNumber = 'Mobile number is required';
-    } else if (!/^[0-9+\-\s()]+$/.test(formData.mobileNumber)) {
-      newErrors.mobileNumber = 'Please enter a valid mobile number';
+    } else if (!/^[0-9]{6,15}$/.test(formData.mobileNumber.replace(/\s/g, ''))) {
+      newErrors.mobileNumber = 'Please enter a valid mobile number (6-15 digits)';
     }
 
-    if (!formData.usesameMobile && formData.whatsappNumber && !/^[0-9+\-\s()]+$/.test(formData.whatsappNumber)) {
-      newErrors.whatsappNumber = 'Please enter a valid WhatsApp number';
+    if (!formData.usesameMobile && formData.whatsappNumber && !/^[0-9]{6,15}$/.test(formData.whatsappNumber.replace(/\s/g, ''))) {
+      newErrors.whatsappNumber = 'Please enter a valid WhatsApp number (6-15 digits)';
     }
 
     setErrors(newErrors);
