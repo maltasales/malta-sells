@@ -322,7 +322,7 @@ export default function VerificationModal({
               <span className="text-sm text-gray-700">Same as mobile</span>
             </label>
 
-            {!formData.usesameMobile && (
+            {!formData.usesameMobile ? (
               <div className="flex">
                 {/* WhatsApp Country Code Dropdown */}
                 <div className="relative">
@@ -363,6 +363,20 @@ export default function VerificationModal({
                     errors.whatsappNumber ? 'border-red-300 bg-red-50' : 'border-gray-300'
                   }`}
                   placeholder="Enter WhatsApp number"
+                />
+              </div>
+            ) : (
+              <div className="flex">
+                <div className="px-3 py-2 border border-r-0 border-gray-300 rounded-l-lg bg-gray-100 flex items-center space-x-2">
+                  <span>{selectedCountryCode.flag}</span>
+                  <span className="text-sm text-gray-500">{selectedCountryCode.code}</span>
+                </div>
+                <input
+                  type="tel"
+                  value={formData.mobileNumber}
+                  disabled
+                  className="flex-1 px-3 py-2 border rounded-r-lg bg-gray-100 text-gray-500 cursor-not-allowed"
+                  placeholder="Same as mobile number"
                 />
               </div>
             )}
