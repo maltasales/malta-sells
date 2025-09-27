@@ -5,12 +5,13 @@ import { MapPin, Bed, Bath, Phone, Mail, Wifi, ArrowLeft, Calculator, Sofa, Badg
 import Link from "next/link";
 import ImageCarousel from "@/components/ImageCarousel";
 import FavoriteButton from "@/components/FavoriteButton";
+import { formatPrice } from "@/utils/priceUtils";
 
 export default function PropertyDetailClient({ property }: { property: any }) {
   const handleShare = async () => {
     const shareData = {
       title: property.title,
-      text: `Check out this ${property.title} in ${property.location} for ${property.currency}${property.price.toLocaleString()}`,
+      text: `Check out this ${property.title} in ${property.location} for ${formatPrice(property.price, property.currency)}`,
       url: window.location.href
     };
 
