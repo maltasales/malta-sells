@@ -93,8 +93,7 @@ export default function ListingCard({ listing }: ListingCardProps) {
           </Link>
           <div className="text-right">
             <p className="text-lg font-bold text-gray-900">
-              {listing.currency}{listing.price}
-              <span className="text-sm font-normal text-gray-500">/{listing.period}</span>
+              {formatPrice(listing.price, listing.currency)}
             </p>
           </div>
         </div>
