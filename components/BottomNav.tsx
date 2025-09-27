@@ -33,13 +33,16 @@ export default function BottomNav() {
       <div className="flex justify-around">
         {navItems.map((item) => {
           const isActive = pathname === item.href;
+          const isSpecial = item.isSpecial;
           return (
             <Link
               key={item.name}
               href={item.href}
-              data-testid={`bottom-nav-${item.name.toLowerCase()}`}
+              data-testid={`bottom-nav-${item.name.toLowerCase().replace(' ', '-')}`}
               className={`flex flex-col items-center py-2 px-3 rounded-lg transition-colors ${
-                isActive
+                isSpecial
+                  ? 'text-white bg-[#D12C1D] hover:bg-[#B8241A]'
+                  : isActive
                   ? 'text-[#D12C1D] bg-red-50'
                   : 'text-gray-600 hover:text-gray-900'
               }`}
