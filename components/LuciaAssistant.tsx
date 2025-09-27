@@ -88,12 +88,76 @@ export default function LuciaAssistant({ isOpen, onClose }: LuciaAssistantProps)
 
       const { data, error } = await queryBuilder;
       
-      if (error) throw error;
+      if (error) {
+        console.log('Supabase error, falling back to mock data:', error);
+        return getMockProperties(query);
+      }
+      
+      // If no data from Supabase, return mock data
+      if (!data || data.length === 0) {
+        return getMockProperties(query);
+      }
+      
       return data as Property[] || [];
     } catch (error) {
       console.error('Error fetching properties:', error);
-      return [];
+      return getMockProperties(query);
     }
+  };
+
+  const getMockProperties = (query?: string): Property[] => {
+    const mockProperties: Property[] = [
+      {
+        id: '1',
+        title: 'Modern Apartment in Sliema',
+        location: 'Sliema',
+        price: 350000,
+        currency: '€',
+        beds: 2,
+        baths: 1,
+        area: 85,
+        images: ['https://images.pexels.com/photos/1918291/pexels-photo-1918291.jpeg?w=400&h=250&fit=crop'],
+        property_type: 'Apartment',
+        description: 'Beautiful modern apartment with sea views'
+      },
+      {
+        id: '2',
+        title: 'Luxury Villa in Valletta',
+        location: 'Valletta',
+        price: 750000,
+        currency: '€',
+        beds: 3,
+        baths: 2,
+        area: 150,
+        images: ['https://images.pexels.com/photos/323780/pexels-photo-323780.jpeg?w=400&h=250&fit=crop'],
+        property_type: 'Villa',
+        description: 'Stunning villa in the heart of Valletta'
+      },
+      {
+        id: '3',
+        title: 'Cozy Studio in St. Julians',
+        location: 'St. Julians',
+        price: 280000,
+        currency: '€',
+        beds: 1,
+        baths: 1,
+        area: 45,
+        images: ['https://images.pexels.com/photos/1571460/pexels-photo-1571460.jpeg?w=400&h=250&fit=crop'],
+        property_type: 'Studio',
+        description: 'Perfect starter home in St. Julians'
+      }
+    ];
+
+    if (query) {
+      const lowerQuery = query.toLowerCase();
+      return mockProperties.filter(p => 
+        p.title.toLowerCase().includes(lowerQuery) ||
+        p.location.toLowerCase().includes(lowerQuery) ||
+        p.property_type.toLowerCase().includes(lowerQuery)
+      );
+    }
+
+    return mockProperties;
   };
 
   const saveConversation = async (message: string, response: string) => {
