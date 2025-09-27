@@ -76,8 +76,7 @@ export default function PropertyDetailClient({ property }: { property: any }) {
             <h1 className="text-2xl font-bold text-gray-900">{property.title}</h1>
             <div className="text-right">
               <p className="text-2xl font-bold text-gray-900">
-                {property.currency}{property.price}
-                <span className="text-base font-normal text-gray-500">/{property.period}</span>
+                {formatPrice(property.price, property.currency)}
               </p>
             </div>
           </div>
