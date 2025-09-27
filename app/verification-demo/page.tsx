@@ -118,6 +118,7 @@ export default function VerificationDemo() {
         onVerificationComplete={handleVerificationComplete}
         userEmail="mile.milevski@example.com"
         userName="Mile Milevski"
+        userId="demo-user-id"
       />
     </div>
   );
