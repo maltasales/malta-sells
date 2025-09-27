@@ -164,7 +164,7 @@ export default function LuciaAssistant({ isOpen, onClose }: LuciaAssistantProps)
     if (!user) return;
     
     try {
-      await supabase.from('conversations').insert([
+      const { error } = await supabase.from('conversations').insert([
         {
           user_id: user.id,
           message,
@@ -172,8 +172,14 @@ export default function LuciaAssistant({ isOpen, onClose }: LuciaAssistantProps)
           timestamp: new Date().toISOString()
         }
       ]);
+      
+      if (error) {
+        console.log('Error saving conversation (table may not exist):', error);
+        // Continue without throwing error since this is not critical
+      }
     } catch (error) {
-      console.error('Error saving conversation:', error);
+      console.log('Error saving conversation:', error);
+      // Continue without throwing error since this is not critical
     }
   };
 
