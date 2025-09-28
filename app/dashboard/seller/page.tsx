@@ -119,8 +119,9 @@ export default function SellerDashboard() {
   }, [user, fetchSellerProperties, checkVerificationStatus]);
 
   const handleAddPropertyClick = () => {
-    if (!isVerified) {
-      // If not verified, show verification modal
+    // Only show verification modal the FIRST TIME if not verified
+    if (!isVerified && !hasAttemptedAddProperty) {
+      setHasAttemptedAddProperty(true);
       setShowVerificationModal(true);
       return;
     }
@@ -133,7 +134,7 @@ export default function SellerDashboard() {
       return;
     }
 
-    // If verified and within limits, go to create property page
+    // Always go to create property page (after first verification attempt)
     router.push('/dashboard/seller/create');
   };
 
