@@ -39,7 +39,7 @@ export default function UpgradePlanPage() {
     const selectedPlan = plans.find(p => p.id === planId);
     if (selectedPlan) {
       // For free plans or downgrades, update immediately
-      if (planId === 'basic' || selectedPlan.price === 0) {
+      if (planId === 'free' || selectedPlan.price === 0) {
         const success = await updateUserPlan(user.id, planId, supabase);
         if (success) {
           // Refresh the page to show updated plan
