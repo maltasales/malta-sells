@@ -221,10 +221,11 @@ export default function VideosPage() {
   useEffect(() => {
     // Only set start video after loading is complete and we have real data
     if (startId && propertyVideos.length > 0 && !loading) {
-      console.log('Setting start video:', startId, 'from videos:', propertyVideos.map(v => v.id));
+      console.log('🎯 Setting start video:', startId, 'from videos:', propertyVideos.map(v => ({ id: v.id, title: v.title })));
       const index = propertyVideos.findIndex(video => video.id === startId);
-      console.log('Found index:', index);
+      console.log('🎯 Found index:', index, 'for video ID:', startId);
       if (index !== -1) {
+        console.log('🎯 Setting currentIndex to:', index);
         setCurrentIndex(index);
         setIsPaused(false);
         setShowPlayOverlay(false);
@@ -234,11 +235,16 @@ export default function VideosPage() {
           if (containerRef.current) {
             const videoElement = containerRef.current.children[index] as HTMLElement;
             if (videoElement) {
+              console.log('🎯 Scrolling to video at index:', index);
               videoElement.scrollIntoView({ behavior: 'instant', block: 'start' });
             }
           }
         }, 100);
+      } else {
+        console.warn('🚨 Video with ID not found:', startId, 'in available videos');
       }
+    } else {
+      console.log('⏳ Waiting for data - startId:', startId, 'videos.length:', propertyVideos.length, 'loading:', loading);
     }
   }, [startId, propertyVideos, loading]);
 
