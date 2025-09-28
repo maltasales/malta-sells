@@ -84,7 +84,7 @@ export default function SellerDashboard() {
                 full_name: user.name || '',
                 verified: false,
                 verification_prompt_shown: false,
-                plan_id: 'basic',
+                plan_id: 'free',
                 role: user.role,
                 created_at: new Date().toISOString(),
                 updated_at: new Date().toISOString()
