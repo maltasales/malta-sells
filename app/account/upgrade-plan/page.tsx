@@ -38,14 +38,18 @@ export default function UpgradePlanPage() {
     
     const selectedPlan = plans.find(p => p.id === planId);
     if (selectedPlan) {
-      // For free plans or downgrades, update immediately
+      // For free plans or downgrades, update localStorage directly
       if (planId === 'free' || selectedPlan.price === 0) {
-        const success = await updateUserPlan(user.id, planId, supabase);
-        if (success) {
-          // Refresh the page to show updated plan
-          window.location.reload();
+        try {
+          // Update localStorage
+          const updatedUser = { ...user, plan_id: planId };
+          localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+          
+          // Redirect back to dashboard
+          router.push('/dashboard/seller');
           return;
-        } else {
+        } catch (error) {
+          console.error('Error updating plan:', error);
           alert('Failed to update plan. Please try again.');
           return;
         }
