@@ -203,29 +203,24 @@ export default function VideosPage() {
           console.error('Error fetching profiles:', profilesError);
         }
 
-        // Transform data with REAL profile information ONLY
+        // Transform data - show ALL videos but use REAL profile names when available
         const transformedVideos = properties?.map((property: any) => {
           const profile = profiles?.find(p => p.id === property.seller_id);
           
           console.log('🔍 VIDEOS PROPERTY:', property.id, 'SELLER ID:', property.seller_id);
-          console.log('🔍 VIDEOS REAL PROFILE FOUND:', profile);
+          console.log('🔍 PROFILE FOUND:', profile);
           
-          if (!profile || !profile.full_name) {
-            console.error('❌ NO REAL PROFILE DATA for video seller:', property.seller_id);
-            console.error('This video will be SKIPPED because no real profile exists');
-            return null; // Skip videos without real profile data
-          }
-          
-          // Use ONLY REAL profile data - NO FALLBACKS, NO GENERATED NAMES
-          const displayName = profile.full_name; // REAL NAME ONLY
+          // Use REAL profile name if available, otherwise use seller ID identifier
+          const displayName = profile?.full_name || `Seller ${property.seller_id.slice(-4)}`;
           const displayRole = 'Property Seller';
-          const avatarUrl = profile.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=D12C1D&color=fff&size=100`;
-          const phoneNumber = profile.phone || null;
+          const avatarUrl = profile?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=D12C1D&color=fff&size=100`;
+          const phoneNumber = profile?.phone || null;
           
-          console.log('✅ VIDEOS USING REAL PROFILE DATA:', {
+          console.log('✅ DISPLAYING VIDEO:', {
             name: displayName,
             phone: phoneNumber,  
-            seller_id: property.seller_id
+            seller_id: property.seller_id,
+            hasRealProfile: !!profile?.full_name
           });
           
           return {
