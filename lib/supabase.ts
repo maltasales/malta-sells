@@ -17,6 +17,9 @@ export type Database = {
           avatar_url: string | null;
           banner_url: string | null;
           phone: string | null;
+          plan_id: string | null;
+          plan_expires_at: string | null;
+          verified: boolean | null;
           created_at: string;
           updated_at: string;
         };
@@ -27,6 +30,9 @@ export type Database = {
           avatar_url?: string | null;
           banner_url?: string | null;
           phone?: string | null;
+          plan_id?: string | null;
+          plan_expires_at?: string | null;
+          verified?: boolean | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -37,6 +43,9 @@ export type Database = {
           avatar_url?: string | null;
           banner_url?: string | null;
           phone?: string | null;
+          plan_id?: string | null;
+          plan_expires_at?: string | null;
+          verified?: boolean | null;
           created_at?: string;
           updated_at?: string;
         };
