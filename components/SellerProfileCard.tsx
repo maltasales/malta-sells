@@ -1,6 +1,7 @@
 'use client';
 
 import { User, ExternalLink, BadgeCheck } from 'lucide-react';
+import { getPlanById, getDefaultPlan } from '@/lib/plans';
 import Link from 'next/link';
 import { useRef, useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
