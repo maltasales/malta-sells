@@ -1,6 +1,7 @@
 'use client';
 
 import { ArrowLeft, Phone, Mail, MapPin, Bed, Bath, User, BadgeCheck } from 'lucide-react';
+import { getPlanById, getDefaultPlan } from '@/lib/plans';
 import Link from 'next/link';
 
 interface Property {
