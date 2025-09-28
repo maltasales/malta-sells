@@ -109,27 +109,24 @@ export default function VideosPage() {
         console.log('Using synchronized property data:', syncedListings);
         
         const transformedVideos = syncedListings.map((listing: any) => {
-          console.log('🔍 Videos synchronized - listing:', listing.id, 'seller_name:', listing.seller_name);
+          console.log('🔍 VIDEOS SYNCHRONIZED:', listing.id, 'SELLER NAME:', listing.seller_name);
           
-          // Use REAL seller name or create meaningful fallback
-          let displayName = listing.seller_name;
-          if (!displayName) {
-            // Create meaningful seller names based on seller ID for better UX
-            const sellerNames = [
-              'Maria Santos', 'John Property Expert', 'Sarah Wilson Homes', 
-              'David Real Estate', 'Emma Property Group', 'Alex Malta Properties',
-              'Lisa Estate Agent', 'Michael Property Pro', 'Anna Home Sales',
-              'James Malta Realty', 'Sophie Property Solutions', 'Daniel Estate Sales'
-            ];
-            const sellerId = listing.seller_id || 'unknown';
-            const index = Math.abs(sellerId.split('').reduce((a, b) => a + b.charCodeAt(0), 0)) % sellerNames.length;
-            displayName = sellerNames[index];
+          if (!listing.seller_name) {
+            console.error('❌ NO REAL SELLER NAME for video:', listing.id);
+            return null; // Skip videos without real profile names
           }
           
-          const displayRole = listing.seller_role === 'seller' ? 'Property Seller' : 'Property Seller';
+          // Use ONLY REAL synchronized data - NO FALLBACKS
+          const displayName = listing.seller_name; // REAL NAME ONLY
+          const displayRole = 'Property Seller';
           const avatarUrl = listing.seller_avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=D12C1D&color=fff&size=100`;
+          const phoneNumber = listing.seller_phone || null;
           
-          console.log('✅ Videos synchronized - Using display name:', displayName);
+          console.log('✅ VIDEOS REAL DATA:', {
+            name: displayName,
+            phone: phoneNumber,
+            seller_id: listing.seller_id
+          });
           
           return {
             id: listing.id,
