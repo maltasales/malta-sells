@@ -528,9 +528,15 @@ export default function VideosPage() {
                           <p className="text-white font-semibold hover:text-blue-300 transition-colors cursor-pointer">
                             {video.agent.name}
                           </p>
-                          <span className="inline-flex items-center justify-center w-4 h-4 bg-blue-500 rounded-full flex-shrink-0">
-                            <BadgeCheck className="w-3 h-3 text-white" />
-                          </span>
+                          {/* Show verification badge only for paid plans (not Free plan) */}
+                          {(() => {
+                            const isPaidPlan = video.agent.plan_id !== 'free';
+                            return isPaidPlan ? (
+                              <span className="inline-flex items-center justify-center w-4 h-4 bg-blue-500 rounded-full flex-shrink-0">
+                                <BadgeCheck className="w-3 h-3 text-white" />
+                              </span>
+                            ) : null;
+                          })()}
                         </div>
                       </Link>
                     </div>
