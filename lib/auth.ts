@@ -70,26 +70,56 @@ export async function signUp(data: SignUpData): Promise<{ user: User }> {
 
   // CRITICAL: Save profile to Supabase IMMEDIATELY so it shows on listings
   try {
-    console.log('Creating profile in Supabase for:', newUser.name, newUser.id);
-    const { data: profileData, error: profileError } = await supabase
+    console.log('🔥 CREATING REAL PROFILE in Supabase for:', newUser.name, newUser.id);
+    
+    // First check if profile already exists
+    const { data: existingProfile } = await supabase
       .from('profiles')
-      .insert({
-        id: newUser.id,
-        full_name: data.full_name,
-        role: data.role
-      })
-      .select()
+      .select('id')
+      .eq('id', newUser.id)
       .single();
 
-    if (profileError) {
-      console.error('Failed to create profile:', profileError);
-      console.log('Continuing without profile creation - will use fallback names');
+    if (existingProfile) {
+      console.log('Profile already exists, updating with new data');
+      const { data: updatedProfile, error: updateError } = await supabase
+        .from('profiles')
+        .update({
+          full_name: data.full_name,
+          role: data.role,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', newUser.id)
+        .select()
+        .single();
+
+      if (updateError) {
+        console.error('❌ Failed to update profile:', updateError);
+        throw new Error('Failed to save user profile');
+      }
+      console.log('✅ Profile updated successfully:', updatedProfile);
     } else {
-      console.log('Profile created successfully in Supabase:', profileData);
+      // Create new profile
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .insert({
+          id: newUser.id,
+          full_name: data.full_name,
+          role: data.role,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        })
+        .select()
+        .single();
+
+      if (profileError) {
+        console.error('❌ Failed to create profile:', profileError);
+        throw new Error('Failed to save user profile');
+      }
+      console.log('✅ REAL PROFILE created successfully:', profileData);
     }
   } catch (error) {
-    console.error('Error creating profile:', error);
-    console.log('Continuing without profile creation - will use fallback names');
+    console.error('❌ CRITICAL ERROR: Cannot create profile:', error);
+    throw new Error('Failed to save user profile. Please try again.');
   }
 
   // Store user locally
