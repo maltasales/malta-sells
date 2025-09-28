@@ -245,25 +245,25 @@ export default function VideosPage() {
             videoUrl: property.video_url,
             thumbnail: property.images?.[0] || 'https://images.pexels.com/photos/1918291/pexels-photo-1918291.jpeg?w=200&h=300&fit=crop',
             description: property.description,
-            // Agent info for Property Videos cards
+            // Agent info for Property Videos cards - REAL DATA ONLY
             agent: {
-              name: displayName,
-              avatar: avatarUrl,
-              phone: profile?.phone || '+356 9999 1234',
+              name: displayName, // REAL NAME from profile
+              avatar: avatarUrl, // REAL or generated from REAL NAME
+              phone: phoneNumber, // REAL PHONE or null
               id: property.seller_id,
               role: displayRole,
-              plan_id: profile?.plan_id || 'free',
-              verified: profile?.verified || false
+              plan_id: profile.plan_id || 'free',
+              verified: profile.verified || false
             },
-            // Owner info for Property Details pages (same data, different structure)
+            // Owner info for Property Details pages - REAL DATA ONLY
             owner: {
-              name: displayName,
-              avatar: avatarUrl,
-              phone: profile?.phone || '+356 9999 1234',
+              name: displayName, // REAL NAME from profile
+              avatar: avatarUrl, // REAL or generated from REAL NAME  
+              phone: phoneNumber, // REAL PHONE or null
               id: property.seller_id,
               role: displayRole,
-              plan_id: profile?.plan_id || 'free',
-              verified: profile?.verified || false
+              plan_id: profile.plan_id || 'free',
+              verified: profile.verified || false
             }
           };
         }).filter(Boolean) || []; // Remove null entries (videos without real profiles)
