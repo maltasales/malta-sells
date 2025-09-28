@@ -316,13 +316,30 @@ export default function SellerDashboard() {
                       <Link
                         href={`/property/${property.id}`}
                         className="flex-1 flex items-center justify-center space-x-1 px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm"
+                        data-testid="view-property-button"
                       >
                         <Eye className="w-4 h-4" />
                         <span>View</span>
                       </Link>
-                      <button className="flex items-center justify-center space-x-1 px-3 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors text-sm">
+                      <button 
+                        className="flex items-center justify-center space-x-1 px-3 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors text-sm"
+                        data-testid="edit-property-button"
+                      >
                         <Edit className="w-4 h-4" />
                         <span>Edit</span>
+                      </button>
+                      <button 
+                        onClick={() => handleDeleteProperty(property.id)}
+                        disabled={deletingPropertyId === property.id}
+                        className="flex items-center justify-center space-x-1 px-3 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                        data-testid="delete-property-button"
+                      >
+                        {deletingPropertyId === property.id ? (
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-red-700"></div>
+                        ) : (
+                          <Trash2 className="w-4 h-4" />
+                        )}
+                        <span>Delete</span>
                       </button>
                     </div>
                   </div>
