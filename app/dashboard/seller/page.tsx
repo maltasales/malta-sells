@@ -134,10 +134,25 @@ export default function SellerDashboard() {
     }
   }, [user, fetchSellerProperties, checkVerificationStatus]);
 
-  const handleAddPropertyClick = () => {
-    // Only show verification modal the FIRST TIME if not verified
-    if (!isVerified && !hasAttemptedAddProperty) {
-      setHasAttemptedAddProperty(true);
+  const handleAddPropertyClick = async () => {
+    // Show verification modal ONLY the FIRST TIME if not verified and prompt not shown yet
+    if (!isVerified && !verificationPromptShown) {
+      // Set verification_prompt_shown = true in database immediately
+      try {
+        const { error } = await supabase
+          .from('profiles')
+          .update({ verification_prompt_shown: true, updated_at: new Date().toISOString() })
+          .eq('id', user?.id);
+        
+        if (error) {
+          console.error('Error updating verification prompt status:', error);
+        } else {
+          setVerificationPromptShown(true);
+        }
+      } catch (error) {
+        console.error('Error updating verification prompt status:', error);
+      }
+      
       setShowVerificationModal(true);
       return;
     }
@@ -150,7 +165,7 @@ export default function SellerDashboard() {
       return;
     }
 
-    // Always go to create property page (after first verification attempt)
+    // Always go to create property page (after first verification attempt or if verified)
     router.push('/dashboard/seller/create');
   };
 
