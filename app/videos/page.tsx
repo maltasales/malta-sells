@@ -211,25 +211,23 @@ export default function VideosPage() {
             videoUrl: property.video_url,
             thumbnail: property.images?.[0] || 'https://images.pexels.com/photos/1918291/pexels-photo-1918291.jpeg?w=200&h=300&fit=crop',
             description: property.description,
-            // Agent info for Property Videos cards - REAL DATA ONLY
             agent: {
-              name: displayName, // REAL NAME from profile
-              avatar: avatarUrl, // REAL or generated from REAL NAME
-              phone: phoneNumber, // REAL PHONE or null
+              name: sellerName,
+              avatar: sellerAvatar,
+              phone: sellerPhone,
               id: property.seller_id,
-              role: displayRole,
-              plan_id: profile.plan_id || 'free',
-              verified: profile.verified || false
+              role: 'Property Seller',
+              plan_id: profile?.plan_id || 'free',
+              verified: profile?.verified || false
             },
-            // Owner info for Property Details pages - REAL DATA ONLY
             owner: {
-              name: displayName, // REAL NAME from profile
-              avatar: avatarUrl, // REAL or generated from REAL NAME  
-              phone: phoneNumber, // REAL PHONE or null
+              name: sellerName,
+              avatar: sellerAvatar,
+              phone: sellerPhone,
               id: property.seller_id,
-              role: displayRole,
-              plan_id: profile.plan_id || 'free',
-              verified: profile.verified || false
+              role: 'Property Seller',
+              plan_id: profile?.plan_id || 'free',
+              verified: profile?.verified || false
             }
           };
         }) || []; // Show all videos
