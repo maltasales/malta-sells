@@ -266,9 +266,19 @@ export default function StoriesSection() {
 
       // Transform the synchronized data to match the expected format
       const transformedVideos = listingsWithProfiles?.map((listing: any) => {
-        const sellerName = listing.seller_name || 'Property Seller';
+        console.log('🔍 CHECKING SYNCHRONIZED LISTING for:', listing.listing_id, 'seller_name:', listing.seller_name);
+        
+        // MUST use the EXACT real name from synchronized data - NO fallbacks like "Property Seller"
+        if (!listing.seller_name) {
+          console.error('❌ NO REAL NAME in synchronized listing for seller:', listing.seller_id, '- SKIPPING this listing');
+          return null; // Skip listings without real names
+        }
+        
+        const sellerName = listing.seller_name; // EXACT name like "Test video"
         const sellerAvatar = listing.seller_avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(sellerName)}&background=D12C1D&color=fff&size=100`;
         const sellerPhone = listing.seller_phone || '+356 9999 1234';
+        
+        console.log('✅ USING REAL NAME FROM SYNC:', sellerName, 'for listing:', listing.listing_title);
         
         return {
           id: listing.listing_id,
