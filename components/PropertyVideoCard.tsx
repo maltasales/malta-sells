@@ -2,6 +2,7 @@
 
 import { useRef, useState, useEffect } from 'react';
 import { Play, BadgeCheck } from 'lucide-react';
+import { getPlanById, getDefaultPlan } from '@/lib/plans';
 import Link from 'next/link';
 
 interface PropertyVideo {
