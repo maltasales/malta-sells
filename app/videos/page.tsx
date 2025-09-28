@@ -212,19 +212,35 @@ export default function VideosPage() {
   };
 
   useEffect(() => {
-    fetchPropertyVideos();
+    const loadVideosAndSetStart = async () => {
+      await fetchPropertyVideos();
+    };
+    loadVideosAndSetStart();
   }, []);
 
   useEffect(() => {
-    if (startId && propertyVideos.length > 0) {
+    // Only set start video after loading is complete and we have real data
+    if (startId && propertyVideos.length > 0 && !loading) {
+      console.log('Setting start video:', startId, 'from videos:', propertyVideos.map(v => v.id));
       const index = propertyVideos.findIndex(video => video.id === startId);
+      console.log('Found index:', index);
       if (index !== -1) {
         setCurrentIndex(index);
         setIsPaused(false);
         setShowPlayOverlay(false);
+        
+        // Scroll to the correct video immediately
+        setTimeout(() => {
+          if (containerRef.current) {
+            const videoElement = containerRef.current.children[index] as HTMLElement;
+            if (videoElement) {
+              videoElement.scrollIntoView({ behavior: 'instant', block: 'start' });
+            }
+          }
+        }, 100);
       }
     }
-  }, [startId, propertyVideos]);
+  }, [startId, propertyVideos, loading]);
 
   useEffect(() => {
     // Play current video and pause others
