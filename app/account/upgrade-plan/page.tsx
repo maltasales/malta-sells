@@ -170,15 +170,29 @@ export default function UpgradePlanPage() {
                   {/* CTA Button */}
                   <button
                     onClick={() => handleSelectPlan(plan.id)}
-                    className={`w-full py-3 px-6 rounded-lg font-medium transition-colors ${
-                      plan.isFreeTrial
+                    disabled={user?.plan_id === plan.id}
+                    className={`w-full py-3 px-6 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
+                      user?.plan_id === plan.id
+                        ? 'bg-gray-300 text-gray-600'
+                        : plan.isFreeTrial
                         ? `${plan.color} text-white ${plan.hoverColor}`
                         : plan.popular
                         ? `${plan.color} text-white ${plan.hoverColor}`
+                        : plan.id === 'free'
+                        ? 'bg-gray-100 text-gray-900 hover:bg-gray-200'
                         : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
                     }`}
                   >
-                    {plan.isFreeTrial ? 'Start Free Trial' : plan.popular ? 'Get Started' : 'Choose Plan'}
+                    {user?.plan_id === plan.id 
+                      ? 'Current Plan' 
+                      : plan.id === 'free'
+                      ? 'Downgrade'
+                      : plan.isFreeTrial 
+                      ? 'Start Free Trial' 
+                      : plan.popular 
+                      ? 'Get Started' 
+                      : 'Choose Plan'
+                    }
                   </button>
                 </div>
               </div>
