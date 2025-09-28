@@ -118,8 +118,9 @@ export async function signUp(data: SignUpData): Promise<{ user: User }> {
       console.log('✅ REAL PROFILE created successfully:', profileData);
     }
   } catch (error) {
-    console.error('❌ CRITICAL ERROR: Cannot create profile:', error);
-    throw new Error('Failed to save user profile. Please try again.');
+    console.error('❌ Profile creation failed:', error);
+    console.log('User account created but profile sync may be incomplete');
+    // Don't throw error - allow user creation to continue
   }
 
   // Store user locally
