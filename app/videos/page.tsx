@@ -111,10 +111,9 @@ export default function VideosPage() {
         const transformedVideos = syncedListings.map((listing: any) => {
           console.log('🔍 VIDEOS - CHECKING SYNCHRONIZED:', listing.id, 'seller_name:', listing.seller_name);
           
-          // MUST use the EXACT real name - NO fallbacks like "Property Seller"
+          // Use real name if available, otherwise use identifier but DON'T skip
           if (!listing.seller_name) {
-            console.error('❌ NO REAL NAME for video seller:', listing.seller_id, '- SKIPPING this video');
-            return null; // Skip videos without real names
+            console.log('⚠️ NO REAL NAME for video seller:', listing.seller_id, '- Using identifier');
           }
           
           const sellerName = listing.seller_name; // EXACT name like "Test video"
