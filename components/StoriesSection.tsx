@@ -158,7 +158,7 @@ export default function StoriesSection() {
           console.error('Error fetching profiles fallback:', profilesError);
         }
 
-        // Transform data - show ALL properties but use REAL profile names when available
+        // Simple: Use real profile data if available, basic fallback if not
         const fallbackVideos = properties?.map((property: any) => {
           const profile = profiles?.find(p => p.id === property.seller_id);
           
