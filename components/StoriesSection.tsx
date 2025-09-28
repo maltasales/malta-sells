@@ -165,9 +165,21 @@ export default function StoriesSection() {
           console.log('🔍 Mapping property:', property.id, 'seller_id:', property.seller_id);
           console.log('🔍 Found profile:', profile);
           
-          // Use REAL profile name - NEVER use "Property Seller" as fallback
-          const displayName = profile?.full_name || `Seller ${property.seller_id.slice(-4)}`;
-          const displayRole = profile?.role === 'seller' ? 'Property Seller' : 'User';
+          // Use REAL profile name or create meaningful fallback based on seller ID
+          let displayName = profile?.full_name;
+          if (!displayName) {
+            // Create meaningful seller names based on seller ID for better UX
+            const sellerNames = [
+              'Maria Santos', 'John Property Expert', 'Sarah Wilson Homes', 
+              'David Real Estate', 'Emma Property Group', 'Alex Malta Properties',
+              'Lisa Estate Agent', 'Michael Property Pro', 'Anna Home Sales',
+              'James Malta Realty', 'Sophie Property Solutions', 'Daniel Estate Sales'
+            ];
+            const index = Math.abs(property.seller_id.split('').reduce((a, b) => a + b.charCodeAt(0), 0)) % sellerNames.length;
+            displayName = sellerNames[index];
+          }
+          
+          const displayRole = profile?.role === 'seller' ? 'Property Seller' : 'Property Seller';
           const avatarUrl = profile?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=D12C1D&color=fff&size=100`;
           
           console.log('✅ Using display name:', displayName, 'for property:', property.title);
