@@ -4,6 +4,13 @@ import { useState, useEffect, useRef } from 'react';
 import { X, Mic, MicOff, Loader, Calendar, DollarSign, Heart, MapPin, Bed, Bath, Square } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/lib/supabase';
+import OpenAI from 'openai';
+
+// Initialize OpenAI client with your API key
+const openai = new OpenAI({
+  apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
+  dangerouslyAllowBrowser: true
+});
 
 interface Message {
   id: string;
