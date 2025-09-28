@@ -18,6 +18,18 @@ export interface Plan {
 
 export const PLANS: Plan[] = [
   {
+    id: 'free',
+    name: 'Free',
+    price: 0,
+    period: 'forever',
+    maxListings: 1,
+    features: [
+      'List up to 1 property',
+      'Basic listing features',
+      'Email support',
+    ],
+  },
+  {
     id: 'basic',
     name: 'Basic',
     price: 0,
