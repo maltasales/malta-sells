@@ -258,6 +258,11 @@ export default function StoriesSection() {
 
       // Transform the synchronized data to match the expected format
       const transformedVideos = listingsWithProfiles?.map((listing: any) => {
+        // Generate proper display name and avatar for consistent user representation
+        const displayName = listing.seller_name || 'Property Seller';
+        const displayRole = listing.seller_role === 'seller' ? 'Property Seller' : 'User';
+        const avatarUrl = listing.seller_avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=D12C1D&color=fff&size=100`;
+        
         return {
           id: listing.listing_id,
           title: listing.listing_title,
@@ -271,11 +276,25 @@ export default function StoriesSection() {
           videoUrl: listing.listing_video_url,
           thumbnail: listing.listing_images?.[0] || 'https://images.pexels.com/photos/1918291/pexels-photo-1918291.jpeg?w=200&h=300&fit=crop',
           description: listing.listing_description,
+          // Agent info for Property Videos cards
           agent: {
-            name: listing.seller_name || 'Property Seller',
-            avatar: listing.seller_avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(listing.seller_name || 'Property Seller')}&background=D12C1D&color=fff&size=100`,
+            name: displayName,
+            avatar: avatarUrl,
             phone: listing.seller_phone || '+356 9999 1234',
             id: listing.seller_id,
+            role: displayRole,
+            plan_id: listing.seller_plan_id || 'free',
+            verified: listing.seller_verified || false
+          },
+          // Owner info for Property Details pages (same data, different structure)
+          owner: {
+            name: displayName,
+            avatar: avatarUrl,
+            phone: listing.seller_phone || '+356 9999 1234',
+            id: listing.seller_id,
+            role: displayRole,
+            plan_id: listing.seller_plan_id || 'free',
+            verified: listing.seller_verified || false
           }
         };
       }) || [];
