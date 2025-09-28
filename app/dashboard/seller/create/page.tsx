@@ -108,6 +108,43 @@ export default function CreatePropertyPage() {
     },
   });
 
+  // Check listing limits on component mount
+  useEffect(() => {
+    const checkListingLimits = async () => {
+      if (!profile) return;
+
+      try {
+        // Get current listing count
+        const { data, error } = await supabase
+          .from('properties')
+          .select('id')
+          .eq('seller_id', profile.id);
+
+        if (error) {
+          console.error('Error fetching listing count:', error);
+          return;
+        }
+
+        const listingCount = data?.length || 0;
+        setCurrentListingCount(listingCount);
+
+        // Check if user can add more listings
+        const userPlan = profile.plan_id ? getPlanById(profile.plan_id) : getDefaultPlan();
+        if (!canAddListing(listingCount, userPlan.id)) {
+          // Redirect to upgrade page if limit exceeded
+          router.push('/account/upgrade-plan');
+          return;
+        }
+      } catch (error) {
+        console.error('Error checking listing limits:', error);
+      } finally {
+        setCheckingLimits(false);
+      }
+    };
+
+    checkListingLimits();
+  }, [profile, router]);
+
   const handleGenerateAIDescription = async () => {
     setIsGeneratingDescription(true);
     
