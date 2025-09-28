@@ -225,10 +225,10 @@ export default function VideosPage() {
             }
           }
           
-          // If still no name, skip this video
+          // If still no name, use a basic identifier but DON'T skip
           if (!sellerName) {
-            console.error('❌ NO REAL NAME found for video seller:', property.seller_id, '- SKIPPING this video');
-            return null;
+            console.log('⚠️ NO REAL NAME found for video seller:', property.seller_id, '- Using identifier');
+            sellerName = `Seller ${property.seller_id.slice(-4)}`;
           }
           
           // Set avatar and phone with fallbacks
