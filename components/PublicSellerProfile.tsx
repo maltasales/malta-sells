@@ -86,9 +86,16 @@ export default function PublicSellerProfile({ seller }: PublicSellerProfileProps
               <div>
                 <div className="flex items-center space-x-2">
                   <h1 className="text-3xl font-bold text-gray-900">{seller.name}</h1>
-                  <span className="inline-flex items-center justify-center w-8 h-8 bg-blue-500 rounded-full">
-                    <BadgeCheck className="w-5 h-5 text-white" />
-                  </span>
+                  {/* Show verification badge only for paid plans (not Free plan) */}
+                  {(() => {
+                    const userPlan = seller.plan_id ? getPlanById(seller.plan_id) : getDefaultPlan();
+                    const isPaidPlan = userPlan.id !== 'free';
+                    return isPaidPlan ? (
+                      <span className="inline-flex items-center justify-center w-8 h-8 bg-blue-500 rounded-full">
+                        <BadgeCheck className="w-5 h-5 text-white" />
+                      </span>
+                    ) : null;
+                  })()}
                 </div>
                 <div className="flex items-center space-x-2 mt-2">
                   <span className="px-3 py-1 bg-[#D12C1D] text-white text-sm font-medium rounded-full capitalize">
