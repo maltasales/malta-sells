@@ -47,8 +47,8 @@ export interface SignInData {
 }
 
 export async function signUp(data: SignUpData): Promise<{ user: User }> {
-  // Import here to avoid circular dependencies
-  const { ensureProfileExists } = await import('./profileSync');
+  // Import Supabase to save profile immediately
+  const { supabase } = await import('./supabase');
   
   // Check if user already exists
   const existingUser = users.find(u => u.email === data.email);
@@ -68,7 +68,36 @@ export async function signUp(data: SignUpData): Promise<{ user: User }> {
     verification_prompt_shown: false,
   };
 
-  // Store user
+  // CRITICAL: Save profile to Supabase IMMEDIATELY so it shows on listings
+  try {
+    console.log('Creating profile in Supabase for:', newUser.name, newUser.id);
+    const { data: profileData, error: profileError } = await supabase
+      .from('profiles')
+      .insert({
+        id: newUser.id,
+        full_name: data.full_name,
+        role: data.role,
+        plan_id: data.role === 'seller' ? 'free' : undefined,
+        verified: false,
+        verification_prompt_shown: false,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      })
+      .select()
+      .single();
+
+    if (profileError) {
+      console.error('Failed to create profile:', profileError);
+      throw new Error('Failed to create user profile');
+    }
+    
+    console.log('Profile created successfully in Supabase:', profileData);
+  } catch (error) {
+    console.error('Error creating profile:', error);
+    throw new Error('Failed to create user profile');
+  }
+
+  // Store user locally
   users.push(newUser);
   currentUser = newUser;
 
@@ -76,16 +105,6 @@ export async function signUp(data: SignUpData): Promise<{ user: User }> {
   if (typeof window !== 'undefined') {
     localStorage.setItem('users', JSON.stringify(users));
     localStorage.setItem('currentUser', JSON.stringify(currentUser));
-  }
-
-  // Ensure profile exists in database for proper sync across Property Videos and Listings
-  if (data.role === 'seller') {
-    await ensureProfileExists(newUser.id, {
-      full_name: data.full_name,
-      email: data.email,
-      role: data.role,
-      plan_id: 'free'
-    });
   }
 
   return { user: newUser };
