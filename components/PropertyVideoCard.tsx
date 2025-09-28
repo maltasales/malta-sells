@@ -160,9 +160,16 @@ export default function PropertyVideoCard({ video }: PropertyVideoCardProps) {
                   <p className="text-white text-xs font-medium truncate hover:text-blue-300 transition-colors">
                     {video.agent.name}
                   </p>
-                  <span className="inline-flex items-center justify-center w-3 h-3 bg-blue-500 rounded-full flex-shrink-0">
-                    <BadgeCheck className="w-2 h-2 text-white" />
-                  </span>
+                  {/* Show verification badge only for paid plans (not Free plan) */}
+                  {(() => {
+                    const userPlan = video.agent.plan_id ? getPlanById(video.agent.plan_id) : getDefaultPlan();
+                    const isPaidPlan = userPlan.id !== 'free';
+                    return isPaidPlan ? (
+                      <span className="inline-flex items-center justify-center w-3 h-3 bg-blue-500 rounded-full flex-shrink-0">
+                        <BadgeCheck className="w-2 h-2 text-white" />
+                      </span>
+                    ) : null;
+                  })()}
                 </div>
               </div>
               <p className="text-white text-sm font-bold">
