@@ -162,12 +162,20 @@ export default function StoriesSection() {
         const fallbackVideos = properties?.map((property: any) => {
           const profile = profiles?.find(p => p.id === property.seller_id);
           
+          console.log('🔍 CHECKING PROFILE for property:', property.id, 'seller_id:', property.seller_id);
+          console.log('🔍 FOUND PROFILE:', profile);
           
-          // Use REAL profile name if available, otherwise use seller ID as identifier
-          const sellerName = profile?.full_name || 'Property Seller';
-          const sellerAvatar = profile?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(sellerName)}&background=D12C1D&color=fff&size=100`;
-          const sellerPhone = profile?.phone || '+356 9999 1234';
+          // MUST use the EXACT real name from profile - NO fallbacks like "Property Seller"
+          if (!profile?.full_name) {
+            console.error('❌ NO REAL NAME for seller:', property.seller_id, '- SKIPPING this property');
+            return null; // Skip properties without real names
+          }
           
+          const sellerName = profile.full_name; // EXACT name like "Test video"
+          const sellerAvatar = profile.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(sellerName)}&background=D12C1D&color=fff&size=100`;
+          const sellerPhone = profile.phone || '+356 9999 1234';
+          
+          console.log('✅ USING REAL NAME:', sellerName, 'for property:', property.title);
           
           return {
             id: property.id,
