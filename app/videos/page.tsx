@@ -192,25 +192,11 @@ export default function VideosPage() {
           console.error('Error fetching profiles:', profilesError);
         }
 
-        // Transform data - show ALL videos but use REAL profile names when available
         const transformedVideos = properties?.map((property: any) => {
           const profile = profiles?.find(p => p.id === property.seller_id);
-          
-          console.log('🔍 VIDEOS PROPERTY:', property.id, 'SELLER ID:', property.seller_id);
-          console.log('🔍 PROFILE FOUND:', profile);
-          
-          // Use REAL profile name if available, otherwise use seller ID identifier
-          const displayName = profile?.full_name || `Seller ${property.seller_id.slice(-4)}`;
-          const displayRole = 'Property Seller';
-          const avatarUrl = profile?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=D12C1D&color=fff&size=100`;
-          const phoneNumber = profile?.phone || null;
-          
-          console.log('✅ DISPLAYING VIDEO:', {
-            name: displayName,
-            phone: phoneNumber,  
-            seller_id: property.seller_id,
-            hasRealProfile: !!profile?.full_name
-          });
+          const sellerName = profile?.full_name || 'Property Seller';
+          const sellerAvatar = profile?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(sellerName)}&background=D12C1D&color=fff&size=100`;
+          const sellerPhone = profile?.phone || '+356 9999 1234';
           
           return {
             id: property.id,
