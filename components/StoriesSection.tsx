@@ -134,10 +134,12 @@ export default function StoriesSection() {
             video_url,
             images,
             description,
-            seller_id
+            seller_id,
+            created_at
           `)
           .not('video_url', 'is', null)
-          .order('created_at', { ascending: false });
+          .order('created_at', { ascending: false })
+          .limit(8);
 
         if (propertiesError) {
           console.error('Error fetching properties fallback:', propertiesError);
