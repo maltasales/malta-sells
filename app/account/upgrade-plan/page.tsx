@@ -83,11 +83,26 @@ export default function UpgradePlanPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="text-lg font-semibold text-gray-900">Current Plan</h3>
-                  <p className="text-gray-600">You are currently on the <span className="font-medium">Free Plan</span></p>
+                  {(() => {
+                    const currentPlan = user.plan_id ? getPlanById(user.plan_id) : getDefaultPlan();
+                    return (
+                      <>
+                        <p className="text-gray-600">You are currently on the <span className="font-medium">{currentPlan?.name} Plan</span></p>
+                        <p className="text-sm text-gray-500 mt-1">{currentPlan?.maxListings} listing{currentPlan?.maxListings !== 1 ? 's' : ''} allowed</p>
+                      </>
+                    );
+                  })()}
                 </div>
                 <div className="text-right">
-                  <p className="text-2xl font-bold text-gray-900">€0</p>
-                  <p className="text-sm text-gray-500">per month</p>
+                  {(() => {
+                    const currentPlan = user.plan_id ? getPlanById(user.plan_id) : getDefaultPlan();
+                    return (
+                      <>
+                        <p className="text-2xl font-bold text-gray-900">€{currentPlan?.price || 0}</p>
+                        <p className="text-sm text-gray-500">per {currentPlan?.period || 'month'}</p>
+                      </>
+                    );
+                  })()}
                 </div>
               </div>
             </div>
