@@ -109,9 +109,19 @@ export default function VideosPage() {
         console.log('Using synchronized property data:', syncedListings);
         
         const transformedVideos = syncedListings.map((listing: any) => {
-          const sellerName = listing.seller_name || 'Property Seller';
+          console.log('🔍 VIDEOS - CHECKING SYNCHRONIZED:', listing.id, 'seller_name:', listing.seller_name);
+          
+          // MUST use the EXACT real name - NO fallbacks like "Property Seller"
+          if (!listing.seller_name) {
+            console.error('❌ NO REAL NAME for video seller:', listing.seller_id, '- SKIPPING this video');
+            return null; // Skip videos without real names
+          }
+          
+          const sellerName = listing.seller_name; // EXACT name like "Test video"
           const sellerAvatar = listing.seller_avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(sellerName)}&background=D12C1D&color=fff&size=100`;
           const sellerPhone = listing.seller_phone || '+356 9999 1234';
+          
+          console.log('✅ VIDEOS - USING REAL NAME:', sellerName, 'for video:', listing.title);
           
           return {
             id: listing.id,
