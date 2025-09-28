@@ -263,10 +263,14 @@ export default function StoriesSection() {
 
       // Transform the synchronized data to match the expected format
       const transformedVideos = listingsWithProfiles?.map((listing: any) => {
-        // Generate proper display name and avatar for consistent user representation
-        const displayName = listing.seller_name || 'Property Seller';
+        console.log('🔍 Synchronized data - listing:', listing.listing_id, 'seller_name:', listing.seller_name);
+        
+        // Use REAL seller name from synchronized data - NEVER use "Property Seller"
+        const displayName = listing.seller_name || `Seller ${listing.seller_id?.slice(-4) || 'Unknown'}`;
         const displayRole = listing.seller_role === 'seller' ? 'Property Seller' : 'User';
         const avatarUrl = listing.seller_avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=D12C1D&color=fff&size=100`;
+        
+        console.log('✅ Synchronized - Using display name:', displayName);
         
         return {
           id: listing.listing_id,
