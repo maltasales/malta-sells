@@ -62,6 +62,7 @@ export async function signUp(data: SignUpData): Promise<{ user: User }> {
     createdAt: new Date().toISOString(),
     // Assign Free plan to new sellers, no plan for buyers
     plan_id: data.role === 'seller' ? 'free' : undefined,
+    verification_prompt_shown: false,
   };
 
   // Store user
