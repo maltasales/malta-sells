@@ -433,6 +433,16 @@ export default function VerificationModal({
             Cancel
           </button>
           <button
+            onClick={() => {
+              // Skip verification but mark as shown so it won't appear again
+              onVerificationComplete();
+            }}
+            disabled={loading}
+            className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+          >
+            Skip for now
+          </button>
+          <button
             onClick={handleSubmit}
             disabled={loading}
             className="flex-1 px-4 py-2 bg-[#D12C1D] text-white rounded-lg hover:bg-[#B8241A] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
