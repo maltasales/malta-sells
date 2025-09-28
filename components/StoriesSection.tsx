@@ -164,7 +164,7 @@ export default function StoriesSection() {
           
           
           // Use REAL profile name if available, otherwise use seller ID as identifier
-          const displayName = profile?.full_name || `Seller ${property.seller_id.slice(-4)}`;
+          const sellerName = profile?.full_name || 'Property Seller';
           const displayRole = 'Property Seller';
           const avatarUrl = profile?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=D12C1D&color=fff&size=100`;
           const phoneNumber = profile?.phone || null;
