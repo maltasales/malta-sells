@@ -266,9 +266,16 @@ export default function SellerProfileCard({ user }: SellerProfileCardProps) {
         <div className="space-y-2">
           <div className="flex items-center space-x-2">
             <h2 className="text-2xl font-bold text-gray-900">{user.name}</h2>
-            <span className="inline-flex items-center justify-center w-6 h-6 bg-blue-500 rounded-full">
-              <BadgeCheck className="w-4 h-4 text-white" />
-            </span>
+            {/* Show verification badge only for paid plans (not Free plan) */}
+            {(() => {
+              const userPlan = user.plan_id ? getPlanById(user.plan_id) : getDefaultPlan();
+              const isPaidPlan = userPlan.id !== 'free';
+              return isPaidPlan ? (
+                <span className="inline-flex items-center justify-center w-6 h-6 bg-blue-500 rounded-full">
+                  <BadgeCheck className="w-4 h-4 text-white" />
+                </span>
+              ) : null;
+            })()}
           </div>
           <div className="flex items-center space-x-2">
             <span className="px-2 py-1 bg-[#D12C1D] text-white text-xs font-medium rounded-full capitalize">
