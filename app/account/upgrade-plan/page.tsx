@@ -33,10 +33,25 @@ export default function UpgradePlanPage() {
   const { user } = useAuth();
   const router = useRouter();
 
-  const handleSelectPlan = (planId: string) => {
+  const handleSelectPlan = async (planId: string) => {
+    if (!user) return;
+    
     const selectedPlan = plans.find(p => p.id === planId);
     if (selectedPlan) {
-      // Navigate to payment page with plan details
+      // For free plans or downgrades, update immediately
+      if (planId === 'free' || selectedPlan.price === 0) {
+        const success = await updateUserPlan(user.id, planId, supabase);
+        if (success) {
+          // Refresh the page to show updated plan
+          window.location.reload();
+          return;
+        } else {
+          alert('Failed to update plan. Please try again.');
+          return;
+        }
+      }
+      
+      // For paid plans, navigate to payment page
       const queryParams = new URLSearchParams({
         plan: planId,
         name: selectedPlan.name,
