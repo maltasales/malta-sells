@@ -217,7 +217,7 @@ export default function StoriesSection() {
               verified: profile.verified || false
             }
           };
-        }) || [];
+        }).filter(Boolean) || []; // Remove null entries (properties without real profiles)
 
         console.log('Using fallback data:', fallbackVideos);
         
