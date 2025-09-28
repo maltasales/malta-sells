@@ -65,16 +65,16 @@ export default function SellerDashboard() {
     if (!user) return;
 
     try {
-      // Check if user has phone number and verified status in profile
+      // Check if user has phone number, verified status, and verification prompt status
       const { data, error } = await supabase
         .from('profiles')
-        .select('phone, full_name, verified')
+        .select('phone, full_name, verified, verification_prompt_shown, plan_id')
         .eq('id', user.id)
         .single();
 
       if (error) {
         console.log('Error checking verification:', error);
-        // If profile doesn't exist, create a basic one
+        // If profile doesn't exist, create a basic one with Free plan
         if (error.code === 'PGRST116') {
           const { error: insertError } = await supabase
             .from('profiles')
@@ -83,7 +83,11 @@ export default function SellerDashboard() {
                 id: user.id,
                 full_name: user.name || '',
                 verified: false,
-                created_at: new Date().toISOString()
+                verification_prompt_shown: false,
+                plan_id: 'free',
+                role: user.role,
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString()
               }
             ]);
           
@@ -92,14 +96,26 @@ export default function SellerDashboard() {
           }
         }
         setIsVerified(false);
+        setVerificationPromptShown(false);
         return;
       }
 
       // Consider verified if phone number exists OR verified flag is true
       setIsVerified(!!(data?.phone || data?.verified));
+      setVerificationPromptShown(!!data?.verification_prompt_shown);
+      
+      // Update user object with database plan_id if different
+      if (data?.plan_id && user.plan_id !== data.plan_id) {
+        // Update localStorage user object
+        const updatedUser = { ...user, plan_id: data.plan_id };
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+        }
+      }
     } catch (error) {
       console.error('Error checking verification status:', error);
       setIsVerified(false);
+      setVerificationPromptShown(false);
     }
   }, [user]);
 
