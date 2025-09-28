@@ -182,7 +182,6 @@ export default function StoriesSection() {
             videoUrl: property.video_url,
             thumbnail: property.images?.[0] || 'https://images.pexels.com/photos/1918291/pexels-photo-1918291.jpeg?w=200&h=300&fit=crop',
             description: property.description,
-            // Agent info for Property Videos cards
             agent: {
               name: sellerName,
               avatar: sellerAvatar,
@@ -192,7 +191,6 @@ export default function StoriesSection() {
               plan_id: profile?.plan_id || 'free',
               verified: profile?.verified || false
             },
-            // Owner info for Property Details pages
             owner: {
               name: sellerName,
               avatar: sellerAvatar,
