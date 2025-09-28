@@ -135,37 +135,33 @@ export default function SellerDashboard() {
   }, [user, fetchSellerProperties, checkVerificationStatus]);
 
   const handleAddPropertyClick = async () => {
-    // Show verification modal ONLY the FIRST TIME if not verified and prompt not shown yet
-    if (!isVerified && !verificationPromptShown) {
-      // Set verification_prompt_shown = true in database immediately
+    // Simple logic: Show verification ONLY the very first time (if never shown before AND not verified)
+    if (!verificationPromptShown && !isVerified) {
+      // Mark as shown immediately to prevent showing again
+      setVerificationPromptShown(true);
+      
+      // Update database
       try {
-        const { error } = await supabase
+        await supabase
           .from('profiles')
           .update({ verification_prompt_shown: true, updated_at: new Date().toISOString() })
           .eq('id', user?.id);
-        
-        if (error) {
-          console.error('Error updating verification prompt status:', error);
-        } else {
-          setVerificationPromptShown(true);
-        }
       } catch (error) {
-        console.error('Error updating verification prompt status:', error);
+        console.error('Error updating verification prompt:', error);
       }
       
       setShowVerificationModal(true);
       return;
     }
 
-    // Check listing limits based on user's plan
+    // Check plan limits - redirect to upgrade if exceeded
     const userPlan = user?.plan_id ? getPlanById(user.plan_id) : getDefaultPlan();
     if (!canAddListing(properties.length, userPlan.id)) {
-      // Redirect to upgrade page if limit exceeded
       router.push('/account/upgrade-plan');
       return;
     }
 
-    // Always go to create property page (after first verification attempt or if verified)
+    // Go directly to create property page
     router.push('/dashboard/seller/create');
   };
 
