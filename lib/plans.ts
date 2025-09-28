@@ -79,23 +79,26 @@ export const PLANS: Plan[] = [
   },
 ];
 
-export function getPlanById(planId: string): Plan | undefined {
-  return PLANS.find(plan => plan.id === planId);
+export function getPlanById(planId: string): Plan {
+  const plan = PLANS.find(plan => plan.id === planId);
+  if (!plan) {
+    console.warn(`Plan not found: ${planId}, returning default Free plan`);
+    return PLANS[0]; // Return Free plan as fallback
+  }
+  return plan;
 }
 
 export function getDefaultPlan(): Plan {
-  return PLANS.find(plan => plan.id === 'free') || PLANS[0];
+  return PLANS[0]; // Always return Free plan
 }
 
 export function canAddListing(currentListingCount: number, planId: string): boolean {
   const plan = getPlanById(planId);
-  if (!plan) return false;
   return currentListingCount < plan.maxListings;
 }
 
 export function getListingLimitMessage(planId: string): string {
   const plan = getPlanById(planId);
-  if (!plan) return 'Unknown plan';
   return `You can list up to ${plan.maxListings} propert${plan.maxListings === 1 ? 'y' : 'ies'} on the ${plan.name} plan.`;
 }
 
