@@ -118,12 +118,51 @@ export default function SellerDashboard() {
   }, [user, fetchSellerProperties, checkVerificationStatus]);
 
   const handleAddPropertyClick = () => {
-    if (isVerified) {
-      // If verified, go directly to create property page
-      router.push('/dashboard/seller/create');
-    } else {
+    if (!isVerified) {
       // If not verified, show verification modal
       setShowVerificationModal(true);
+      return;
+    }
+
+    // Check listing limits based on user's plan
+    const userPlan = user?.plan_id ? getPlanById(user.plan_id) : getDefaultPlan();
+    if (!canAddListing(properties.length, userPlan.id)) {
+      // Redirect to upgrade page if limit exceeded
+      router.push('/account/upgrade-plan');
+      return;
+    }
+
+    // If verified and within limits, go to create property page
+    router.push('/dashboard/seller/create');
+  };
+
+  const handleDeleteProperty = async (propertyId: string) => {
+    if (!confirm('Are you sure you want to delete this property listing? This action cannot be undone.')) {
+      return;
+    }
+
+    setDeletingPropertyId(propertyId);
+    try {
+      const { error } = await supabase
+        .from('properties')
+        .delete()
+        .eq('id', propertyId)
+        .eq('seller_id', user?.id); // Ensure user can only delete their own properties
+
+      if (error) {
+        console.error('Error deleting property:', error);
+        alert('Failed to delete property. Please try again.');
+        return;
+      }
+
+      // Remove from local state
+      setProperties(properties.filter(p => p.id !== propertyId));
+      
+    } catch (error) {
+      console.error('Error deleting property:', error);
+      alert('Failed to delete property. Please try again.');
+    } finally {
+      setDeletingPropertyId(null);
     }
   };
 
