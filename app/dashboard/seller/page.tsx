@@ -358,6 +358,7 @@ export default function SellerDashboard() {
               <button
                 onClick={handleAddPropertyClick}
                 className="inline-flex items-center space-x-2 px-6 py-3 bg-[#D12C1D] text-white rounded-lg hover:bg-[#B8241A] transition-colors"
+                data-testid="add-first-property-button"
               >
                 <Plus className="w-4 h-4" />
                 <span>{isVerified ? 'Add Property' : 'Add Your First Property'}</span>
