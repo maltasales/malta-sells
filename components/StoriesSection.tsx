@@ -162,8 +162,6 @@ export default function StoriesSection() {
         const fallbackVideos = properties?.map((property: any) => {
           const profile = profiles?.find(p => p.id === property.seller_id);
           
-          console.log('🔍 PROPERTY:', property.id, 'SELLER ID:', property.seller_id);
-          console.log('🔍 PROFILE FOUND:', profile);
           
           // Use REAL profile name if available, otherwise use seller ID as identifier
           const displayName = profile?.full_name || `Seller ${property.seller_id.slice(-4)}`;
