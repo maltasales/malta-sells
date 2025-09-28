@@ -271,22 +271,17 @@ export default function StoriesSection() {
       const transformedVideos = listingsWithProfiles?.map((listing: any) => {
         console.log('🔍 SYNCHRONIZED LISTING:', listing.listing_id, 'SELLER NAME:', listing.seller_name);
         
-        if (!listing.seller_name) {
-          console.error('❌ NO REAL SELLER NAME for listing:', listing.listing_id);
-          console.error('This listing will be SKIPPED because no real profile name exists');
-          return null; // Skip listings without real profile names
-        }
-        
-        // Use ONLY REAL synchronized data - NO FALLBACKS
-        const displayName = listing.seller_name; // REAL NAME from synchronized data
+        // Use REAL name if available, otherwise use seller ID identifier
+        const displayName = listing.seller_name || `Seller ${listing.seller_id?.slice(-4) || 'Unknown'}`;
         const displayRole = 'Property Seller';
         const avatarUrl = listing.seller_avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=D12C1D&color=fff&size=100`;
         const phoneNumber = listing.seller_phone || null;
         
-        console.log('✅ SYNCHRONIZED REAL DATA:', {
+        console.log('✅ DISPLAYING SYNCHRONIZED LISTING:', {
           name: displayName,
           phone: phoneNumber,
-          seller_id: listing.seller_id
+          seller_id: listing.seller_id,
+          hasRealName: !!listing.seller_name
         });
         
         return {
