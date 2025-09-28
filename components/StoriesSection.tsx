@@ -158,9 +158,15 @@ export default function StoriesSection() {
           console.error('Error fetching profiles fallback:', profilesError);
         }
 
-        // Transform fallback data
+        // Transform fallback data with complete user profile sync
         const fallbackVideos = properties?.map((property: any) => {
-          const profile = profiles.find(p => p.id === property.seller_id);
+          const profile = profiles?.find(p => p.id === property.seller_id);
+          
+          // Generate proper display name and avatar for consistent user representation
+          const displayName = profile?.full_name || 'Property Seller';
+          const displayRole = profile?.role === 'seller' ? 'Property Seller' : 'User';
+          const avatarUrl = profile?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=D12C1D&color=fff&size=100`;
+          
           return {
             id: property.id,
             title: property.title,
@@ -174,11 +180,25 @@ export default function StoriesSection() {
             videoUrl: property.video_url,
             thumbnail: property.images?.[0] || 'https://images.pexels.com/photos/1918291/pexels-photo-1918291.jpeg?w=200&h=300&fit=crop',
             description: property.description,
+            // Agent info for Property Videos cards
             agent: {
-              name: profile?.full_name || 'Property Seller',
-              avatar: profile?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(profile?.full_name || 'Property Seller')}&background=D12C1D&color=fff&size=100`,
+              name: displayName,
+              avatar: avatarUrl,
               phone: profile?.phone || '+356 9999 1234',
               id: property.seller_id,
+              role: displayRole,
+              plan_id: profile?.plan_id || 'free',
+              verified: profile?.verified || false
+            },
+            // Owner info for Property Details pages (same data, different structure)
+            owner: {
+              name: displayName,
+              avatar: avatarUrl,
+              phone: profile?.phone || '+356 9999 1234',
+              id: property.seller_id,
+              role: displayRole,
+              plan_id: profile?.plan_id || 'free',
+              verified: profile?.verified || false
             }
           };
         }) || [];
