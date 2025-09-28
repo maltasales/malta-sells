@@ -307,21 +307,21 @@ export default function StoriesSection() {
           videoUrl: listing.listing_video_url,
           thumbnail: listing.listing_images?.[0] || 'https://images.pexels.com/photos/1918291/pexels-photo-1918291.jpeg?w=200&h=300&fit=crop',
           description: listing.listing_description,
-          // Agent info for Property Videos cards
+          // Agent info for Property Videos cards - REAL SYNCHRONIZED DATA ONLY
           agent: {
-            name: displayName,
-            avatar: avatarUrl,
-            phone: listing.seller_phone || '+356 9999 1234',
+            name: displayName, // REAL NAME from synchronized data
+            avatar: avatarUrl, // REAL or generated from REAL NAME
+            phone: phoneNumber, // REAL PHONE or null
             id: listing.seller_id,
             role: displayRole,
             plan_id: listing.seller_plan_id || 'free',
             verified: listing.seller_verified || false
           },
-          // Owner info for Property Details pages (same data, different structure)
+          // Owner info for Property Details pages - REAL SYNCHRONIZED DATA ONLY
           owner: {
-            name: displayName,
-            avatar: avatarUrl,
-            phone: listing.seller_phone || '+356 9999 1234',
+            name: displayName, // REAL NAME from synchronized data
+            avatar: avatarUrl, // REAL or generated from REAL NAME
+            phone: phoneNumber, // REAL PHONE or null
             id: listing.seller_id,
             role: displayRole,
             plan_id: listing.seller_plan_id || 'free',
