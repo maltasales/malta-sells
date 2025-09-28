@@ -168,12 +168,6 @@ export default function StoriesSection() {
           const sellerAvatar = profile?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(sellerName)}&background=D12C1D&color=fff&size=100`;
           const sellerPhone = profile?.phone || '+356 9999 1234';
           
-          console.log('✅ DISPLAYING PROPERTY:', {
-            name: displayName,
-            phone: phoneNumber,
-            seller_id: property.seller_id,
-            hasRealProfile: !!profile?.full_name
-          });
           
           return {
             id: property.id,
