@@ -8,6 +8,7 @@ interface User {
   avatar_url?: string;
   banner_url?: string;
   plan_id?: string;
+  verification_prompt_shown?: boolean;
 }
 
 interface AuthState {
