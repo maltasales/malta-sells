@@ -142,25 +142,7 @@ export default function SellerDashboard() {
       return;
     }
 
-    // Show verification ONLY if never shown before (regardless of verification status)
-    if (!verificationPromptShown) {
-      // Mark as shown immediately in state and database
-      setVerificationPromptShown(true);
-      
-      try {
-        await supabase
-          .from('profiles')
-          .update({ verification_prompt_shown: true, updated_at: new Date().toISOString() })
-          .eq('id', user?.id);
-      } catch (error) {
-        console.error('Error updating verification prompt:', error);
-      }
-      
-      setShowVerificationModal(true);
-      return;
-    }
-
-    // Always go directly to create property page if prompt already shown
+    // NEVER show verification modal - go directly to create property page
     router.push('/dashboard/seller/create');
   };
 
