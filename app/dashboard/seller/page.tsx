@@ -206,7 +206,7 @@ export default function SellerDashboard() {
     
     // After verification, check limits and proceed
     const userPlan = user?.plan_id ? getPlanById(user.plan_id) : getDefaultPlan();
-    if (!canAddListing(properties.length, userPlan.id)) {
+    if (!userPlan || !canAddListing(properties.length, userPlan.id)) {
       router.push('/account/upgrade-plan');
       return;
     }
