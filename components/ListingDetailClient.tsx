@@ -174,11 +174,25 @@ export default function ListingDetailClient({ listing }: ListingDetailClientProp
               <div className="flex-1">
                 <div className="flex items-center space-x-1">
                   <p className="font-medium text-gray-900 hover:text-[#D12C1D] transition-colors">{listing.profiles.full_name}</p>
-                  <span className="inline-flex items-center justify-center w-4 h-4 bg-blue-500 rounded-full flex-shrink-0">
-                    <BadgeCheck className="w-3 h-3 text-white" />
-                  </span>
+                  {/* Show verification badge only for paid plans (not Free plan) */}
+                  {(() => {
+                    const userPlan = listing.profiles.plan_id ? getPlanById(listing.profiles.plan_id) : getDefaultPlan();
+                    const isPaidPlan = userPlan.id !== 'free';
+                    return isPaidPlan ? (
+                      <span className="inline-flex items-center justify-center w-4 h-4 bg-blue-500 rounded-full flex-shrink-0">
+                        <BadgeCheck className="w-3 h-3 text-white" />
+                      </span>
+                    ) : null;
+                  })()}
                 </div>
-                <p className="text-sm text-gray-500">Verified Seller</p>
+                {/* Show "Verified Seller" text only for paid plans */}
+                {(() => {
+                  const userPlan = listing.profiles.plan_id ? getPlanById(listing.profiles.plan_id) : getDefaultPlan();
+                  const isPaidPlan = userPlan.id !== 'free';
+                  return isPaidPlan ? (
+                    <p className="text-sm text-gray-500">Verified Seller</p>
+                  ) : null;
+                })()}
               </div>
             </div>
           </Link>
