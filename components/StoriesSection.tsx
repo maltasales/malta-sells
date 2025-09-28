@@ -328,7 +328,7 @@ export default function StoriesSection() {
             verified: listing.seller_verified || false
           }
         };
-      }).filter(Boolean) || []; // Filter out null values (listings without real names)
+      }) || []; // Show all listings
 
       console.log('Transformed videos:', transformedVideos);
 
