@@ -9,6 +9,7 @@ import { PLANS, getPlanById, getDefaultPlan, updateUserPlan } from '@/lib/plans'
 import { supabase } from '@/lib/supabase';
 
 const planIcons = {
+  free: Gift,
   basic: Sparkles,
   pro: Zap,
   enterprise: Crown,
