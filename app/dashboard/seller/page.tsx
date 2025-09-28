@@ -266,7 +266,7 @@ export default function SellerDashboard() {
                 </h3>
                 <p className="text-sm text-gray-600" data-testid="plan-usage-info">
                   {(() => {
-                    const planId = user?.plan_id || 'basic';
+                    const planId = user?.plan_id || 'free';
                     return getListingLimitMessage(planId);
                   })()} 
                   Currently using {properties.length} listing{properties.length !== 1 ? 's' : ''}.
