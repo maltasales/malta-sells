@@ -109,10 +109,14 @@ export default function VideosPage() {
         console.log('Using synchronized property data:', syncedListings);
         
         const transformedVideos = syncedListings.map((listing: any) => {
-          // Generate proper display name and avatar for consistent user representation
-          const displayName = listing.seller_name || 'Property Seller';
+          console.log('🔍 Videos synchronized - listing:', listing.id, 'seller_name:', listing.seller_name);
+          
+          // Use REAL seller name from synchronized data - NEVER use "Property Seller"
+          const displayName = listing.seller_name || `Seller ${listing.seller_id?.slice(-4) || 'Unknown'}`;
           const displayRole = listing.seller_role === 'seller' ? 'Property Seller' : 'User';
           const avatarUrl = listing.seller_avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=D12C1D&color=fff&size=100`;
+          
+          console.log('✅ Videos synchronized - Using display name:', displayName);
           
           return {
             id: listing.id,
