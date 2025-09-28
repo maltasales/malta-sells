@@ -16,7 +16,6 @@ const planIcons = {
 };
 
 const planColors = {
-  free: { color: 'bg-gray-500', hoverColor: 'hover:bg-gray-600' },
   basic: { color: 'bg-green-500', hoverColor: 'hover:bg-green-600' },
   pro: { color: 'bg-[#D12C1D]', hoverColor: 'hover:bg-[#B8241A]' },
   enterprise: { color: 'bg-purple-600', hoverColor: 'hover:bg-purple-700' },
