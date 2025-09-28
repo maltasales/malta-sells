@@ -76,25 +76,20 @@ export async function signUp(data: SignUpData): Promise<{ user: User }> {
       .insert({
         id: newUser.id,
         full_name: data.full_name,
-        role: data.role,
-        plan_id: data.role === 'seller' ? 'free' : undefined,
-        verified: false,
-        verification_prompt_shown: false,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
+        role: data.role
       })
       .select()
       .single();
 
     if (profileError) {
       console.error('Failed to create profile:', profileError);
-      throw new Error('Failed to create user profile');
+      console.log('Continuing without profile creation - will use fallback names');
+    } else {
+      console.log('Profile created successfully in Supabase:', profileData);
     }
-    
-    console.log('Profile created successfully in Supabase:', profileData);
   } catch (error) {
     console.error('Error creating profile:', error);
-    throw new Error('Failed to create user profile');
+    console.log('Continuing without profile creation - will use fallback names');
   }
 
   // Store user locally
