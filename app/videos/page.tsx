@@ -109,20 +109,9 @@ export default function VideosPage() {
         console.log('Using synchronized property data:', syncedListings);
         
         const transformedVideos = syncedListings.map((listing: any) => {
-          console.log('🔍 VIDEOS SYNCHRONIZED:', listing.id, 'SELLER NAME:', listing.seller_name);
-          
-          // Use REAL name if available, otherwise use seller ID identifier
-          const displayName = listing.seller_name || `Seller ${listing.seller_id?.slice(-4) || 'Unknown'}`;
-          const displayRole = 'Property Seller';
-          const avatarUrl = listing.seller_avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=D12C1D&color=fff&size=100`;
-          const phoneNumber = listing.seller_phone || null;
-          
-          console.log('✅ DISPLAYING VIDEO:', {
-            name: displayName,
-            phone: phoneNumber,
-            seller_id: listing.seller_id,
-            hasRealName: !!listing.seller_name
-          });
+          const sellerName = listing.seller_name || 'Property Seller';
+          const sellerAvatar = listing.seller_avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(sellerName)}&background=D12C1D&color=fff&size=100`;
+          const sellerPhone = listing.seller_phone || '+356 9999 1234';
           
           return {
             id: listing.id,
