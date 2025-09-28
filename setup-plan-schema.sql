@@ -5,9 +5,9 @@ ADD COLUMN IF NOT EXISTS plan_expires_at TIMESTAMP WITH TIME ZONE,
 ADD COLUMN IF NOT EXISTS verified BOOLEAN DEFAULT false,
 ADD COLUMN IF NOT EXISTS verification_prompt_shown BOOLEAN DEFAULT false;
 
--- Update existing seller profiles to have the free plan
+-- Update existing seller profiles to have the basic plan
 UPDATE profiles 
-SET plan_id = 'free' 
+SET plan_id = 'basic' 
 WHERE role = 'seller' AND plan_id IS NULL;
 
 -- Create indexes for better query performance
