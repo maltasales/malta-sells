@@ -1,13 +1,14 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import { Plus, Home, Edit, Eye, ArrowLeft, CheckCircle } from 'lucide-react';
+import { Plus, Home, Edit, Eye, ArrowLeft, CheckCircle, Trash2, Crown } from 'lucide-react';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'next/navigation';
 import SellerProfileCard from '@/components/SellerProfileCard';
 import VerificationModal from '@/components/VerificationModal';
 import { supabase } from '@/lib/supabase';
+import { getPlanById, getDefaultPlan, canAddListing, getListingLimitMessage } from '@/lib/plans';
 
 interface Property {
   id: string;
