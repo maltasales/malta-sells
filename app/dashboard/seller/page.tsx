@@ -268,6 +268,8 @@ export default function SellerDashboard() {
                 {/* Plan limit enforcement warning */}
                 {(() => {
                   const userPlan = user?.plan_id ? getPlanById(user.plan_id) : getDefaultPlan();
+                  if (!userPlan || !userPlan.maxListings) return null;
+                  
                   const isAtLimit = properties.length >= userPlan.maxListings;
                   if (isAtLimit) {
                     return (
