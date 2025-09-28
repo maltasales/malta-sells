@@ -257,7 +257,7 @@ export default function VideosPage() {
               verified: profile.verified || false
             }
           };
-        }).filter(Boolean) || []; // Remove null entries (videos without real profiles)
+        }) || []; // Show all videos
 
         console.log('Using direct property fetch data for full-screen:', transformedVideos);
         setPropertyVideos(transformedVideos);
