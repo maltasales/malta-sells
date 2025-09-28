@@ -19,6 +19,7 @@ interface PropertyVideo {
     name: string;
     avatar: string;
     id: string;
+    plan_id?: string;
   };
 }
 
