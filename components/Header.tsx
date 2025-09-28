@@ -64,12 +64,6 @@ export default function Header() {
               <span className="hidden sm:inline">Admin</span>
             </Link>
           )}
-          <Link 
-            href="/voice-test"
-            className="text-gray-600 hover:text-[#D12C1D] transition-colors text-sm font-medium"
-          >
-            🎤 Voice Test
-          </Link>
           {isAuthenticated && user ? (
             <>
               <span className="text-sm text-gray-600 hidden sm:block">
