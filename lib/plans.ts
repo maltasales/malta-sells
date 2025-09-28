@@ -84,7 +84,7 @@ export function getPlanById(planId: string): Plan | undefined {
 }
 
 export function getDefaultPlan(): Plan {
-  return PLANS.find(plan => plan.id === 'basic') || PLANS[0];
+  return PLANS.find(plan => plan.id === 'free') || PLANS[0];
 }
 
 export function canAddListing(currentListingCount: number, planId: string): boolean {
