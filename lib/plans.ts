@@ -98,3 +98,35 @@ export function getListingLimitMessage(planId: string): string {
   if (!plan) return 'Unknown plan';
   return `You can list up to ${plan.maxListings} propert${plan.maxListings === 1 ? 'y' : 'ies'} on the ${plan.name} plan.`;
 }
+
+export async function updateUserPlan(userId: string, newPlanId: string, supabase: any): Promise<boolean> {
+  try {
+    const { error } = await supabase
+      .from('profiles')
+      .update({ 
+        plan_id: newPlanId,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', userId);
+
+    if (error) {
+      console.error('Error updating user plan:', error);
+      return false;
+    }
+
+    // Update localStorage if available
+    if (typeof window !== 'undefined') {
+      const currentUser = localStorage.getItem('currentUser');
+      if (currentUser) {
+        const user = JSON.parse(currentUser);
+        user.plan_id = newPlanId;
+        localStorage.setItem('currentUser', JSON.stringify(user));
+      }
+    }
+
+    return true;
+  } catch (error) {
+    console.error('Error updating user plan:', error);
+    return false;
+  }
+}
