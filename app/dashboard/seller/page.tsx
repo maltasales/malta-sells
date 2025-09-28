@@ -218,6 +218,30 @@ export default function SellerDashboard() {
       <div className="p-4 max-w-4xl mx-auto space-y-6">
         <SellerProfileCard user={user} />
 
+        {/* Plan Status */}
+        <div className="bg-white rounded-lg shadow-sm p-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <Crown className="w-5 h-5 text-[#D12C1D]" />
+              <div>
+                <h3 className="font-semibold text-gray-900">
+                  {user?.plan_id ? getPlanById(user.plan_id)?.name : getDefaultPlan().name} Plan
+                </h3>
+                <p className="text-sm text-gray-600">
+                  {getListingLimitMessage(user?.plan_id || getDefaultPlan().id)} 
+                  Currently using {properties.length} listing{properties.length !== 1 ? 's' : ''}.
+                </p>
+              </div>
+            </div>
+            <Link
+              href="/account/upgrade-plan"
+              className="px-4 py-2 text-[#D12C1D] border border-[#D12C1D] rounded-lg hover:bg-red-50 transition-colors text-sm font-medium"
+            >
+              Upgrade Plan
+            </Link>
+          </div>
+        </div>
+
         {/* Properties List */}
         <div className="bg-white rounded-lg shadow-sm p-6">
           <div className="flex items-center justify-between mb-6">
