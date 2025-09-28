@@ -207,31 +207,30 @@ export default function VideosPage() {
           console.error('Error fetching profiles:', profilesError);
         }
 
-        // Transform fallback data with REAL profile names (NOT "Property Seller") 
+        // Transform data with REAL profile information ONLY
         const transformedVideos = properties?.map((property: any) => {
           const profile = profiles?.find(p => p.id === property.seller_id);
           
-          console.log('🔍 Videos page - Mapping property:', property.id, 'seller_id:', property.seller_id);
-          console.log('🔍 Videos page - Found profile:', profile);
+          console.log('🔍 VIDEOS PROPERTY:', property.id, 'SELLER ID:', property.seller_id);
+          console.log('🔍 VIDEOS REAL PROFILE FOUND:', profile);
           
-          // Use REAL profile name or create meaningful fallback based on seller ID
-          let displayName = profile?.full_name;
-          if (!displayName) {
-            // Create meaningful seller names based on seller ID for better UX
-            const sellerNames = [
-              'Maria Santos', 'John Property Expert', 'Sarah Wilson Homes', 
-              'David Real Estate', 'Emma Property Group', 'Alex Malta Properties',
-              'Lisa Estate Agent', 'Michael Property Pro', 'Anna Home Sales',
-              'James Malta Realty', 'Sophie Property Solutions', 'Daniel Estate Sales'
-            ];
-            const index = Math.abs(property.seller_id.split('').reduce((a, b) => a + b.charCodeAt(0), 0)) % sellerNames.length;
-            displayName = sellerNames[index];
+          if (!profile || !profile.full_name) {
+            console.error('❌ NO REAL PROFILE DATA for video seller:', property.seller_id);
+            console.error('This video will be SKIPPED because no real profile exists');
+            return null; // Skip videos without real profile data
           }
           
-          const displayRole = profile?.role === 'seller' ? 'Property Seller' : 'Property Seller';
-          const avatarUrl = profile?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=D12C1D&color=fff&size=100`;
+          // Use ONLY REAL profile data - NO FALLBACKS, NO GENERATED NAMES
+          const displayName = profile.full_name; // REAL NAME ONLY
+          const displayRole = 'Property Seller';
+          const avatarUrl = profile.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=D12C1D&color=fff&size=100`;
+          const phoneNumber = profile.phone || null;
           
-          console.log('✅ Videos page - Using display name:', displayName, 'for property:', property.title);
+          console.log('✅ VIDEOS USING REAL PROFILE DATA:', {
+            name: displayName,
+            phone: phoneNumber,  
+            seller_id: property.seller_id
+          });
           
           return {
             id: property.id,
