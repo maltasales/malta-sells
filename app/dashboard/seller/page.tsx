@@ -259,10 +259,16 @@ export default function SellerDashboard() {
               <Crown className="w-5 h-5 text-[#D12C1D]" />
               <div>
                 <h3 className="font-semibold text-gray-900 text-lg" data-testid="current-plan-name">
-                  {user?.plan_id ? getPlanById(user.plan_id)?.name : getDefaultPlan().name} Plan
+                  {(() => {
+                    const plan = user?.plan_id ? getPlanById(user.plan_id) : getDefaultPlan();
+                    return plan ? `${plan.name} Plan` : 'Basic Plan';
+                  })()}
                 </h3>
                 <p className="text-sm text-gray-600" data-testid="plan-usage-info">
-                  {getListingLimitMessage(user?.plan_id || getDefaultPlan().id)} 
+                  {(() => {
+                    const planId = user?.plan_id || 'basic';
+                    return getListingLimitMessage(planId);
+                  })()} 
                   Currently using {properties.length} listing{properties.length !== 1 ? 's' : ''}.
                 </p>
                 {/* Plan limit enforcement warning */}
