@@ -47,6 +47,9 @@ export interface SignInData {
 }
 
 export async function signUp(data: SignUpData): Promise<{ user: User }> {
+  // Import here to avoid circular dependencies
+  const { ensureProfileExists } = await import('./profileSync');
+  
   // Check if user already exists
   const existingUser = users.find(u => u.email === data.email);
   if (existingUser) {
@@ -73,6 +76,16 @@ export async function signUp(data: SignUpData): Promise<{ user: User }> {
   if (typeof window !== 'undefined') {
     localStorage.setItem('users', JSON.stringify(users));
     localStorage.setItem('currentUser', JSON.stringify(currentUser));
+  }
+
+  // Ensure profile exists in database for proper sync across Property Videos and Listings
+  if (data.role === 'seller') {
+    await ensureProfileExists(newUser.id, {
+      full_name: data.full_name,
+      email: data.email,
+      role: data.role,
+      plan_id: 'free'
+    });
   }
 
   return { user: newUser };
