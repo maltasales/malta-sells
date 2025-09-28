@@ -178,8 +178,16 @@ export default function SellerDashboard() {
       setShowSuccessMessage(false);
     }, 3000);
     
-    // Update verification status in component state immediately
-    // The database update happens in the VerificationModal component
+    // After verification, automatically proceed to add property
+    // Check listing limits first
+    const userPlan = user?.plan_id ? getPlanById(user.plan_id) : getDefaultPlan();
+    if (!canAddListing(properties.length, userPlan.id)) {
+      router.push('/account/upgrade-plan');
+      return;
+    }
+    
+    // Go to create property page
+    router.push('/dashboard/seller/create');
   };
 
   if (loading) {
