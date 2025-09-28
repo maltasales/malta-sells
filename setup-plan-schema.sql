@@ -1,6 +1,6 @@
 -- Add plan-related columns to the profiles table
 ALTER TABLE profiles 
-ADD COLUMN IF NOT EXISTS plan_id TEXT DEFAULT 'free',
+ADD COLUMN IF NOT EXISTS plan_id TEXT DEFAULT 'basic',
 ADD COLUMN IF NOT EXISTS plan_expires_at TIMESTAMP WITH TIME ZONE,
 ADD COLUMN IF NOT EXISTS verified BOOLEAN DEFAULT false,
 ADD COLUMN IF NOT EXISTS verification_prompt_shown BOOLEAN DEFAULT false;
