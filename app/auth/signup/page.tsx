@@ -159,14 +159,14 @@ export default function SignUpPage() {
               I want to
             </label>
             <div className="grid grid-cols-2 gap-3">
-              <label className="relative">
+              <label className="relative cursor-pointer">
                 <input
                   {...register('role')}
                   type="radio"
                   value="buyer"
                   className="sr-only peer"
                 />
-                <div className="p-4 border-2 border-gray-300 rounded-lg cursor-pointer peer-checked:border-[#D12C1D] peer-checked:bg-red-50 hover:border-gray-400 transition-colors bg-white">
+                <div className="p-4 border-2 border-gray-300 rounded-lg peer-checked:border-[#D12C1D] peer-checked:bg-red-50 hover:border-gray-400 transition-colors bg-white">
                   <div className="text-center">
                     <div className="text-lg font-semibold text-gray-900">
                       Buy Properties
@@ -175,14 +175,14 @@ export default function SignUpPage() {
                 </div>
               </label>
 
-              <label className="relative">
+              <label className="relative cursor-pointer">
                 <input
                   {...register('role')}
                   type="radio"
                   value="seller"
                   className="sr-only peer"
                 />
-                <div className="p-4 border-2 border-gray-300 rounded-lg cursor-pointer peer-checked:border-[#D12C1D] peer-checked:bg-red-50 hover:border-gray-400 transition-colors bg-white">
+                <div className="p-4 border-2 border-gray-300 rounded-lg peer-checked:border-[#D12C1D] peer-checked:bg-red-50 hover:border-gray-400 transition-colors bg-white">
                   <div className="text-center">
                     <div className="text-lg font-semibold text-gray-900">
                       Sell Properties
