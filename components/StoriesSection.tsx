@@ -285,10 +285,9 @@ export default function StoriesSection() {
       const transformedVideos = listingsWithProfiles?.map((listing: any) => {
         console.log('🔍 CHECKING SYNCHRONIZED LISTING for:', listing.listing_id, 'seller_name:', listing.seller_name);
         
-        // MUST use the EXACT real name from synchronized data - NO fallbacks like "Property Seller"
+        // Use real name if available, otherwise use identifier but DON'T skip
         if (!listing.seller_name) {
-          console.error('❌ NO REAL NAME in synchronized listing for seller:', listing.seller_id, '- SKIPPING this listing');
-          return null; // Skip listings without real names
+          console.log('⚠️ NO REAL NAME in synchronized listing for seller:', listing.seller_id, '- Using identifier');
         }
         
         const sellerName = listing.seller_name; // EXACT name like "Test video"
