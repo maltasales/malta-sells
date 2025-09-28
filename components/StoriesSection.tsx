@@ -158,14 +158,19 @@ export default function StoriesSection() {
           console.error('Error fetching profiles fallback:', profilesError);
         }
 
-        // Transform fallback data with complete user profile sync
+        // Transform fallback data with REAL profile names (NOT "Property Seller")
         const fallbackVideos = properties?.map((property: any) => {
           const profile = profiles?.find(p => p.id === property.seller_id);
           
-          // Generate proper display name and avatar for consistent user representation
-          const displayName = profile?.full_name || 'Property Seller';
+          console.log('🔍 Mapping property:', property.id, 'seller_id:', property.seller_id);
+          console.log('🔍 Found profile:', profile);
+          
+          // Use REAL profile name - NEVER use "Property Seller" as fallback
+          const displayName = profile?.full_name || `Seller ${property.seller_id.slice(-4)}`;
           const displayRole = profile?.role === 'seller' ? 'Property Seller' : 'User';
           const avatarUrl = profile?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=D12C1D&color=fff&size=100`;
+          
+          console.log('✅ Using display name:', displayName, 'for property:', property.title);
           
           return {
             id: property.id,
