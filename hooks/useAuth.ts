@@ -12,6 +12,7 @@ export interface User {
   createdAt: string;
   avatar_url?: string;
   banner_url?: string;
+  plan_id?: string;
 }
 
 export const useAuth = () => {
