@@ -128,21 +128,21 @@ export default function VideosPage() {
             description: listing.description,
             // Agent info for Property Videos cards
             agent: {
-              name: displayName,
-              avatar: avatarUrl,
-              phone: listing.seller_phone || '+356 9999 1234',
+              name: sellerName,
+              avatar: sellerAvatar,
+              phone: sellerPhone,
               id: listing.seller_id,
-              role: displayRole,
+              role: 'Property Seller',
               plan_id: listing.seller_plan_id || 'free',
               verified: listing.seller_verified || false
             },
             // Owner info for Property Details pages (same data, different structure)
             owner: {
-              name: displayName,
-              avatar: avatarUrl,
-              phone: listing.seller_phone || '+356 9999 1234',
+              name: sellerName,
+              avatar: sellerAvatar,
+              phone: sellerPhone,
               id: listing.seller_id,
-              role: displayRole,
+              role: 'Property Seller',
               plan_id: listing.seller_plan_id || 'free',
               verified: listing.seller_verified || false
             }
