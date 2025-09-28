@@ -96,7 +96,7 @@ export default function VideosPage() {
   const searchParams = useSearchParams();
   const startId = searchParams?.get('start');
 
-  // Fetch real property videos from Supabase
+  // Fetch real property videos from Supabase (same logic as StoriesSection)
   const fetchPropertyVideos = async () => {
     try {
       console.log('Fetching property videos for full-screen player...');
@@ -108,75 +108,74 @@ export default function VideosPage() {
       if (!syncError && syncedListings && syncedListings.length > 0) {
         console.log('Using synchronized property data:', syncedListings);
         
-        // Transform synchronized data to match expected format
         const transformedVideos = syncedListings.map((listing: any) => ({
-          id: listing.listing_id,
-          title: listing.listing_title,
-          location: listing.listing_location,
-          price: listing.listing_price,
-          currency: listing.listing_currency,
-          beds: listing.listing_beds,
-          baths: listing.listing_baths,
-          area: listing.listing_area,
-          videoUrl: listing.listing_video_url,
-          description: listing.listing_description,
+          id: listing.id,
+          title: listing.title,
+          location: listing.location,
+          price: listing.price,
+          currency: listing.currency,
+          beds: listing.beds,
+          baths: listing.baths,
+          area: listing.area,
+          seller_id: listing.seller_id,
+          videoUrl: listing.video_url,
+          thumbnail: listing.images?.[0] || 'https://images.pexels.com/photos/1918291/pexels-photo-1918291.jpeg?w=200&h=300&fit=crop',
+          description: listing.description,
           agent: {
             name: listing.seller_name || 'Property Seller',
-            avatar: listing.seller_avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(listing.seller_name || 'Property Seller')}&background=D12C1D&color=fff&size=100`,
+            avatar: listing.seller_avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(listing.seller_name || 'Property Seller')}&background=D12C1D&color=fff&size=100`,
             phone: listing.seller_phone || '+356 9999 1234',
             id: listing.seller_id,
+            plan_id: listing.seller_plan_id
           }
         }));
-        
+
+        console.log('Videos data set for full-screen player:', transformedVideos);
         setPropertyVideos(transformedVideos);
-        setLoading(false);
-        return;
-      }
-
-      // Fallback to direct property fetch
-      console.log('Falling back to direct property fetch...');
-      const { data: properties, error: directError } = await supabase
-        .from('properties')
-        .select(`
-          id,
-          title,
-          location,
-          price,
-          currency,
-          beds,
-          baths,
-          area,
-          video_url,
-          images,
-          description,
-          seller_id
-        `)
-        .not('video_url', 'is', null)
-        .order('created_at', { ascending: false });
-
-      if (directError) {
-        console.error('Error fetching properties:', directError);
-        console.log('Using mock data as final fallback...');
-        setLoading(false);
-        return;
-      }
-
-      if (properties && properties.length > 0) {
-        // Fetch seller profiles
-        const sellerIds = properties.map(p => p.seller_id).filter(Boolean);
-        let profiles: any[] = [];
+      } else {
+        console.log('Sync function failed or returned empty, trying direct fetch...');
         
-        if (sellerIds.length > 0) {
-          const { data: profilesData } = await supabase
-            .from('profiles')
-            .select('id, full_name, avatar_url, phone')
-            .in('id', sellerIds);
-          profiles = profilesData || [];
+        // Fallback to direct property and profile fetch
+        const { data: properties, error: propertiesError } = await supabase
+          .from('properties')
+          .select(`
+            id,
+            title,
+            location,
+            price,
+            currency,
+            beds,
+            baths,
+            area,
+            description,
+            tags,
+            images,
+            video_url,
+            seller_id,
+            created_at
+          `)
+          .order('created_at', { ascending: false })
+          .limit(8);
+
+        if (propertiesError) {
+          console.error('Error fetching properties:', propertiesError);
+          return;
         }
 
-        // Transform direct fetch data
-        const transformedVideos = properties.map((property: any) => {
-          const profile = profiles.find(p => p.id === property.seller_id);
+        // Fetch profiles separately
+        const sellerIds = properties?.map(p => p.seller_id) || [];
+        const { data: profiles, error: profilesError } = await supabase
+          .from('profiles')
+          .select('id, full_name, avatar_url, phone, plan_id')
+          .in('id', sellerIds);
+
+        if (profilesError) {
+          console.error('Error fetching profiles:', profilesError);
+        }
+
+        // Transform fallback data
+        const transformedVideos = properties?.map((property: any) => {
+          const profile = profiles?.find(p => p.id === property.seller_id);
           return {
             id: property.id,
             title: property.title,
@@ -186,21 +185,22 @@ export default function VideosPage() {
             beds: property.beds,
             baths: property.baths,
             area: property.area,
+            seller_id: property.seller_id,
             videoUrl: property.video_url,
+            thumbnail: property.images?.[0] || 'https://images.pexels.com/photos/1918291/pexels-photo-1918291.jpeg?w=200&h=300&fit=crop',
             description: property.description,
             agent: {
               name: profile?.full_name || 'Property Seller',
               avatar: profile?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(profile?.full_name || 'Property Seller')}&background=D12C1D&color=fff&size=100`,
               phone: profile?.phone || '+356 9999 1234',
               id: property.seller_id,
+              plan_id: profile?.plan_id
             }
           };
-        });
+        }) || [];
 
-        console.log('Using direct property fetch data:', transformedVideos);
+        console.log('Using direct property fetch data for full-screen:', transformedVideos);
         setPropertyVideos(transformedVideos);
-      } else {
-        console.log('No properties found, keeping mock data...');
       }
 
     } catch (error) {
