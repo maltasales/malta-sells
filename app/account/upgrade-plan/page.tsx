@@ -5,7 +5,8 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import AuthGuard from '@/components/AuthGuard';
-import { PLANS, getPlanById, getDefaultPlan } from '@/lib/plans';
+import { PLANS, getPlanById, getDefaultPlan, updateUserPlan } from '@/lib/plans';
+import { supabase } from '@/lib/supabase';
 
 const planIcons = {
   free: Gift,
