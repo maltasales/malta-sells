@@ -33,6 +33,7 @@ export default function SellerDashboard() {
   const [showVerificationModal, setShowVerificationModal] = useState(false);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [deletingPropertyId, setDeletingPropertyId] = useState<string | null>(null);
+  const [hasAttemptedAddProperty, setHasAttemptedAddProperty] = useState(false);
 
   const fetchSellerProperties = useCallback(async () => {
     if (!user) return;
