@@ -205,15 +205,13 @@ export default function SellerDashboard() {
       setShowSuccessMessage(false);
     }, 3000);
     
-    // After verification, automatically proceed to add property
-    // Check listing limits first
+    // After verification, check limits and proceed
     const userPlan = user?.plan_id ? getPlanById(user.plan_id) : getDefaultPlan();
     if (!canAddListing(properties.length, userPlan.id)) {
       router.push('/account/upgrade-plan');
       return;
     }
     
-    // Go to create property page
     router.push('/dashboard/seller/create');
   };
 
