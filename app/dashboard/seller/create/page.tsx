@@ -79,6 +79,8 @@ export default function CreatePropertyPage() {
   const { profile } = useAuth();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const [currentListingCount, setCurrentListingCount] = useState(0);
+  const [checkingLimits, setCheckingLimits] = useState(true);
   const [isGeneratingDescription, setIsGeneratingDescription] = useState(false);
   const [isGeneratingVideo, setIsGeneratingVideo] = useState(false);
   const [images, setImages] = useState<File[]>([]);
