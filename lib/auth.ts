@@ -7,6 +7,7 @@ interface User {
   createdAt: string;
   avatar_url?: string;
   banner_url?: string;
+  plan_id?: string;
 }
 
 interface AuthState {
