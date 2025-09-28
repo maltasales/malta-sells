@@ -147,16 +147,15 @@ export default function StoriesSection() {
           return;
         }
 
-        // Fetch profiles for fallback
-        const sellerIds = properties?.map(p => p.seller_id).filter(Boolean) || [];
-        let profiles: any[] = [];
-        
-        if (sellerIds.length > 0) {
-          const { data: profilesData } = await supabase
-            .from('profiles')
-            .select('id, full_name, avatar_url, phone')
-            .in('id', sellerIds);
-          profiles = profilesData || [];
+        // Fetch complete profiles with all needed info for sync
+        const sellerIds = properties?.map(p => p.seller_id) || [];
+        const { data: profiles, error: profilesError } = await supabase
+          .from('profiles')
+          .select('id, full_name, avatar_url, phone, role, plan_id, verified')
+          .in('id', sellerIds);
+
+        if (profilesError) {
+          console.error('Error fetching profiles fallback:', profilesError);
         }
 
         // Transform fallback data
