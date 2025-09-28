@@ -1,69 +1,32 @@
 'use client';
 
-import { ArrowLeft, Check, Sparkles, Zap, Crown } from 'lucide-react';
+import { ArrowLeft, Check, Sparkles, Zap, Crown, Gift } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import AuthGuard from '@/components/AuthGuard';
+import { PLANS, getPlanById, getDefaultPlan } from '@/lib/plans';
 
-const plans = [
-  {
-    id: 'basic',
-    name: 'Basic',
-    price: 0,
-    originalPrice: 29.99,
-    period: 'month',
-    icon: Sparkles,
-    color: 'bg-green-500',
-    hoverColor: 'hover:bg-green-600',
-    popular: false,
-    isFreeTrial: true,
-    trialEndDate: 'Jan 1, 2026',
-    features: [
-      'List up to 5 properties',
-      'AI video generation (for listings)',
-      'One featured listing for 7 days',
-      'Verification badge',
-      'Basic support',
-    ],
-  },
-  {
-    id: 'pro',
-    name: 'Pro',
-    price: 49,
-    period: 'month',
-    icon: Zap,
-    color: 'bg-[#D12C1D]',
-    hoverColor: 'hover:bg-[#B8241A]',
-    popular: true,
-    features: [
-      'List up to 10 properties',
-      'AI video generation (for listings)',
-      '3 Featured listings (7 days each)',
-      'Verification badge',
-      'Priority support',
-      'Advanced features',
-    ],
-  },
-  {
-    id: 'enterprise',
-    name: 'Enterprise',
-    price: 79,
-    period: 'month',
-    icon: Crown,
-    color: 'bg-purple-600',
-    hoverColor: 'hover:bg-purple-700',
-    popular: false,
-    features: [
-      'List up to 20 properties',
-      'AI video generation (for listings)',
-      '5 Featured listings (7 days each)',
-      'Verification badge',
-      'Premium support',
-      'Premium features',
-    ],
-  },
-];
+const planIcons = {
+  free: Gift,
+  basic: Sparkles,
+  pro: Zap,
+  enterprise: Crown,
+};
+
+const planColors = {
+  free: { color: 'bg-gray-500', hoverColor: 'hover:bg-gray-600' },
+  basic: { color: 'bg-green-500', hoverColor: 'hover:bg-green-600' },
+  pro: { color: 'bg-[#D12C1D]', hoverColor: 'hover:bg-[#B8241A]' },
+  enterprise: { color: 'bg-purple-600', hoverColor: 'hover:bg-purple-700' },
+};
+
+const plans = PLANS.map(plan => ({
+  ...plan,
+  icon: planIcons[plan.id as keyof typeof planIcons] || Gift,
+  ...planColors[plan.id as keyof typeof planColors],
+  popular: plan.id === 'pro',
+}));
 
 export default function UpgradePlanPage() {
   const { user } = useAuth();
