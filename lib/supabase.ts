@@ -20,6 +20,7 @@ export type Database = {
           plan_id: string | null;
           plan_expires_at: string | null;
           verified: boolean | null;
+          verification_prompt_shown: boolean | null;
           created_at: string;
           updated_at: string;
         };
@@ -33,6 +34,7 @@ export type Database = {
           plan_id?: string | null;
           plan_expires_at?: string | null;
           verified?: boolean | null;
+          verification_prompt_shown?: boolean | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -46,6 +48,7 @@ export type Database = {
           plan_id?: string | null;
           plan_expires_at?: string | null;
           verified?: boolean | null;
+          verification_prompt_shown?: boolean | null;
           created_at?: string;
           updated_at?: string;
         };
