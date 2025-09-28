@@ -290,7 +290,7 @@ export default function StoriesSection() {
           console.log('⚠️ NO REAL NAME in synchronized listing for seller:', listing.seller_id, '- Using identifier');
         }
         
-        const sellerName = listing.seller_name; // EXACT name like "Test video"
+        const sellerName = listing.seller_name || `Seller ${listing.seller_id?.slice(-4) || 'Unknown'}`; // Use real name or identifier
         const sellerAvatar = listing.seller_avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(sellerName)}&background=D12C1D&color=fff&size=100`;
         const sellerPhone = listing.seller_phone || '+356 9999 1234';
         
