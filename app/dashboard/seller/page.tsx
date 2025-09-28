@@ -265,18 +265,32 @@ export default function SellerDashboard() {
             <div className="flex items-center space-x-3">
               <Crown className="w-5 h-5 text-[#D12C1D]" />
               <div>
-                <h3 className="font-semibold text-gray-900">
+                <h3 className="font-semibold text-gray-900 text-lg" data-testid="current-plan-name">
                   {user?.plan_id ? getPlanById(user.plan_id)?.name : getDefaultPlan().name} Plan
                 </h3>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-gray-600" data-testid="plan-usage-info">
                   {getListingLimitMessage(user?.plan_id || getDefaultPlan().id)} 
                   Currently using {properties.length} listing{properties.length !== 1 ? 's' : ''}.
                 </p>
+                {/* Plan limit enforcement warning */}
+                {(() => {
+                  const userPlan = user?.plan_id ? getPlanById(user.plan_id) : getDefaultPlan();
+                  const isAtLimit = properties.length >= userPlan.maxListings;
+                  if (isAtLimit) {
+                    return (
+                      <p className="text-sm text-orange-600 font-medium mt-1">
+                        ⚠️ You've reached your plan limit. Upgrade to add more listings.
+                      </p>
+                    );
+                  }
+                  return null;
+                })()}
               </div>
             </div>
             <Link
               href="/account/upgrade-plan"
               className="px-4 py-2 text-[#D12C1D] border border-[#D12C1D] rounded-lg hover:bg-red-50 transition-colors text-sm font-medium"
+              data-testid="upgrade-plan-button"
             >
               Upgrade Plan
             </Link>
