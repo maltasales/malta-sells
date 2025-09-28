@@ -2,6 +2,7 @@
 "use client";
 
 import { MapPin, Bed, Bath, Phone, Mail, Wifi, ArrowLeft, Calculator, Sofa, BadgeCheck } from "lucide-react";
+import { getPlanById, getDefaultPlan } from '@/lib/plans';
 import Link from "next/link";
 import ImageCarousel from "@/components/ImageCarousel";
 import FavoriteButton from "@/components/FavoriteButton";
