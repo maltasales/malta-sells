@@ -156,7 +156,7 @@ export default function VideosPage() {
               verified: listing.seller_verified || false
             }
           };
-        }).filter(Boolean); // Filter out null values (videos without real names)
+        }); // Show all videos
 
         console.log('Videos data set for full-screen player:', transformedVideos);
         setPropertyVideos(transformedVideos);
