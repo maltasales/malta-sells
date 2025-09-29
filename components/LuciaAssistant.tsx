@@ -383,24 +383,9 @@ export default function LuciaAssistant({ isOpen, onClose }: LuciaAssistantProps)
     if (!isAuthenticated || micState === 'disabled') return;
 
     if (micState === 'idle') {
-      setMicState('listening');
-      setIsRecording(true);
-      
-      // Simulate voice recognition (replace with actual implementation)
-      setTimeout(() => {
-        const sampleCommands = [
-          "Show me apartments in Sliema",
-          "Find villas under 500,000 euros",
-          "Properties with sea view in Valletta",
-          "Three bedroom apartments"
-        ];
-        const randomCommand = sampleCommands[Math.floor(Math.random() * sampleCommands.length)];
-        handleVoiceCommand(randomCommand);
-        setIsRecording(false);
-      }, 3000);
+      startRecording();
     } else if (micState === 'listening') {
-      setMicState('idle');
-      setIsRecording(false);
+      stopRecording();
     }
   };
 
