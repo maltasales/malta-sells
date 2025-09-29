@@ -207,43 +207,57 @@ export default function LuciaAssistant({ isOpen, onClose }: LuciaAssistantProps)
     setMessages(prev => [...prev, userMessage]);
 
     try {
-      let response = '';
       let properties: Property[] = [];
+      
+      // Use OpenAI GPT for intelligent response generation
+      const completion = await openai.chat.completions.create({
+        model: "gpt-4",
+        messages: [
+          {
+            role: "system", 
+            content: `You are Lucia, a helpful AI assistant for Malta real estate. You help users find properties in Malta. 
+            Analyze user queries and provide helpful responses about properties. If they ask about specific locations, property types, or price ranges, acknowledge their request and offer to show relevant properties.
+            Keep responses conversational, helpful, and under 100 words.`
+          },
+          {
+            role: "user",
+            content: command
+          }
+        ],
+        max_tokens: 150
+      });
 
-      // Simple command processing
+      const aiResponse = completion.choices[0]?.message?.content || "I can help you find properties in Malta. What are you looking for?";
+
+      // Determine which properties to fetch based on the command
       const lowerCommand = command.toLowerCase();
       
       if (lowerCommand.includes('apartment') || lowerCommand.includes('flat')) {
         properties = await fetchProperties('apartment');
-        response = "I found some great apartments for you in Malta:";
       } else if (lowerCommand.includes('villa') || lowerCommand.includes('house')) {
         properties = await fetchProperties('villa');
-        response = "Here are some beautiful villas and houses available:";
       } else if (lowerCommand.includes('sliema')) {
         properties = await fetchProperties('sliema');
-        response = "Here are properties available in Sliema:";
       } else if (lowerCommand.includes('valletta')) {
         properties = await fetchProperties('valletta');
-        response = "I found these properties in Valletta:";
-      } else if (lowerCommand.includes('price') || lowerCommand.includes('budget')) {
+      } else if (lowerCommand.includes('property') || lowerCommand.includes('show') || lowerCommand.includes('find')) {
         properties = await fetchProperties();
-        response = "Here are some properties within different price ranges:";
-      } else {
-        properties = await fetchProperties();
-        response = "Here are some featured properties that might interest you:";
       }
 
       // Add Lucia response
       const luciaMessage: Message = {
         id: (Date.now() + 1).toString(),
         type: 'lucia',
-        content: response,
+        content: aiResponse,
         properties: properties.slice(0, 3),
         timestamp: new Date()
       };
       
       setMessages(prev => [...prev, luciaMessage]);
-      await saveConversation(command, response);
+      
+      // Generate speech for the response
+      await generateSpeech(aiResponse);
+      await saveConversation(command, aiResponse);
       
     } catch (error) {
       console.error('Error processing voice command:', error);
@@ -258,6 +272,111 @@ export default function LuciaAssistant({ isOpen, onClose }: LuciaAssistantProps)
     }
     
     setMicState('idle');
+  };
+
+  const generateSpeech = async (text: string) => {
+    try {
+      const response = await openai.audio.speech.create({
+        model: "tts-1",
+        voice: "nova",
+        input: text,
+        speed: 1.0
+      });
+
+      const audioBuffer = await response.arrayBuffer();
+      const audioBlob = new Blob([audioBuffer], { type: 'audio/mpeg' });
+      const audioUrl = URL.createObjectURL(audioBlob);
+      
+      const audio = new Audio(audioUrl);
+      audio.play();
+      
+      // Cleanup URL after playing
+      audio.addEventListener('ended', () => {
+        URL.revokeObjectURL(audioUrl);
+      });
+      
+    } catch (error) {
+      console.error('Error generating speech:', error);
+    }
+  };
+
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mediaRecorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = mediaRecorder;
+      audioChunksRef.current = [];
+
+      mediaRecorder.ondataavailable = (event) => {
+        audioChunksRef.current.push(event.data);
+      };
+
+      mediaRecorder.onstop = async () => {
+        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/wav' });
+        await processAudioWithWhisper(audioBlob);
+        
+        // Stop all tracks to release microphone
+        stream.getTracks().forEach(track => track.stop());
+      };
+
+      mediaRecorder.start();
+      setMicState('listening');
+      setIsRecording(true);
+      
+    } catch (error) {
+      console.error('Error starting recording:', error);
+      setMicState('idle');
+      setIsRecording(false);
+    }
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
+      mediaRecorderRef.current.stop();
+      setMicState('processing');
+      setIsRecording(false);
+    }
+  };
+
+  const processAudioWithWhisper = async (audioBlob: Blob) => {
+    try {
+      const formData = new FormData();
+      formData.append('file', audioBlob, 'audio.wav');
+      formData.append('model', 'whisper-1');
+      formData.append('language', 'en');
+
+      const response = await openai.audio.transcriptions.create({
+        file: audioBlob as any,
+        model: 'whisper-1',
+        language: 'en'
+      });
+
+      const transcription = response.text;
+      
+      if (transcription && transcription.trim()) {
+        await handleVoiceCommand(transcription);
+      } else {
+        setMicState('idle');
+        const errorMessage: Message = {
+          id: Date.now().toString(),
+          type: 'lucia',
+          content: "I couldn't understand what you said. Please try again.",
+          timestamp: new Date()
+        };
+        setMessages(prev => [...prev, errorMessage]);
+      }
+    } catch (error) {
+      console.error('Error processing audio with Whisper:', error);
+      setMicState('idle');
+      
+      const errorMessage: Message = {
+        id: Date.now().toString(),
+        type: 'lucia',
+        content: "I had trouble processing your voice. Please try again.",
+        timestamp: new Date()
+      };
+      setMessages(prev => [...prev, errorMessage]);
+    }
   };
 
   const handleMicClick = () => {
