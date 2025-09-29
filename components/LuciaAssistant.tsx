@@ -430,8 +430,8 @@ export default function LuciaAssistant({ isOpen, onClose }: LuciaAssistantProps)
 
   const getMicStatusText = () => {
     switch (micState) {
-      case 'listening': return 'Listening...';
-      case 'processing': return 'Processing...';
+      case 'listening': return 'Listening... (tap to stop)';
+      case 'processing': return 'Processing your voice...';
       case 'disabled': return 'Login required';
       default: return 'Tap to speak';
     }
