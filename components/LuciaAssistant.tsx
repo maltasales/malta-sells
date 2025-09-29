@@ -47,6 +47,8 @@ export default function LuciaAssistant({ isOpen, onClose }: LuciaAssistantProps)
   const [micState, setMicState] = useState<MicState>('idle');
   const [isRecording, setIsRecording] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
 
   useEffect(() => {
     if (isOpen) {
