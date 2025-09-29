@@ -8,14 +8,6 @@ import OpenAI from 'openai';
 
 // Initialize OpenAI client with your API key
 
-interface Message {
-  id: string;
-  type: 'user' | 'lucia';
-  content: string;
-  timestamp: Date;
-  properties?: Property[];
-}
-
 interface Property {
   id: string;
   title: string;
