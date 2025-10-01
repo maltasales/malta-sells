@@ -1,6 +1,6 @@
 'use client';
 
-import AIVoiceAssistant from '@/components/AIVoiceAssistant';
+import VoiceAssistant from '@/components/VoiceAssistant';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 
@@ -10,22 +10,22 @@ export default function VoiceTestPage() {
       <div className="container mx-auto px-4">
         {/* Header */}
         <div className="mb-8">
-          <Link 
-            href="/" 
+          <Link
+            href="/"
             className="inline-flex items-center space-x-2 text-gray-600 hover:text-gray-800 transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>Back to Home</span>
           </Link>
-          <h1 className="text-3xl font-bold text-gray-900 mt-4">AI Voice Assistant Test</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mt-4">AI Voice Assistant</h1>
           <p className="text-gray-600 mt-2">
-            Testing voice recording → Whisper transcription → ChatGPT response → TTS output
+            Type text and hear it spoken with AI-powered text-to-speech
           </p>
         </div>
 
         {/* Voice Assistant Component */}
         <div className="flex justify-center">
-          <AIVoiceAssistant />
+          <VoiceAssistant />
         </div>
 
         {/* Technical Details */}
@@ -35,39 +35,39 @@ export default function VoiceTestPage() {
             <div className="flex items-start space-x-3">
               <span className="flex-shrink-0 w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-bold">1</span>
               <div>
-                <h3 className="font-medium text-gray-900">Voice Recording</h3>
-                <p className="text-gray-600">Captures your voice using browser's MediaRecorder API</p>
+                <h3 className="font-medium text-gray-900">Text Input</h3>
+                <p className="text-gray-600">Enter any text you want to hear spoken</p>
               </div>
             </div>
             <div className="flex items-start space-x-3">
               <span className="flex-shrink-0 w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-bold">2</span>
               <div>
-                <h3 className="font-medium text-gray-900">Whisper Transcription</h3>
-                <p className="text-gray-600">Converts speech to text using OpenAI's Whisper model</p>
+                <h3 className="font-medium text-gray-900">Serverless Processing</h3>
+                <p className="text-gray-600">Text is sent securely to serverless API endpoint</p>
               </div>
             </div>
             <div className="flex items-start space-x-3">
               <span className="flex-shrink-0 w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-bold">3</span>
               <div>
-                <h3 className="font-medium text-gray-900">ChatGPT Response</h3>
-                <p className="text-gray-600">Generates intelligent response using GPT-3.5-turbo</p>
+                <h3 className="font-medium text-gray-900">OpenAI TTS Generation</h3>
+                <p className="text-gray-600">Converts text to natural speech using gpt-4o-mini-tts</p>
               </div>
             </div>
             <div className="flex items-start space-x-3">
               <span className="flex-shrink-0 w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-bold">4</span>
               <div>
-                <h3 className="font-medium text-gray-900">Text-to-Speech</h3>
-                <p className="text-gray-600">Converts response to natural voice using OpenAI TTS</p>
+                <h3 className="font-medium text-gray-900">Audio Playback</h3>
+                <p className="text-gray-600">Audio is played directly in your browser</p>
               </div>
             </div>
           </div>
         </div>
 
-        {/* API Status */}
+        {/* Security Note */}
         <div className="mt-8 max-w-md mx-auto p-4 bg-green-50 rounded-lg border border-green-200">
-          <h3 className="font-medium text-green-800 mb-2">✅ OpenAI API Configuration</h3>
+          <h3 className="font-medium text-green-800 mb-2">Secure Implementation</h3>
           <p className="text-green-700 text-sm">
-            API key configured and ready for testing
+            API keys are kept server-side only. All OpenAI calls go through secure serverless endpoints.
           </p>
         </div>
       </div>
