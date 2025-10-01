@@ -50,7 +50,7 @@ export default function VoiceTestPage() {
               <span className="flex-shrink-0 w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-bold">3</span>
               <div>
                 <h3 className="font-medium text-gray-900">OpenAI TTS Generation</h3>
-                <p className="text-gray-600">Converts text to natural speech using gpt-4o-mini-tts</p>
+                <p className="text-gray-600">Converts text to natural speech using OpenAI TTS (tts-1)</p>
               </div>
             </div>
             <div className="flex items-start space-x-3">

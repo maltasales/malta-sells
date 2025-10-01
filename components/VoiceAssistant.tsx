@@ -105,7 +105,7 @@ export default function VoiceAssistant() {
         </Button>
 
         <p className="text-xs text-muted-foreground text-center">
-          Powered by OpenAI Text-to-Speech (gpt-4o-mini-tts)
+          Powered by OpenAI Text-to-Speech (tts-1)
         </p>
       </CardContent>
     </Card>
