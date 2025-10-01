@@ -2,66 +2,66 @@ import { notFound } from 'next/navigation';
 import ListingDetailClient from '@/components/ListingDetailClient';
 import { supabase } from '@/lib/supabase';
 
-// Mock data for static generation - replace with actual Supabase query in production
-const mockListingIds = ['1', '2', '3', '4', '5', '6', '7', '8'];
+// Force dynamic rendering to avoid build-time errors
+export const dynamic = 'force-dynamic';
 
+// Allow dynamic params to handle missing routes gracefully
+export const dynamicParams = true;
+
+// Skip static generation for this route
 export async function generateStaticParams() {
-  try {
-    // Try to fetch actual listing IDs from Supabase
-    const { data: listings, error } = await supabase
-      .from('properties')
-      .select('id');
-
-    if (error || !listings || listings.length === 0) {
-      // Fallback to mock data if Supabase query fails
-      return mockListingIds.map((id) => ({
-        id: id,
-      }));
-    }
-
-    return listings.map((listing) => ({
-      id: listing.id,
-    }));
-  } catch (error) {
-    console.error('Error generating static params:', error);
-    // Fallback to mock data
-    return mockListingIds.map((id) => ({
-      id: id,
-    }));
-  }
+  // Return empty array to skip static generation
+  return [];
 }
 
 async function getListing(id: string) {
-  const { data: listing, error } = await supabase
-    .from('properties')
-    .select(`
-      *,
-      profiles!properties_seller_id_fkey (
-        id,
-        full_name,
-        avatar_url,
-        email
-      )
-    `)
-    .eq('id', id)
-    .single();
+  try {
+    const { data: listing, error } = await supabase
+      .from('properties')
+      .select('*')
+      .eq('id', id)
+      .single();
 
-  if (error) {
-    console.error('Error fetching listing:', error);
+    if (error) {
+      console.error('Error fetching listing:', error);
+      return null;
+    }
+
+    return listing;
+  } catch (error) {
+    console.error('Error in getListing:', error);
     return null;
   }
-
-  return listing;
 }
 
 export default async function ListingDetailPage({ params }: { params: { id: string } }) {
-  const listing = await getListing(params.id);
+  try {
+    const listing = await getListing(params.id);
 
-  if (!listing) {
-    notFound();
+    if (!listing) {
+      notFound();
+    }
+
+    return (
+      <ListingDetailClient listing={listing} />
+    );
+  } catch (error) {
+    console.error('Error in ListingDetailPage:', error);
+
+    // Show error fallback instead of crashing
+    return (
+      <div className="min-h-screen bg-white">
+        <div className="p-6 text-center">
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">Unable to load listing</h1>
+          <p className="text-gray-600 mb-6">We're having trouble loading this listing. Please try again later.</p>
+          <a
+            href="/"
+            className="inline-block bg-[#D12C1D] text-white px-6 py-3 rounded-lg hover:bg-[#B8241A] transition-colors"
+          >
+            Back to Home
+          </a>
+        </div>
+      </div>
+    );
   }
-
-  return (
-    <ListingDetailClient listing={listing} />
-  );
 }
