@@ -4,7 +4,6 @@ import { useAuth } from '@/hooks/useAuth';
 import { signOut } from '@/lib/auth';
 import { useRouter } from 'next/navigation';
 import { Search, Shield } from 'lucide-react';
-import Image from 'next/image';
 import Link from 'next/link';
 
 export default function Header() {
@@ -36,13 +35,9 @@ export default function Header() {
       <div className="flex items-center justify-between px-4 py-3 max-w-7xl mx-auto">
         <div className="flex items-center">
           <Link href="/" className="flex items-center space-x-2">
-            <Image
-              src="/logo copy.png"
-              alt="Malta Sells Logo"
-              width={40}
-              height={40}
-              className="rounded-lg"
-            />
+            <div className="w-10 h-10 bg-gradient-to-r from-[#D12C1D] to-[#B8241A] rounded-lg flex items-center justify-center">
+              <span className="text-white font-bold text-xl">MS</span>
+            </div>
           </Link>
         </div>
         
