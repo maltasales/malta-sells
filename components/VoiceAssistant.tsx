@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Volume2, Loader2 } from 'lucide-react';
+import { Volume2, Loader as Loader2 } from 'lucide-react';
 
 export default function VoiceAssistant() {
   const [text, setText] = useState('');
