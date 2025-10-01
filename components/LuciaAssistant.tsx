@@ -4,9 +4,14 @@ import { useState, useEffect, useRef } from 'react';
 import { X, Mic, MicOff, Loader, Calendar, DollarSign, Heart, MapPin, Bed, Bath, Square } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/lib/supabase';
-import OpenAI from 'openai';
 
-// Initialize OpenAI client with your API key
+interface Message {
+  id: string;
+  type: 'user' | 'lucia';
+  content: string;
+  properties?: Property[];
+  timestamp: Date;
+}
 
 interface Property {
   id: string;
@@ -196,39 +201,31 @@ export default function LuciaAssistant({ isOpen, onClose }: LuciaAssistantProps)
 
     try {
       let properties: Property[] = [];
-      
-      // Use OpenAI GPT for intelligent response generation
-      const completion = await openai.chat.completions.create({
-        model: "gpt-4",
-        messages: [
-          {
-            role: "system", 
-            content: `You are Lucia, a helpful AI assistant for Malta real estate. You help users find properties in Malta. 
-            Analyze user queries and provide helpful responses about properties. If they ask about specific locations, property types, or price ranges, acknowledge their request and offer to show relevant properties.
-            Keep responses conversational, helpful, and under 100 words.`
-          },
-          {
-            role: "user",
-            content: command
-          }
-        ],
-        max_tokens: 150
-      });
 
-      const aiResponse = completion.choices[0]?.message?.content || "I can help you find properties in Malta. What are you looking for?";
+      // Generate AI response based on command
+      let aiResponse = "I can help you find properties in Malta. What are you looking for?";
 
-      // Determine which properties to fetch based on the command
       const lowerCommand = command.toLowerCase();
-      
+
       if (lowerCommand.includes('apartment') || lowerCommand.includes('flat')) {
+        aiResponse = "I found some great apartments for you! Here are a few options that might interest you.";
         properties = await fetchProperties('apartment');
       } else if (lowerCommand.includes('villa') || lowerCommand.includes('house')) {
+        aiResponse = "Here are some beautiful villas and houses available in Malta.";
         properties = await fetchProperties('villa');
       } else if (lowerCommand.includes('sliema')) {
+        aiResponse = "Sliema is a wonderful area! Let me show you properties available there.";
         properties = await fetchProperties('sliema');
       } else if (lowerCommand.includes('valletta')) {
+        aiResponse = "Valletta is the capital and has stunning historic properties. Take a look at these.";
         properties = await fetchProperties('valletta');
       } else if (lowerCommand.includes('property') || lowerCommand.includes('show') || lowerCommand.includes('find')) {
+        aiResponse = "Here are some featured properties that might interest you!";
+        properties = await fetchProperties();
+      } else if (lowerCommand.includes('hello') || lowerCommand.includes('hi')) {
+        aiResponse = "Hello! I'm here to help you find your dream property in Malta. What are you looking for?";
+      } else {
+        aiResponse = "I understand you're looking for properties. Let me show you some options!";
         properties = await fetchProperties();
       }
 
@@ -242,9 +239,7 @@ export default function LuciaAssistant({ isOpen, onClose }: LuciaAssistantProps)
       };
       
       setMessages(prev => [...prev, luciaMessage]);
-      
-      // Generate speech for the response
-      await generateSpeech(aiResponse);
+
       await saveConversation(command, aiResponse);
       
     } catch (error) {
@@ -262,31 +257,6 @@ export default function LuciaAssistant({ isOpen, onClose }: LuciaAssistantProps)
     setMicState('idle');
   };
 
-  const generateSpeech = async (text: string) => {
-    try {
-      const response = await openai.audio.speech.create({
-        model: "tts-1",
-        voice: "nova",
-        input: text,
-        speed: 1.0
-      });
-
-      const audioBuffer = await response.arrayBuffer();
-      const audioBlob = new Blob([audioBuffer], { type: 'audio/mpeg' });
-      const audioUrl = URL.createObjectURL(audioBlob);
-      
-      const audio = new Audio(audioUrl);
-      audio.play();
-      
-      // Cleanup URL after playing
-      audio.addEventListener('ended', () => {
-        URL.revokeObjectURL(audioUrl);
-      });
-      
-    } catch (error) {
-      console.error('Error generating speech:', error);
-    }
-  };
 
   const startRecording = async () => {
     try {
@@ -327,44 +297,14 @@ export default function LuciaAssistant({ isOpen, onClose }: LuciaAssistantProps)
   };
 
   const processAudioWithWhisper = async (audioBlob: Blob) => {
-    try {
-      const formData = new FormData();
-      formData.append('file', audioBlob, 'audio.wav');
-      formData.append('model', 'whisper-1');
-      formData.append('language', 'en');
-
-      const response = await openai.audio.transcriptions.create({
-        file: audioBlob as any,
-        model: 'whisper-1',
-        language: 'en'
-      });
-
-      const transcription = response.text;
-      
-      if (transcription && transcription.trim()) {
-        await handleVoiceCommand(transcription);
-      } else {
-        setMicState('idle');
-        const errorMessage: Message = {
-          id: Date.now().toString(),
-          type: 'lucia',
-          content: "I couldn't understand what you said. Please try again.",
-          timestamp: new Date()
-        };
-        setMessages(prev => [...prev, errorMessage]);
-      }
-    } catch (error) {
-      console.error('Error processing audio with Whisper:', error);
-      setMicState('idle');
-      
-      const errorMessage: Message = {
-        id: Date.now().toString(),
-        type: 'lucia',
-        content: "I had trouble processing your voice. Please try again.",
-        timestamp: new Date()
-      };
-      setMessages(prev => [...prev, errorMessage]);
-    }
+    setMicState('idle');
+    const demoMessage: Message = {
+      id: Date.now().toString(),
+      type: 'lucia',
+      content: "Voice recognition requires an OpenAI API key. For now, try the text-based search or visit /voice-test for full voice features!",
+      timestamp: new Date()
+    };
+    setMessages(prev => [...prev, demoMessage]);
   };
 
   const handleMicClick = () => {
