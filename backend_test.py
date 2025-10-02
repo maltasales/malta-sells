@@ -17,27 +17,20 @@ import base64
 BASE_URL = "http://localhost:3000"
 VOICE_API_URL = f"{BASE_URL}/api/voice"
 
-def create_test_audio_file():
-    """Create a simple test WAV file with a sine wave tone"""
-    duration = 2  # seconds
-    sample_rate = 44100
-    frequency = 440  # A4 note
-    
-    # Generate sine wave
-    frames = []
-    for i in range(int(duration * sample_rate)):
-        value = int(32767 * math.sin(2 * math.pi * frequency * i / sample_rate))
-        frames.append(struct.pack('<h', value))
-    
-    # Create temporary WAV file
-    temp_file = tempfile.NamedTemporaryFile(suffix='.wav', delete=False)
-    with wave.open(temp_file.name, 'wb') as wav_file:
-        wav_file.setnchannels(1)  # mono
-        wav_file.setsampwidth(2)  # 2 bytes per sample
-        wav_file.setframerate(sample_rate)
-        wav_file.writeframes(b''.join(frames))
-    
-    return temp_file.name
+def test_text_input(text, description=""):
+    """Helper function to test text input with the voice API"""
+    print(f"   📝 Testing: {description or text[:50]}")
+    try:
+        response = requests.post(
+            VOICE_API_URL, 
+            headers={'Content-Type': 'application/json'},
+            json={'text': text},
+            timeout=60
+        )
+        return response
+    except Exception as e:
+        print(f"   ❌ Request failed: {e}")
+        return None
 
 def test_voice_api_health_check():
     """Test GET /api/voice endpoint for health check"""
