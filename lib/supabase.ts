@@ -1,8 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 
-// Temporary: Direct API keys for testing (move to environment variables later)
-const supabaseUrl = 'https://qopnwgmmvfdopdtxiqbb.supabase.co';
-const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFvcG53Z21tdmZkb3BkdHhpcWJiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1MzQxNjcsImV4cCI6MjA3MzExMDE2N30.a33jCyJEFyBg61tAU7rmbo0j7E5uOPZYYOakbI0vsZ4';
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
 export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey);
 
