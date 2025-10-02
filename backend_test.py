@@ -128,8 +128,8 @@ def test_voice_api_post_empty_audio():
         return False
 
 def test_voice_api_post_valid_audio():
-    """Test POST /api/voice with valid audio file"""
-    print("\n🔍 Testing POST /api/voice (Valid Audio)")
+    """Test POST /api/voice with valid audio file - NEW JSON FORMAT"""
+    print("\n🔍 Testing POST /api/voice (Valid Audio - JSON Response)")
     
     # Create test audio file
     audio_file_path = create_test_audio_file()
@@ -153,29 +153,61 @@ def test_voice_api_post_valid_audio():
             print(f"   Response: {response.text}")
             return False
         
-        # Check for successful audio response
+        # Check for successful JSON response with Base64 audio
         if response.status_code == 200:
             content_type = response.headers.get('Content-Type', '')
-            if 'audio/mpeg' in content_type:
-                print("   ✅ Received audio response (MP3)")
-                print(f"   Audio size: {len(response.content)} bytes")
-                
-                # Check custom headers
-                transcript = response.headers.get('X-Transcript', '')
-                ai_response = response.headers.get('X-Response', '')
-                processing_time = response.headers.get('X-Processing-Time', '')
-                
-                if transcript:
-                    print(f"   Transcript: {transcript}")
-                if ai_response:
-                    print(f"   AI Response: {ai_response}")
-                if processing_time:
-                    print(f"   Server Processing Time: {processing_time}ms")
-                
-                print("   ✅ OpenAI pipeline working (Whisper + GPT + TTS)")
-                return True
+            if 'application/json' in content_type:
+                try:
+                    data = response.json()
+                    print("   ✅ Received JSON response")
+                    
+                    # Validate required fields
+                    required_fields = ['audioBase64', 'transcript', 'response', 'processingTime', 'audioSize']
+                    missing_fields = [field for field in required_fields if field not in data]
+                    
+                    if missing_fields:
+                        print(f"   ❌ Missing required fields: {missing_fields}")
+                        return False
+                    
+                    # Validate Base64 audio
+                    audio_base64 = data.get('audioBase64', '')
+                    if not audio_base64:
+                        print("   ❌ Empty audioBase64 field")
+                        return False
+                    
+                    # Check if it's valid Base64
+                    try:
+                        import base64
+                        audio_bytes = base64.b64decode(audio_base64)
+                        print(f"   ✅ Valid Base64 audio data: {len(audio_bytes)} bytes")
+                    except Exception as e:
+                        print(f"   ❌ Invalid Base64 audio data: {e}")
+                        return False
+                    
+                    # Display response data
+                    print(f"   Transcript: {data.get('transcript', 'N/A')}")
+                    print(f"   AI Response: {data.get('response', 'N/A')}")
+                    print(f"   Server Processing Time: {data.get('processingTime', 'N/A')}ms")
+                    print(f"   Audio Size: {data.get('audioSize', 'N/A')} bytes")
+                    
+                    # Verify audio size matches Base64 decoded size
+                    expected_size = data.get('audioSize', 0)
+                    actual_size = len(audio_bytes)
+                    if expected_size != actual_size:
+                        print(f"   ⚠️ Audio size mismatch: expected {expected_size}, got {actual_size}")
+                    else:
+                        print("   ✅ Audio size matches expected value")
+                    
+                    print("   ✅ OpenAI pipeline working (Whisper + GPT + TTS) - JSON format")
+                    return True
+                    
+                except json.JSONDecodeError as e:
+                    print(f"   ❌ Invalid JSON response: {e}")
+                    print(f"   Response text: {response.text[:200]}...")
+                    return False
             else:
-                print(f"   ⚠️ Unexpected content type: {content_type}")
+                print(f"   ❌ Expected application/json, got: {content_type}")
+                print(f"   Response: {response.text[:200]}...")
                 return False
         
         # Check for error response
