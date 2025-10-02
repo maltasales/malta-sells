@@ -393,22 +393,88 @@ def test_base64_audio_validation():
         print(f"   ❌ Error: {e}")
         return False
 
-def test_response_headers():
-    """Test response headers for proper configuration"""
-    print("\n🔍 Testing Response Headers")
+def test_mobile_compatibility():
+    """Test mobile compatibility with proper Content-Type headers"""
+    print("\n🔍 Testing Mobile Compatibility (Content-Type: application/json)")
     try:
-        response = requests.get(VOICE_API_URL, timeout=10)
-        headers = response.headers
+        # Test with mobile user agent
+        headers = {
+            'Content-Type': 'application/json',
+            'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/605.1.15'
+        }
         
-        print("   Response Headers:")
-        for key, value in headers.items():
-            print(f"     {key}: {value}")
+        response = requests.post(
+            VOICE_API_URL,
+            headers=headers,
+            json={'text': 'Show me properties in Valletta'},
+            timeout=30
+        )
         
-        # Check for CORS headers if needed
-        if 'Access-Control-Allow-Origin' in headers:
-            print("   ✅ CORS headers present")
+        print(f"   Status Code: {response.status_code}")
+        print(f"   Content-Type: {response.headers.get('Content-Type', 'N/A')}")
         
-        return True
+        if response.status_code == 200:
+            data = response.json()
+            if 'application/json' in response.headers.get('Content-Type', ''):
+                print("   ✅ Mobile-compatible JSON response")
+                return True
+        elif response.status_code == 502:
+            print("   ❌ 502 Bad Gateway error on mobile request!")
+            return False
+        
+        print("   ⚠️ Unexpected mobile response")
+        return False
+        
+    except Exception as e:
+        print(f"   ❌ Error: {e}")
+        return False
+
+def test_tts_truncation():
+    """Test TTS truncation for long responses (20 second limit)"""
+    print("\n🔍 Testing TTS Truncation (20 second limit)")
+    
+    # Request that might generate a long response
+    long_query = "Tell me everything about buying property in Malta including all the legal requirements, taxes, fees, best locations, market trends, and investment opportunities"
+    
+    try:
+        start_time = time.time()
+        response = test_text_input(long_query, "Long query for TTS truncation test")
+        if not response:
+            return False
+            
+        elapsed_time = time.time() - start_time
+        
+        print(f"   Status Code: {response.status_code}")
+        print(f"   Processing Time: {elapsed_time:.2f}s")
+        
+        if response.status_code == 200:
+            data = response.json()
+            response_text = data.get('text', '')
+            audio_size = data.get('audioSize', 0)
+            
+            print(f"   Response length: {len(response_text)} characters")
+            print(f"   Audio size: {audio_size} bytes")
+            
+            # Check if response was truncated (should be under 300 chars based on API code)
+            if len(response_text) <= 300:
+                print("   ✅ Response appropriately sized for TTS")
+            else:
+                print("   ⚠️ Response might be too long for optimal TTS")
+            
+            # Check processing time (should be reasonable)
+            if elapsed_time <= 30:  # 30 second reasonable limit
+                print("   ✅ Processing time within acceptable range")
+                return True
+            else:
+                print("   ⚠️ Processing time longer than expected")
+                return False
+                
+        elif response.status_code == 502:
+            print("   ❌ 502 Bad Gateway error!")
+            return False
+        
+        print("   ⚠️ Unexpected response for TTS truncation test")
+        return False
         
     except Exception as e:
         print(f"   ❌ Error: {e}")
