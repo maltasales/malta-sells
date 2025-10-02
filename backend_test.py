@@ -92,33 +92,27 @@ def test_voice_api_post_no_text():
         print(f"   ❌ Error: {e}")
         return False
 
-def test_voice_api_post_empty_audio():
-    """Test POST /api/voice with empty audio file"""
-    print("\n🔍 Testing POST /api/voice (Empty Audio)")
+def test_voice_api_post_empty_text():
+    """Test POST /api/voice with empty text input"""
+    print("\n🔍 Testing POST /api/voice (Empty Text Input)")
     try:
-        # Create empty file
-        temp_file = tempfile.NamedTemporaryFile(suffix='.wav', delete=False)
-        temp_file.close()
-        
-        with open(temp_file.name, 'rb') as f:
-            files = {'audio': ('empty.wav', f, 'audio/wav')}
-            response = requests.post(VOICE_API_URL, files=files, timeout=10)
-        
-        os.unlink(temp_file.name)
-        
+        response = test_text_input("", "Empty string")
+        if not response:
+            return False
+            
         print(f"   Status Code: {response.status_code}")
         print(f"   Response: {response.text}")
         
         if response.status_code == 400:
             data = response.json()
-            if "Empty audio file" in data.get('error', ''):
-                print("   ✅ Proper error handling for empty audio")
+            if "Empty text input" in data.get('error', ''):
+                print("   ✅ Proper error handling for empty text")
                 return True
         elif response.status_code == 502:
             print("   ❌ 502 Bad Gateway error still present!")
             return False
             
-        print("   ⚠️ Unexpected response for empty audio")
+        print("   ⚠️ Unexpected response for empty text")
         return False
         
     except Exception as e:
