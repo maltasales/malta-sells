@@ -12,6 +12,7 @@ import tempfile
 import wave
 import struct
 import math
+import base64
 
 # Test configuration
 BASE_URL = "http://localhost:3000"
