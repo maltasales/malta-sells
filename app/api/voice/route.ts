@@ -3,6 +3,13 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
   try {
+    if (!process.env.OPENAI_API_KEY) {
+      return NextResponse.json(
+        { error: "OPENAI_API_KEY is not configured. Please add it to your .env file." },
+        { status: 500 }
+      );
+    }
+
     const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
     const { text } = await req.json();
 
@@ -24,7 +31,7 @@ export async function POST(req: NextRequest) {
       },
     });
   } catch (err) {
-    console.error(err);
+    console.error("Voice API Error:", err);
     const errorMessage = err instanceof Error ? err.message : "An error occurred";
     return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
