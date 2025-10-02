@@ -389,6 +389,7 @@ def main():
         ("No Audio Error", test_voice_api_post_no_audio),
         ("Empty Audio Error", test_voice_api_post_empty_audio),
         ("Valid Audio Processing", test_voice_api_post_valid_audio),
+        ("Base64 Audio Validation", test_base64_audio_validation),
         ("Large File Error", test_voice_api_large_file),
         ("Response Headers", test_response_headers),
     ]
