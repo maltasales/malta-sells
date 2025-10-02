@@ -500,12 +500,15 @@ def main():
     # Run tests
     tests = [
         ("Health Check (GET)", test_voice_api_health_check),
-        ("No Audio Error", test_voice_api_post_no_audio),
-        ("Empty Audio Error", test_voice_api_post_empty_audio),
-        ("Valid Audio Processing", test_voice_api_post_valid_audio),
+        ("No Text Input Error", test_voice_api_post_no_text),
+        ("Empty Text Input Error", test_voice_api_post_empty_text),
+        ("Normal Property Question", test_voice_api_post_normal_text),
+        ("Short Text Processing", test_voice_api_short_text),
+        ("Long Text Processing", test_voice_api_long_text),
+        ("Very Long Text Handling", test_voice_api_very_long_text),
         ("Base64 Audio Validation", test_base64_audio_validation),
-        ("Large File Error", test_voice_api_large_file),
-        ("Response Headers", test_response_headers),
+        ("Mobile Compatibility", test_mobile_compatibility),
+        ("TTS Truncation Test", test_tts_truncation),
     ]
     
     results = {}
