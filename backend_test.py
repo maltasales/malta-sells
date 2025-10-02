@@ -236,34 +236,98 @@ def test_voice_api_post_normal_text():
         print(f"   ❌ Error: {e}")
         return False
 
-def test_voice_api_large_file():
-    """Test POST /api/voice with large audio file"""
-    print("\n🔍 Testing POST /api/voice (Large File)")
+def test_voice_api_short_text():
+    """Test POST /api/voice with short text (few words)"""
+    print("\n🔍 Testing POST /api/voice (Short Text)")
     try:
-        # Create a large dummy file (>25MB)
-        temp_file = tempfile.NamedTemporaryFile(suffix='.wav', delete=False)
-        temp_file.write(b'0' * (26 * 1024 * 1024))  # 26MB
-        temp_file.close()
-        
-        with open(temp_file.name, 'rb') as f:
-            files = {'audio': ('large.wav', f, 'audio/wav')}
-            response = requests.post(VOICE_API_URL, files=files, timeout=10)
-        
-        os.unlink(temp_file.name)
-        
+        response = test_text_input("Hello Lucia", "Short text (2 words)")
+        if not response:
+            return False
+            
         print(f"   Status Code: {response.status_code}")
         print(f"   Response: {response.text}")
         
-        if response.status_code == 400:
+        if response.status_code == 200:
             data = response.json()
-            if "too large" in data.get('error', '').lower():
-                print("   ✅ Proper error handling for large files")
+            if data.get('text') and data.get('audioBase64'):
+                print("   ✅ Short text processed successfully")
                 return True
         elif response.status_code == 502:
             print("   ❌ 502 Bad Gateway error still present!")
             return False
             
-        print("   ⚠️ Unexpected response for large file")
+        print("   ⚠️ Unexpected response for short text")
+        return False
+        
+    except Exception as e:
+        print(f"   ❌ Error: {e}")
+        return False
+
+def test_voice_api_long_text():
+    """Test POST /api/voice with longer text (100+ words)"""
+    print("\n🔍 Testing POST /api/voice (Long Text - 100+ words)")
+    
+    long_text = """I am looking for a luxury apartment in Malta with at least three bedrooms and two bathrooms. 
+    The property should have sea views and be located in a prime area like Sliema, St. Julians, or Valletta. 
+    I prefer modern amenities including air conditioning, a fully equipped kitchen, and parking space. 
+    My budget is around 500,000 euros and I would like to schedule viewings for properties that match these criteria. 
+    Can you also provide information about the local amenities, schools, and transportation options in these areas? 
+    I am particularly interested in properties that are close to the beach and have good access to restaurants and shopping centers."""
+    
+    try:
+        response = test_text_input(long_text, f"Long text ({len(long_text)} characters)")
+        if not response:
+            return False
+            
+        print(f"   Status Code: {response.status_code}")
+        print(f"   Response: {response.text[:200]}...")
+        
+        if response.status_code == 200:
+            data = response.json()
+            if data.get('text') and data.get('audioBase64'):
+                print("   ✅ Long text processed successfully")
+                print(f"   Response length: {len(data.get('text', ''))} characters")
+                return True
+        elif response.status_code == 502:
+            print("   ❌ 502 Bad Gateway error still present!")
+            return False
+            
+        print("   ⚠️ Unexpected response for long text")
+        return False
+        
+    except Exception as e:
+        print(f"   ❌ Error: {e}")
+        return False
+
+def test_voice_api_very_long_text():
+    """Test POST /api/voice with very long text (should be handled or truncated)"""
+    print("\n🔍 Testing POST /api/voice (Very Long Text - 1000+ characters)")
+    
+    very_long_text = "Malta real estate " * 100  # Creates ~1800 character string
+    
+    try:
+        response = test_text_input(very_long_text, f"Very long text ({len(very_long_text)} characters)")
+        if not response:
+            return False
+            
+        print(f"   Status Code: {response.status_code}")
+        print(f"   Response: {response.text}")
+        
+        if response.status_code == 400:
+            data = response.json()
+            if "too long" in data.get('error', '').lower():
+                print("   ✅ Proper error handling for very long text")
+                return True
+        elif response.status_code == 200:
+            data = response.json()
+            if data.get('text') and data.get('audioBase64'):
+                print("   ✅ Very long text handled successfully (truncated or processed)")
+                return True
+        elif response.status_code == 502:
+            print("   ❌ 502 Bad Gateway error still present!")
+            return False
+            
+        print("   ⚠️ Unexpected response for very long text")
         return False
         
     except Exception as e:
