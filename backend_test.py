@@ -313,7 +313,11 @@ def test_base64_audio_validation():
                 audio_bytes = base64.b64decode(audio_base64)
                 
                 # Check if it looks like MP3 (starts with ID3 tag or MP3 frame sync)
-                if audio_bytes.startswith(b'ID3') or audio_bytes.startswith(b'\xff\xfb'):
+                # MP3 frame sync can be 0xFF followed by 0xFB, 0xFA, 0xF3, 0xF2, etc.
+                is_mp3 = (audio_bytes.startswith(b'ID3') or 
+                         (len(audio_bytes) >= 2 and audio_bytes[0] == 0xFF and (audio_bytes[1] & 0xE0) == 0xE0))
+                
+                if is_mp3:
                     print("   ✅ Base64 audio appears to be valid MP3 format")
                     print(f"   Audio data size: {len(audio_bytes)} bytes")
                     
