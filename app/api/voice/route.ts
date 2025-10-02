@@ -1,23 +1,31 @@
 import OpenAI from "openai";
+import { NextRequest, NextResponse } from "next/server";
 
-export default async function handler(req, res) {
+export async function POST(req: NextRequest) {
   try {
     const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-    const { text } = req.body;
+    const { text } = await req.json();
 
-    if (!text) return res.status(400).json({ error: "Missing text" });
+    if (!text) {
+      return NextResponse.json({ error: "Missing text" }, { status: 400 });
+    }
 
     const response = await openai.audio.speech.create({
-      model: "gpt-4o-mini-tts",
+      model: "tts-1",
       voice: "alloy",
       input: text,
     });
 
     const audioBuffer = Buffer.from(await response.arrayBuffer());
-    res.setHeader("Content-Type", "audio/mpeg");
-    res.send(audioBuffer);
+
+    return new NextResponse(audioBuffer, {
+      headers: {
+        "Content-Type": "audio/mpeg",
+      },
+    });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: err.message });
+    const errorMessage = err instanceof Error ? err.message : "An error occurred";
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }
