@@ -119,20 +119,20 @@ def test_voice_api_post_empty_text():
         print(f"   ❌ Error: {e}")
         return False
 
-def test_voice_api_post_valid_audio():
-    """Test POST /api/voice with valid audio file - NEW JSON FORMAT"""
-    print("\n🔍 Testing POST /api/voice (Valid Audio - JSON Response)")
+def test_voice_api_post_normal_text():
+    """Test POST /api/voice with normal property question"""
+    print("\n🔍 Testing POST /api/voice (Normal Property Question)")
     
-    # Create test audio file
-    audio_file_path = create_test_audio_file()
+    test_text = "Show me apartments in Sliema with sea views"
     
     try:
-        with open(audio_file_path, 'rb') as f:
-            files = {'audio': ('test.wav', f, 'audio/wav')}
-            print("   📤 Sending audio file to voice API...")
-            start_time = time.time()
-            response = requests.post(VOICE_API_URL, files=files, timeout=60)
-            elapsed_time = time.time() - start_time
+        print("   📤 Sending text to Lucia voice API...")
+        start_time = time.time()
+        response = test_text_input(test_text, "Normal property question")
+        if not response:
+            return False
+            
+        elapsed_time = time.time() - start_time
         
         print(f"   Status Code: {response.status_code}")
         print(f"   Processing Time: {elapsed_time:.2f}s")
@@ -153,8 +153,8 @@ def test_voice_api_post_valid_audio():
                     data = response.json()
                     print("   ✅ Received JSON response")
                     
-                    # Validate required fields
-                    required_fields = ['audioBase64', 'transcript', 'response', 'processingTime', 'audioSize']
+                    # Validate required fields for new format
+                    required_fields = ['text', 'audioBase64', 'processingTime', 'audioSize']
                     missing_fields = [field for field in required_fields if field not in data]
                     
                     if missing_fields:
@@ -169,7 +169,6 @@ def test_voice_api_post_valid_audio():
                     
                     # Check if it's valid Base64
                     try:
-                        import base64
                         audio_bytes = base64.b64decode(audio_base64)
                         print(f"   ✅ Valid Base64 audio data: {len(audio_bytes)} bytes")
                     except Exception as e:
@@ -177,8 +176,7 @@ def test_voice_api_post_valid_audio():
                         return False
                     
                     # Display response data
-                    print(f"   Transcript: {data.get('transcript', 'N/A')}")
-                    print(f"   AI Response: {data.get('response', 'N/A')}")
+                    print(f"   AI Response: {data.get('text', 'N/A')}")
                     print(f"   Server Processing Time: {data.get('processingTime', 'N/A')}ms")
                     print(f"   Audio Size: {data.get('audioSize', 'N/A')} bytes")
                     
@@ -190,7 +188,7 @@ def test_voice_api_post_valid_audio():
                     else:
                         print("   ✅ Audio size matches expected value")
                     
-                    print("   ✅ OpenAI pipeline working (Whisper + GPT + TTS) - JSON format")
+                    print("   ✅ Text → GPT-4o-mini → TTS pipeline working - JSON format")
                     return True
                     
                 except json.JSONDecodeError as e:
@@ -237,10 +235,6 @@ def test_voice_api_post_valid_audio():
     except Exception as e:
         print(f"   ❌ Error: {e}")
         return False
-    finally:
-        # Clean up test file
-        if os.path.exists(audio_file_path):
-            os.unlink(audio_file_path)
 
 def test_voice_api_large_file():
     """Test POST /api/voice with large audio file"""
