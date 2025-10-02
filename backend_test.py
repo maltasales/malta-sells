@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 """
 Backend Testing for Malta Sells Voice API
-Testing the /api/voice endpoint to confirm 502 Bad Gateway errors are resolved
+Testing the updated /api/voice endpoint with Base64 JSON response format
+- Verifies 502 Bad Gateway errors are resolved
+- Tests new JSON response format with audioBase64 field
+- Validates Base64 audio encoding and response structure
 """
 
 import requests
