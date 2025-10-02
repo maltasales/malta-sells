@@ -285,6 +285,66 @@ def test_voice_api_large_file():
         print(f"   ❌ Error: {e}")
         return False
 
+def test_base64_audio_validation():
+    """Test Base64 audio validation and decoding"""
+    print("\n🔍 Testing Base64 Audio Validation")
+    
+    # Create test audio file
+    audio_file_path = create_test_audio_file()
+    
+    try:
+        with open(audio_file_path, 'rb') as f:
+            files = {'audio': ('test.wav', f, 'audio/wav')}
+            response = requests.post(VOICE_API_URL, files=files, timeout=60)
+        
+        if response.status_code == 200:
+            try:
+                data = response.json()
+                audio_base64 = data.get('audioBase64', '')
+                
+                if not audio_base64:
+                    print("   ❌ No audioBase64 field in response")
+                    return False
+                
+                # Decode Base64
+                audio_bytes = base64.b64decode(audio_base64)
+                
+                # Check if it looks like MP3 (starts with ID3 tag or MP3 frame sync)
+                if audio_bytes.startswith(b'ID3') or audio_bytes.startswith(b'\xff\xfb'):
+                    print("   ✅ Base64 audio appears to be valid MP3 format")
+                    print(f"   Audio data size: {len(audio_bytes)} bytes")
+                    
+                    # Verify it matches the audioSize field
+                    expected_size = data.get('audioSize', 0)
+                    if len(audio_bytes) == expected_size:
+                        print("   ✅ Audio size matches audioSize field")
+                        return True
+                    else:
+                        print(f"   ⚠️ Size mismatch: decoded={len(audio_bytes)}, expected={expected_size}")
+                        return False
+                else:
+                    print("   ❌ Decoded audio doesn't appear to be MP3 format")
+                    print(f"   First 20 bytes: {audio_bytes[:20]}")
+                    return False
+                    
+            except json.JSONDecodeError:
+                print("   ❌ Response is not valid JSON")
+                return False
+            except Exception as e:
+                print(f"   ❌ Base64 decoding error: {e}")
+                return False
+        else:
+            print(f"   ⚠️ API returned status {response.status_code}, skipping Base64 test")
+            return False
+            
+    except Exception as e:
+        print(f"   ❌ Error: {e}")
+        return False
+    finally:
+        # Clean up test file
+        if os.path.exists(audio_file_path):
+            os.unlink(audio_file_path)
+
 def test_response_headers():
     """Test response headers for proper configuration"""
     print("\n🔍 Testing Response Headers")
