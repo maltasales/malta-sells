@@ -1,20 +1,16 @@
 #!/usr/bin/env python3
 """
-Backend Testing for Malta Sells Voice API
-Testing the updated /api/voice endpoint with Base64 JSON response format
-- Verifies 502 Bad Gateway errors are resolved
-- Tests new JSON response format with audioBase64 field
-- Validates Base64 audio encoding and response structure
+Backend Testing for Malta Sells Lucia Voice Assistant API
+Testing the redesigned /api/voice endpoint with text input and JSON response format
+- Verifies text-to-speech pipeline: Text → GPT-4o-mini → TTS → Base64 JSON response
+- Tests elimination of HTTP 502 errors from audio file upload complexity
+- Validates JSON response format with { text, audioBase64, processingTime, audioSize }
+- Tests various text input scenarios and error handling
 """
 
 import requests
 import json
 import time
-import os
-import tempfile
-import wave
-import struct
-import math
 import base64
 
 # Test configuration
