@@ -544,13 +544,35 @@ def main():
     else:
         print("\n⚠️ WARNING: Voice API endpoint may still have issues")
     
-    # Check OpenAI integration
-    if results.get("Valid Audio Processing", False):
-        print("🎉 SUCCESS: OpenAI integration is working!")
-        print("   Whisper + GPT + TTS pipeline is functional")
+    # Check text-to-speech pipeline
+    if results.get("Normal Property Question", False):
+        print("🎉 SUCCESS: Text → GPT-4o-mini → TTS pipeline is working!")
+        print("   Simplified text input eliminates audio upload complexity")
     else:
-        print("⚠️ WARNING: OpenAI integration may have issues")
+        print("⚠️ WARNING: Text-to-speech pipeline may have issues")
         print("   (This could be due to API key, quota, or network issues)")
+    
+    # Check mobile compatibility
+    if results.get("Mobile Compatibility", False):
+        print("🎉 SUCCESS: Mobile compatibility confirmed!")
+        print("   JSON responses work properly on mobile devices")
+    else:
+        print("⚠️ WARNING: Mobile compatibility issues detected")
+    
+    # Overall assessment
+    critical_tests = ["Health Check (GET)", "Normal Property Question", "Base64 Audio Validation"]
+    critical_passed = sum(1 for test in critical_tests if results.get(test, False))
+    
+    if critical_passed == len(critical_tests):
+        print(f"\n🎯 OVERALL: EXCELLENT - All critical functionality working")
+        print("   ✅ 502 errors eliminated")
+        print("   ✅ Text input pipeline functional") 
+        print("   ✅ JSON responses with Base64 audio")
+        print("   ✅ No binary streaming issues")
+    elif critical_passed >= 2:
+        print(f"\n🎯 OVERALL: GOOD - Core functionality working ({critical_passed}/{len(critical_tests)} critical tests passed)")
+    else:
+        print(f"\n🎯 OVERALL: NEEDS ATTENTION - Major issues detected ({critical_passed}/{len(critical_tests)} critical tests passed)")
 
 if __name__ == "__main__":
     main()
