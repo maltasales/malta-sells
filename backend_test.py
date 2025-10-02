@@ -335,16 +335,15 @@ def test_voice_api_very_long_text():
         return False
 
 def test_base64_audio_validation():
-    """Test Base64 audio validation and decoding"""
+    """Test Base64 audio validation and MP3 format verification"""
     print("\n🔍 Testing Base64 Audio Validation")
     
-    # Create test audio file
-    audio_file_path = create_test_audio_file()
+    test_text = "What are the best areas to buy property in Malta?"
     
     try:
-        with open(audio_file_path, 'rb') as f:
-            files = {'audio': ('test.wav', f, 'audio/wav')}
-            response = requests.post(VOICE_API_URL, files=files, timeout=60)
+        response = test_text_input(test_text, "Base64 audio validation test")
+        if not response:
+            return False
         
         if response.status_code == 200:
             try:
@@ -393,10 +392,6 @@ def test_base64_audio_validation():
     except Exception as e:
         print(f"   ❌ Error: {e}")
         return False
-    finally:
-        # Clean up test file
-        if os.path.exists(audio_file_path):
-            os.unlink(audio_file_path)
 
 def test_response_headers():
     """Test response headers for proper configuration"""
