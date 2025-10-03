@@ -6,6 +6,7 @@ import { getPlanById, getDefaultPlan } from '@/lib/plans';
 import Link from "next/link";
 import ImageCarousel from "@/components/ImageCarousel";
 import FavoriteButton from "@/components/FavoriteButton";
+import MortgageCalculator from "@/components/MortgageCalculator";
 import { formatPrice } from "@/utils/priceUtils";
 
 export default function PropertyDetailClient({ property }: { property: any }) {
@@ -57,10 +58,10 @@ export default function PropertyDetailClient({ property }: { property: any }) {
       {/* Action Buttons */}
       <div className="px-4 py-4 bg-gray-50 border-b border-gray-100">
         <div className="grid grid-cols-2 gap-3">
-          <button className="flex items-center justify-center space-x-2 py-3 px-4 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-[#D12C1D] transition-all duration-200 shadow-sm">
-            <Calculator className="w-4 h-4 text-[#D12C1D]" />
-            <span className="text-sm font-medium text-gray-700">Bank's Calculators</span>
-          </button>
+          <MortgageCalculator 
+            propertyPrice={property.price} 
+            propertyId={property.id}
+          />
           
           <button className="flex items-center justify-center space-x-2 py-3 px-4 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-[#D12C1D] transition-all duration-200 shadow-sm">
             <Sofa className="w-4 h-4 text-[#D12C1D]" />

@@ -4,9 +4,14 @@ import { useState, useEffect, useRef } from 'react';
 import { X, Mic, MicOff, Loader, Calendar, DollarSign, Heart, MapPin, Bed, Bath, Square } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/lib/supabase';
-import OpenAI from 'openai';
 
-// Initialize OpenAI client with your API key
+interface Message {
+  id: string;
+  type: 'user' | 'lucia';
+  content: string;
+  timestamp: Date;
+  properties?: Property[];
+}
 
 interface Property {
   id: string;
@@ -34,9 +39,20 @@ export default function LuciaAssistant({ isOpen, onClose }: LuciaAssistantProps)
   const [messages, setMessages] = useState<Message[]>([]);
   const [micState, setMicState] = useState<MicState>('idle');
   const [isRecording, setIsRecording] = useState(false);
+  const [RecordRTC, setRecordRTC] = useState<any>(null);
+  const [textInput, setTextInput] = useState('');
+  
+  const recorderRef = useRef<any>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  const audioRef = useRef<HTMLAudioElement>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const audioChunksRef = useRef<Blob[]>([]);
+
+  // Load RecordRTC dynamically
+  useEffect(() => {
+    import('recordrtc').then((module) => {
+      setRecordRTC(() => module.default);
+    });
+  }, []);
 
   useEffect(() => {
     if (isOpen) {
@@ -197,39 +213,29 @@ export default function LuciaAssistant({ isOpen, onClose }: LuciaAssistantProps)
     try {
       let properties: Property[] = [];
       
-      // Use OpenAI GPT for intelligent response generation
-      const completion = await openai.chat.completions.create({
-        model: "gpt-4",
-        messages: [
-          {
-            role: "system", 
-            content: `You are Lucia, a helpful AI assistant for Malta real estate. You help users find properties in Malta. 
-            Analyze user queries and provide helpful responses about properties. If they ask about specific locations, property types, or price ranges, acknowledge their request and offer to show relevant properties.
-            Keep responses conversational, helpful, and under 100 words.`
-          },
-          {
-            role: "user",
-            content: command
-          }
-        ],
-        max_tokens: 150
-      });
-
-      const aiResponse = completion.choices[0]?.message?.content || "I can help you find properties in Malta. What are you looking for?";
-
+      // Generate a simple response based on the command
+      let aiResponse = "I can help you find properties in Malta. What are you looking for?";
+      
       // Determine which properties to fetch based on the command
       const lowerCommand = command.toLowerCase();
       
       if (lowerCommand.includes('apartment') || lowerCommand.includes('flat')) {
         properties = await fetchProperties('apartment');
+        aiResponse = "Here are some apartments I found for you in Malta:";
       } else if (lowerCommand.includes('villa') || lowerCommand.includes('house')) {
         properties = await fetchProperties('villa');
+        aiResponse = "Here are some villas I found for you in Malta:";
       } else if (lowerCommand.includes('sliema')) {
         properties = await fetchProperties('sliema');
+        aiResponse = "Here are some properties in Sliema:";
       } else if (lowerCommand.includes('valletta')) {
         properties = await fetchProperties('valletta');
+        aiResponse = "Here are some properties in Valletta:";
       } else if (lowerCommand.includes('property') || lowerCommand.includes('show') || lowerCommand.includes('find')) {
         properties = await fetchProperties();
+        aiResponse = "Here are some featured properties in Malta:";
+      } else {
+        aiResponse = "I can help you find properties in Malta. Try asking about apartments, villas, or specific locations like Sliema or Valletta.";
       }
 
       // Add Lucia response
@@ -243,8 +249,6 @@ export default function LuciaAssistant({ isOpen, onClose }: LuciaAssistantProps)
       
       setMessages(prev => [...prev, luciaMessage]);
       
-      // Generate speech for the response
-      await generateSpeech(aiResponse);
       await saveConversation(command, aiResponse);
       
     } catch (error) {
@@ -262,54 +266,32 @@ export default function LuciaAssistant({ isOpen, onClose }: LuciaAssistantProps)
     setMicState('idle');
   };
 
-  const generateSpeech = async (text: string) => {
-    try {
-      const response = await openai.audio.speech.create({
-        model: "tts-1",
-        voice: "nova",
-        input: text,
-        speed: 1.0
-      });
-
-      const audioBuffer = await response.arrayBuffer();
-      const audioBlob = new Blob([audioBuffer], { type: 'audio/mpeg' });
-      const audioUrl = URL.createObjectURL(audioBlob);
-      
-      const audio = new Audio(audioUrl);
-      audio.play();
-      
-      // Cleanup URL after playing
-      audio.addEventListener('ended', () => {
-        URL.revokeObjectURL(audioUrl);
-      });
-      
-    } catch (error) {
-      console.error('Error generating speech:', error);
-    }
-  };
+  // Speech generation is now handled in processAudioWithWhisper via the /api/voice endpoint
 
   const startRecording = async () => {
+    if (!RecordRTC) {
+      console.error('RecordRTC not loaded yet');
+      return;
+    }
+    
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mediaRecorder = new MediaRecorder(stream);
-      mediaRecorderRef.current = mediaRecorder;
-      audioChunksRef.current = [];
-
-      mediaRecorder.ondataavailable = (event) => {
-        audioChunksRef.current.push(event.data);
-      };
-
-      mediaRecorder.onstop = async () => {
-        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/wav' });
-        await processAudioWithWhisper(audioBlob);
-        
-        // Stop all tracks to release microphone
-        stream.getTracks().forEach(track => track.stop());
-      };
-
-      mediaRecorder.start();
+      streamRef.current = stream;
+      
+      // Use RecordRTC to record in WAV format
+      const recorder = new RecordRTC(stream, {
+        type: 'audio',
+        mimeType: 'audio/wav',
+        recorderType: RecordRTC.StereoAudioRecorder,
+        numberOfAudioChannels: 1,
+        desiredSampRate: 16000,
+      });
+      
+      recorder.startRecording();
+      recorderRef.current = recorder;
       setMicState('listening');
       setIsRecording(true);
+      console.log('🎤 Recording started (WAV, 16kHz)');
       
     } catch (error) {
       console.error('Error starting recording:', error);
@@ -319,51 +301,231 @@ export default function LuciaAssistant({ isOpen, onClose }: LuciaAssistantProps)
   };
 
   const stopRecording = () => {
-    if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
-      mediaRecorderRef.current.stop();
+    if (recorderRef.current && isRecording) {
+      recorderRef.current.stopRecording(async () => {
+        const blob = recorderRef.current.getBlob();
+        console.log('✅ Recording stopped:', blob.size, 'bytes');
+        
+        // Stop stream
+        if (streamRef.current) {
+          streamRef.current.getTracks().forEach(track => track.stop());
+        }
+        
+        // For now, show message that voice recording is not available
+        // TODO: Implement Whisper transcription if needed
+        setMicState('idle');
+        setMessages(prev => [...prev, {
+          id: Date.now().toString(),
+          type: 'lucia',
+          content: "Voice recording is temporarily unavailable. Please use the text input above to chat with me!",
+          timestamp: new Date()
+        }]);
+      });
+      
       setMicState('processing');
       setIsRecording(false);
     }
   };
 
-  const processAudioWithWhisper = async (audioBlob: Blob) => {
-    try {
-      const formData = new FormData();
-      formData.append('file', audioBlob, 'audio.wav');
-      formData.append('model', 'whisper-1');
-      formData.append('language', 'en');
+  const processTextWithLucia = async (text: string) => {
+    let retries = 0;
+    const maxRetries = 2;
+    
+    const attemptProcessing = async (): Promise<boolean> => {
+      try {
+        console.log('📤 Sending text to Lucia:', text);
+        
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 30000);
+        
+        const response = await fetch('/api/voice', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ text: text.trim() }),
+          signal: controller.signal,
+        });
+        
+        clearTimeout(timeoutId);
 
-      const response = await openai.audio.transcriptions.create({
-        file: audioBlob as any,
-        model: 'whisper-1',
-        language: 'en'
-      });
+        if (!response.ok) {
+          let errorMessage = `HTTP ${response.status}`;
+          try {
+            const errorData = await response.json();
+            errorMessage = errorData.error || errorMessage;
+          } catch (jsonError) {
+            console.warn('Failed to parse error response as JSON');
+          }
+          throw new Error(errorMessage);
+        }
 
-      const transcription = response.text;
-      
-      if (transcription && transcription.trim()) {
-        await handleVoiceCommand(transcription);
-      } else {
-        setMicState('idle');
-        const errorMessage: Message = {
-          id: Date.now().toString(),
-          type: 'lucia',
-          content: "I couldn't understand what you said. Please try again.",
-          timestamp: new Date()
-        };
-        setMessages(prev => [...prev, errorMessage]);
+        // Parse JSON response with better error handling
+        let data;
+        try {
+          const responseText = await response.text();
+          console.log('📥 Response size:', responseText.length, 'chars');
+          
+          if (!responseText.trim()) {
+            throw new Error('Empty response from server');
+          }
+          
+          data = JSON.parse(responseText);
+          console.log('✅ JSON parsed successfully');
+        } catch (jsonError: any) {
+          console.error('❌ JSON parsing failed:', jsonError.message);
+          throw new Error('Invalid response format. Please try again.');
+        }
+
+        const { audioBase64, text: aiResponse } = data;
+        
+        console.log('✅ Lucia response:', aiResponse);
+        console.log('✅ Processing time:', data.processingTime + 'ms');
+        
+        if (aiResponse?.trim()) {
+          // Add user message
+          setMessages(prev => [...prev, {
+            id: Date.now().toString(),
+            type: 'user',
+            content: text,
+            timestamp: new Date()
+          }]);
+
+          // Play audio from Base64 data with retry logic
+          const playSuccess = await new Promise<boolean>((resolve) => {
+            const audio = new Audio("data:audio/mp3;base64," + audioBase64);
+            
+            const playPromise = audio.play();
+            
+            if (playPromise !== undefined) {
+              playPromise
+                .then(() => {
+                  console.log('✅ Playing Lucia audio');
+                  resolve(true);
+                })
+                .catch((err) => {
+                  console.error('❌ Playback error:', err);
+                  resolve(false);
+                });
+            } else {
+              resolve(true);
+            }
+            
+            audio.onended = () => console.log('✅ Audio playback finished');
+            audio.onerror = () => {
+              console.error('❌ Audio playback error');
+              resolve(false);
+            };
+          });
+
+          // Add Lucia response
+          setMessages(prev => [...prev, {
+            id: (Date.now() + 1).toString(),
+            type: 'lucia',
+            content: aiResponse,
+            timestamp: new Date()
+          }]);
+          
+          setMicState('idle');
+          return playSuccess;
+        } else {
+          setMicState('idle');
+          setMessages(prev => [...prev, {
+            id: Date.now().toString(),
+            type: 'lucia',
+            content: "I'm sorry, I couldn't generate a response. Please try again.",
+            timestamp: new Date()
+          }]);
+          return false;
+        }
+      } catch (error: any) {
+        console.error('❌ Error:', error);
+        if (error.name === 'AbortError') {
+          throw new Error('timeout');
+        }
+        throw error;
       }
-    } catch (error) {
-      console.error('Error processing audio with Whisper:', error);
-      setMicState('idle');
-      
-      const errorMessage: Message = {
-        id: Date.now().toString(),
-        type: 'lucia',
-        content: "I had trouble processing your voice. Please try again.",
-        timestamp: new Date()
-      };
-      setMessages(prev => [...prev, errorMessage]);
+    };
+    
+    // Retry logic
+    while (retries <= maxRetries) {
+      try {
+        const success = await attemptProcessing();
+        
+        if (success || retries >= maxRetries) {
+          break;
+        }
+        
+        retries++;
+        console.log(`⚠️ Retry ${retries}/${maxRetries}...`);
+        await new Promise(r => setTimeout(r, 1000));
+        
+      } catch (error: any) {
+        retries++;
+        
+        if (retries > maxRetries) {
+          setMicState('idle');
+          
+          let errorMsg = 'Error processing voice. Please try again.';
+          if (error.message === 'timeout') {
+            errorMsg = 'Request timeout. Try speaking less.';
+          } else if (error.message) {
+            errorMsg = error.message;
+          }
+          
+          setMessages(prev => [...prev, {
+            id: Date.now().toString(),
+            type: 'lucia',
+            content: errorMsg,
+            timestamp: new Date()
+          }]);
+          break;
+        }
+        
+        await new Promise(r => setTimeout(r, 1000));
+      }
+    }
+  };
+
+  const handleTextSubmit = async () => {
+    if (!isAuthenticated || !textInput.trim() || micState === 'processing') return;
+    
+    const text = textInput.trim();
+    setTextInput('');
+    setMicState('processing');
+    
+    // Retry logic for text processing
+    let retries = 0;
+    const maxRetries = 2;
+    
+    while (retries <= maxRetries) {
+      try {
+        await processTextWithLucia(text);
+        break; // Success
+      } catch (error: any) {
+        retries++;
+        
+        if (retries > maxRetries) {
+          setMicState('idle');
+          
+          let errorMsg = 'Error processing message. Please try again.';
+          if (error.message === 'timeout') {
+            errorMsg = 'Request timeout. Please try again.';
+          } else if (error.message) {
+            errorMsg = error.message;
+          }
+          
+          setMessages(prev => [...prev, {
+            id: Date.now().toString(),
+            type: 'lucia',
+            content: errorMsg,
+            timestamp: new Date()
+          }]);
+          break;
+        }
+        
+        await new Promise(r => setTimeout(r, 1000));
+      }
     }
   };
 
@@ -588,32 +750,75 @@ export default function LuciaAssistant({ isOpen, onClose }: LuciaAssistantProps)
 
         {/* Footer */}
         <div className="p-4 border-t border-gray-100">
-          <div className="flex flex-col items-center space-y-2">
-            <button
-              onClick={handleMicClick}
-              disabled={micState === 'disabled'}
-              className={`w-14 h-14 rounded-full flex items-center justify-center transition-all duration-200 shadow-lg ${
-                micState === 'disabled'
-                  ? 'bg-gray-400 cursor-not-allowed'
-                  : micState === 'listening'
-                  ? 'bg-[#D12C1D] animate-pulse shadow-red-200'
-                  : 'bg-[#D12C1D] hover:bg-[#B8241A] active:scale-95'
-              }`}
-            >
-              {micState === 'processing' ? (
-                <Loader className="w-6 h-6 text-white animate-spin" />
-              ) : micState === 'listening' ? (
-                <MicOff className="w-6 h-6 text-white" />
-              ) : (
-                <Mic className="w-6 h-6 text-white" />
-              )}
-            </button>
-            <p className={`text-xs transition-colors ${
-              micState === 'disabled' ? 'text-gray-400' : 'text-gray-600'
-            }`}>
-              {getMicStatusText()}
-            </p>
-          </div>
+          {isAuthenticated ? (
+            <div className="space-y-4">
+              {/* Voice Input (moved to top) */}
+              <div className="flex flex-col items-center space-y-2">
+                <button
+                  onClick={handleMicClick}
+                  disabled={micState === 'disabled'}
+                  className={`w-16 h-16 rounded-full flex items-center justify-center transition-all duration-200 shadow-lg ${
+                    micState === 'disabled'
+                      ? 'bg-gray-400 cursor-not-allowed'
+                      : micState === 'listening'
+                      ? 'bg-[#D12C1D] animate-pulse shadow-red-200'
+                      : 'bg-[#D12C1D] hover:bg-[#B8241A] active:scale-95'
+                  }`}
+                >
+                  {micState === 'processing' ? (
+                    <Loader className="w-7 h-7 text-white animate-spin" />
+                  ) : micState === 'listening' ? (
+                    <MicOff className="w-7 h-7 text-white" />
+                  ) : (
+                    <Mic className="w-7 h-7 text-white" />
+                  )}
+                </button>
+                <p className={`text-xs transition-colors ${
+                  micState === 'disabled' ? 'text-gray-400' : 'text-gray-600'
+                }`}>
+                  {getMicStatusText()}
+                </p>
+              </div>
+              
+              {/* OR Divider */}
+              <div className="flex items-center space-x-3">
+                <div className="flex-1 h-px bg-gray-300"></div>
+                <span className="text-xs text-gray-500">OR</span>
+                <div className="flex-1 h-px bg-gray-300"></div>
+              </div>
+              
+              {/* Text Input (moved to bottom) */}
+              <div className="space-y-2">
+                <textarea
+                  value={textInput}
+                  onChange={(e) => setTextInput(e.target.value)}
+                  placeholder="Type your message to Lucia..."
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-[#D12C1D] focus:border-transparent text-sm"
+                  rows={2}
+                  maxLength={500}
+                  disabled={micState === 'processing'}
+                />
+                <div className="flex justify-between items-center">
+                  <span className="text-xs text-gray-500">{textInput.length}/500</span>
+                  <button
+                    onClick={handleTextSubmit}
+                    disabled={!textInput.trim() || micState === 'processing'}
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                      !textInput.trim() || micState === 'processing'
+                        ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                        : 'bg-[#D12C1D] text-white hover:bg-[#B8241A]'
+                    }`}
+                  >
+                    {micState === 'processing' ? 'Processing...' : 'Send'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="text-center">
+              <p className="text-sm text-gray-600 mb-3">Login to chat with Lucia</p>
+            </div>
+          )}
         </div>
       </div>
     </div>
