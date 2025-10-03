@@ -195,10 +195,10 @@ export default function AIDecorationPage() {
               <button
                 onClick={handleGenerate}
                 disabled={isGenerating}
-                className={`w-full py-4 px-6 rounded-lg font-semibold text-white transition-all duration-200 ${
+                className={`w-full py-4 px-6 rounded-lg font-semibold transition-all duration-200 ${
                   isGenerating
-                    ? 'bg-purple-400 cursor-not-allowed'
-                    : 'bg-purple-600 hover:bg-purple-700 active:scale-98'
+                    ? 'bg-gray-400 text-white cursor-not-allowed'
+                    : 'bg-white text-gray-900 border-2 border-gray-300 hover:border-gray-400 hover:bg-gray-50 active:scale-98'
                 }`}
               >
                 {isGenerating ? (
