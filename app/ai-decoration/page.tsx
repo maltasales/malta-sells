@@ -158,7 +158,7 @@ export default function AIDecorationPage() {
                   <select
                     value={selectedRoom}
                     onChange={(e) => setSelectedRoom(e.target.value)}
-                    className="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent appearance-none cursor-pointer"
+                    className="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent appearance-none cursor-pointer"
                   >
                     {roomTypes.map((room) => (
                       <option key={room} value={room}>
