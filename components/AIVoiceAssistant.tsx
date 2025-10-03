@@ -1,14 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { Mic, MicOff, Volume2, VolumeX } from 'lucide-react';
-import OpenAI from 'openai';
-
-// Initialize OpenAI client
-const openai = new OpenAI({
-  apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
-  dangerouslyAllowBrowser: true
-});
+import { Mic, MicOff, Volume2 } from 'lucide-react';
 
 export default function AIVoiceAssistant() {
   const [isRecording, setIsRecording] = useState(false);
@@ -22,12 +15,11 @@ export default function AIVoiceAssistant() {
   const audioChunksRef = useRef<Blob[]>([]);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  // Start recording
   const startRecording = async () => {
     try {
       setError('');
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      
+
       mediaRecorderRef.current = new MediaRecorder(stream);
       audioChunksRef.current = [];
 
@@ -38,8 +30,7 @@ export default function AIVoiceAssistant() {
       mediaRecorderRef.current.onstop = async () => {
         const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/wav' });
         await processAudio(audioBlob);
-        
-        // Stop all tracks to release the microphone
+
         stream.getTracks().forEach(track => track.stop());
       };
 
@@ -51,7 +42,6 @@ export default function AIVoiceAssistant() {
     }
   };
 
-  // Stop recording
   const stopRecording = () => {
     if (mediaRecorderRef.current && isRecording) {
       mediaRecorderRef.current.stop();
@@ -59,72 +49,71 @@ export default function AIVoiceAssistant() {
     }
   };
 
-  // Process audio through OpenAI pipeline
   const processAudio = async (audioBlob: Blob) => {
     setIsProcessing(true);
-    
+
     try {
-      // Step 1: Transcribe audio using Whisper
       console.log('🎤 Transcribing audio...');
       const formData = new FormData();
-      formData.append('file', audioBlob, 'audio.wav');
-      formData.append('model', 'whisper-1');
+      formData.append('audio', audioBlob, 'audio.wav');
 
-      const transcription = await openai.audio.transcriptions.create({
-        file: audioBlob,
-        model: 'whisper-1',
+      const transcribeResponse = await fetch('/api/transcribe', {
+        method: 'POST',
+        body: formData,
       });
 
-      const transcribedText = transcription.text;
-      setTranscript(transcribedText);
-      console.log('✅ Transcription:', transcribedText);
+      if (!transcribeResponse.ok) {
+        const errorData = await transcribeResponse.json();
+        throw new Error(errorData.error || 'Transcription failed');
+      }
 
-      if (!transcribedText.trim()) {
+      const { text } = await transcribeResponse.json();
+      setTranscript(text);
+      console.log('✅ Transcription:', text);
+
+      if (!text.trim()) {
         setError('No speech detected. Please try again.');
         setIsProcessing(false);
         return;
       }
 
-      // Step 2: Generate response using ChatGPT
       console.log('🤖 Generating response...');
-      const completion = await openai.chat.completions.create({
-        model: 'gpt-3.5-turbo',
-        messages: [
-          {
-            role: 'system',
-            content: 'You are a helpful AI assistant for a real estate platform called Malta Sells. Keep responses concise and friendly, under 50 words.'
-          },
-          {
-            role: 'user',
-            content: transcribedText
-          }
-        ],
-        max_tokens: 100,
-        temperature: 0.7,
+      const chatResponse = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: text }),
       });
 
-      const responseText = completion.choices[0]?.message?.content || 'Sorry, I could not generate a response.';
+      if (!chatResponse.ok) {
+        const errorData = await chatResponse.json();
+        throw new Error(errorData.error || 'Chat failed');
+      }
+
+      const { response: responseText } = await chatResponse.json();
       setResponse(responseText);
       console.log('✅ Response:', responseText);
 
-      // Step 3: Convert response to speech using TTS
       console.log('🔊 Converting to speech...');
-      const speechResponse = await openai.audio.speech.create({
-        model: 'tts-1',
-        voice: 'alloy',
-        input: responseText,
+      const ttsResponse = await fetch('/api/tts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: responseText }),
       });
 
-      // Play the audio
-      const audioBuffer = await speechResponse.arrayBuffer();
+      if (!ttsResponse.ok) {
+        const errorData = await ttsResponse.json();
+        throw new Error(errorData.error || 'TTS failed');
+      }
+
+      const audioBuffer = await ttsResponse.arrayBuffer();
       const audioBlob = new Blob([audioBuffer], { type: 'audio/mpeg' });
       const audioUrl = URL.createObjectURL(audioBlob);
-      
+
       if (audioRef.current) {
         audioRef.current.src = audioUrl;
         audioRef.current.play();
         setIsPlaying(true);
-        
+
         audioRef.current.onended = () => {
           setIsPlaying(false);
           URL.revokeObjectURL(audioUrl);
@@ -135,7 +124,7 @@ export default function AIVoiceAssistant() {
 
     } catch (err: any) {
       console.error('Error in voice assistant pipeline:', err);
-      setError(`Error: ${err.message || 'Voice assistant failed'}`);
+      setError(`I had trouble processing your voice. Please try again.`);
     } finally {
       setIsProcessing(false);
     }
