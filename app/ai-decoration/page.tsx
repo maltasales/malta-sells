@@ -106,22 +106,17 @@ export default function AIDecorationPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-indigo-50 p-4">
+    <div className="min-h-screen bg-white p-4">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center mb-4">
-            <Palette className="w-8 h-8 text-purple-600 mr-3" />
+            <Palette className="w-8 h-8 text-gray-600 mr-3" />
             <h1 className="text-3xl font-bold text-gray-900">AI Property Decoration</h1>
           </div>
           <p className="text-gray-600 max-w-2xl mx-auto">
             Transform this unfurnished space with AI-powered interior design. Select your preferred room type and style to see how it could look fully decorated.
           </p>
-          {propertyId && (
-            <div className="mt-2 inline-flex items-center px-3 py-1 bg-purple-100 text-purple-700 text-sm rounded-full">
-              Property #{propertyId}
-            </div>
-          )}
         </div>
 
         {!showResult ? (
