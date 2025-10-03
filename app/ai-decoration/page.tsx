@@ -260,15 +260,15 @@ export default function AIDecorationPage() {
           <div className="mt-8 flex flex-wrap gap-4 justify-center">
             <button
               onClick={handleSave}
-              className="flex items-center px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+              className="flex items-center px-6 py-3 bg-white text-gray-700 border border-gray-300 rounded-lg hover:border-gray-400 hover:bg-gray-50 transition-colors"
             >
               <Download className="w-4 h-4 mr-2" />
-              Save Image
+              Save
             </button>
             
             <button
               onClick={handleShare}
-              className="flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="flex items-center px-6 py-3 bg-white text-gray-700 border border-gray-300 rounded-lg hover:border-gray-400 hover:bg-gray-50 transition-colors"
             >
               <Share2 className="w-4 h-4 mr-2" />
               Share
@@ -276,15 +276,15 @@ export default function AIDecorationPage() {
             
             <button
               onClick={handleReset}
-              className="flex items-center px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+              className="flex items-center px-6 py-3 bg-white text-gray-700 border border-gray-300 rounded-lg hover:border-gray-400 hover:bg-gray-50 transition-colors"
             >
               <RotateCcw className="w-4 h-4 mr-2" />
-              Try Another Style
+              Try Another
             </button>
             
             <button
               onClick={() => window.close()}
-              className="flex items-center px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+              className="flex items-center px-6 py-3 bg-white text-red-600 border border-red-300 rounded-lg hover:border-red-400 hover:bg-red-50 transition-colors"
             >
               <X className="w-4 h-4 mr-2" />
               Close
