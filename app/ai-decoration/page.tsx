@@ -238,9 +238,9 @@ export default function AIDecorationPage() {
 
             {/* After */}
             <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-              <div className="p-4 bg-purple-50 border-b">
+              <div className="p-4 bg-gray-50 border-b">
                 <h3 className="font-semibold text-gray-900 flex items-center">
-                  <Palette className="w-4 h-4 text-purple-600 mr-2" />
+                  <Palette className="w-4 h-4 text-gray-600 mr-2" />
                   AI Decorated - {selectedRoom} ({selectedStyle})
                 </h3>
               </div>
