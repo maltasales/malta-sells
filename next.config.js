@@ -13,17 +13,7 @@ const nextConfig = {
   },
   // Environment variables should be configured in deployment platform
   // Remove hardcoded values for security
-};
 
-module.exports = nextConfig;
-/** @type {import('next').NextConfig} */
-const nextConfig = {
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
-  typescript: {
-    ignoreBuildErrors: true,
-  },
   webpack: (config) => {
     config.ignoreWarnings = [
       {
@@ -31,7 +21,3 @@ const nextConfig = {
       },
     ];
     return config;
-  },
-};
-
-module.exports = nextConfig;
