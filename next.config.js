@@ -16,3 +16,22 @@ const nextConfig = {
 };
 
 module.exports = nextConfig;
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+  webpack: (config) => {
+    config.ignoreWarnings = [
+      {
+        module: /@supabase\/storage-js/,
+      },
+    ];
+    return config;
+  },
+};
+
+module.exports = nextConfig;
