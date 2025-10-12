@@ -13,7 +13,6 @@ const nextConfig = {
   },
   // Environment variables should be configured in deployment platform
   // Remove hardcoded values for security
-
   webpack: (config) => {
     config.ignoreWarnings = [
       {
@@ -21,3 +20,7 @@ const nextConfig = {
       },
     ];
     return config;
+  },
+};
+
+module.exports = nextConfig;
