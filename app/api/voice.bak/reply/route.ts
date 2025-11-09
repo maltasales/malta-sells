@@ -8,11 +8,11 @@ export async function POST(req: NextRequest) {
     const openaiKey = process.env.OPENAI_API_KEY;
 
     // 1️⃣ Испраќаме текст до Lucia workflow (Agent Builder)
-    const luciaRes = await fetch(https://api.openai.com/v1/workflows/${workflowId}/runs, {
+    const luciaRes = await fetch(`https://api.openai.com/v1/workflows/${workflowId}/runs`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: Bearer ${openaiKey},
+        Authorization: `Bearer ${openaiKey}`,
       },
       body: JSON.stringify({
         input_as_text: message || "Hello, Lucia!",
@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: Bearer ${openaiKey},
+        Authorization: `Bearer ${openaiKey}`,
       },
       body: JSON.stringify({
         model: process.env.OPENAI_MODEL_TTS || "gpt-4o-mini-tts",
