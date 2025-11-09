@@ -1,66 +1,64 @@
 import { notFound } from 'next/navigation';
 import PublicSellerProfile from '@/components/PublicSellerProfile';
+import { supabase } from '@/lib/supabase';
 
-// Mock seller data - replace with actual database queries later
-const mockSellers = {
-  '1': {
-    id: '1',
-    name: 'Maria Bonello',
-    email: 'maria@example.com',
-    role: 'seller' as const,
-    createdAt: '2023-01-15T00:00:00.000Z',
-    avatar_url: 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?w=200&h=200&fit=crop&crop=face',
-    banner_url: 'https://images.pexels.com/photos/1918291/pexels-photo-1918291.jpeg?w=800&h=300&fit=crop',
-    phone: '+356 9999 1234',
-    bio: 'Experienced property seller in Malta with over 5 years in the real estate market. Specializing in modern apartments and luxury properties.',
-    properties: [
-      {
-        id: '1',
-        title: 'Modern Apartment in Sliema',
-        location: 'Sliema',
-        price: 350000,
-        currency: '€',
-        beds: 2,
-        baths: 1,
-        image: 'https://images.pexels.com/photos/1918291/pexels-photo-1918291.jpeg?w=800&h=600&fit=crop',
-        type: 'Apartment'
-      }
-    ]
-  },
-  '2': {
-    id: '2',
-    name: 'Anhoch',
-    email: 'anhoch@example.com',
-    role: 'seller' as const,
-    createdAt: '2023-03-20T00:00:00.000Z',
-    avatar_url: 'https://images.pexels.com/photos/697509/pexels-photo-697509.jpeg?w=200&h=200&fit=crop&crop=face',
-    banner_url: 'https://images.pexels.com/photos/323780/pexels-photo-323780.jpeg?w=800&h=300&fit=crop',
-    phone: '+356 9999 5678',
-    bio: 'Luxury property specialist focusing on penthouses and high-end properties in Valletta and surrounding areas.',
-    properties: [
-      {
-        id: '2',
-        title: 'Luxury Penthouse in Valletta',
-        location: 'Valletta',
-        price: 750000,
-        currency: '€',
-        beds: 3,
-        baths: 2,
-        image: 'https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?w=800&h=600&fit=crop',
-        type: 'Penthouse'
-      }
-    ]
+export const dynamic = 'force-dynamic';
+
+async function getSeller(id: string) {
+  try {
+    const { data: profile, error: profileError } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', id)
+      .single();
+
+    if (profileError || !profile) {
+      console.error('Error fetching seller profile:', profileError);
+      return null;
+    }
+
+    const { data: properties, error: propertiesError } = await supabase
+      .from('properties')
+      .select('*')
+      .eq('seller_id', id)
+      .order('created_at', { ascending: false });
+
+    if (propertiesError) {
+      console.error('Error fetching seller properties:', propertiesError);
+    }
+
+    const transformedProperties = properties?.map(prop => ({
+      id: prop.id,
+      title: prop.title,
+      location: prop.location,
+      price: prop.price,
+      currency: prop.currency || '€',
+      beds: prop.beds,
+      baths: prop.baths,
+      image: prop.images?.[0] || 'https://images.pexels.com/photos/1918291/pexels-photo-1918291.jpeg?w=800&h=600&fit=crop',
+      type: prop.property_type || 'Property'
+    })) || [];
+
+    return {
+      id: profile.id,
+      name: profile.full_name || 'Property Seller',
+      email: profile.email,
+      role: profile.role || 'seller',
+      createdAt: profile.created_at,
+      avatar_url: profile.avatar_url,
+      banner_url: profile.banner_url,
+      phone: profile.phone,
+      bio: profile.bio || 'Property seller in Malta',
+      properties: transformedProperties
+    };
+  } catch (error) {
+    console.error('Error in getSeller:', error);
+    return null;
   }
-};
-
-export async function generateStaticParams() {
-  return Object.keys(mockSellers).map((id) => ({
-    id: id,
-  }));
 }
 
-export default function PublicSellerPage({ params }: { params: { id: string } }) {
-  const seller = mockSellers[params.id as keyof typeof mockSellers];
+export default async function PublicSellerPage({ params }: { params: { id: string } }) {
+  const seller = await getSeller(params.id);
 
   if (!seller) {
     notFound();

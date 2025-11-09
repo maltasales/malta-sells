@@ -515,7 +515,7 @@ export default function VideosPage() {
                 {/* Content */}
                 <div className="relative p-4 pb-20 pointer-events-auto">
                   <div className="flex items-center space-x-3 mb-3">
-                    <Link href={`/seller/${video.id}`}>
+                    <Link href={`/seller/${video.seller_id || video.agent.id}`}>
                       <img
                         src={video.agent.avatar}
                         alt={video.agent.name}
@@ -523,7 +523,7 @@ export default function VideosPage() {
                       />
                     </Link>
                     <div>
-                      <Link href={`/seller/${video.id}`}>
+                      <Link href={`/seller/${video.seller_id || video.agent.id}`}>
                         <div className="flex items-center space-x-1">
                           <p className="text-white font-semibold hover:text-blue-300 transition-colors cursor-pointer">
                             {video.agent.name}

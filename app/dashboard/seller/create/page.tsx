@@ -191,16 +191,21 @@ export default function CreatePropertyPage() {
   };
 
   const uploadImageToCreatomate = async (file: File): Promise<string> => {
+    if (!profile?.id) throw new Error('User not authenticated');
+
     console.log('Uploading image to Supabase:', file.name);
-    
+
     // Generate unique filename
     const fileExt = file.name.split('.').pop();
-    const fileName = `temp-video-generation/${Date.now()}-${Math.random().toString(36).substr(2, 9)}.${fileExt}`;
-    
+    const fileName = `${profile.id}/temp-video/${Date.now()}-${Math.random().toString(36).substr(2, 9)}.${fileExt}`;
+
     // Upload to Supabase Storage
     const { data, error } = await supabase.storage
-      .from('creatomate')
-      .upload(fileName, file);
+      .from('property-images')
+      .upload(fileName, file, {
+        cacheControl: '3600',
+        upsert: false
+      });
 
     if (error) {
       console.error('Supabase upload error:', error);
@@ -209,7 +214,7 @@ export default function CreatePropertyPage() {
 
     // Get public URL
     const { data: { publicUrl } } = supabase.storage
-      .from('creatomate')
+      .from('property-images')
       .getPublicUrl(fileName);
 
     console.log('Image uploaded to Supabase successfully:', publicUrl);
@@ -502,23 +507,26 @@ export default function CreatePropertyPage() {
       for (let i = 0; i < images.length; i++) {
         const file = images[i];
         const fileExt = file.name.split('.').pop();
-        const fileName = `${propertyId}/images/${i}-${Date.now()}.${fileExt}`;
-        
+        const fileName = `${profile.id}/${propertyId}/${i}-${Date.now()}.${fileExt}`;
+
         console.log(`Uploading image ${i + 1}/${images.length}: ${fileName}`);
-        
+
         const { data: uploadData, error: uploadError } = await supabase.storage
-          .from('creatomate')
-          .upload(fileName, file);
+          .from('property-images')
+          .upload(fileName, file, {
+            cacheControl: '3600',
+            upsert: false
+          });
 
         if (uploadError) {
           console.error('Error uploading image:', uploadError);
           throw new Error(`Failed to upload image ${i + 1}: ${uploadError.message}`);
         }
-        
+
         const { data: { publicUrl } } = supabase.storage
-          .from('creatomate')
+          .from('property-images')
           .getPublicUrl(fileName);
-        
+
         imageUrls.push(publicUrl);
         console.log(`Image ${i + 1} uploaded successfully:`, publicUrl);
       }
@@ -530,11 +538,14 @@ export default function CreatePropertyPage() {
       if (video) {
         console.log('Uploading video file:', video.name);
         const fileExt = video.name.split('.').pop();
-        const fileName = `${propertyId}/video/${Date.now()}.${fileExt}`;
-        
+        const fileName = `${profile.id}/${propertyId}/${Date.now()}.${fileExt}`;
+
         const { data: uploadData, error: uploadError } = await supabase.storage
-          .from('creatomate')
-          .upload(fileName, video);
+          .from('property-videos')
+          .upload(fileName, video, {
+            cacheControl: '3600',
+            upsert: false
+          });
 
         if (uploadError) {
           console.error('Error uploading video:', uploadError);
