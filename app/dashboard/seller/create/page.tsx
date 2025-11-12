@@ -536,10 +536,16 @@ export default function CreatePropertyPage() {
       // Handle video upload or use generated video URL
       let videoUrl: string | null = null;
       if (video) {
-        console.log('Uploading video file:', video.name);
+        console.log('=== VIDEO UPLOAD START ===');
+        console.log('Video file name:', video.name);
+        console.log('Video file size:', video.size, 'bytes');
+        console.log('Video file type:', video.type);
+
         const fileExt = video.name.split('.').pop();
         const fileName = `${profile.id}/${propertyId}/${Date.now()}.${fileExt}`;
+        console.log('Upload path:', fileName);
 
+        console.log('Attempting upload to property-videos bucket...');
         const { data: uploadData, error: uploadError } = await supabase.storage
           .from('property-videos')
           .upload(fileName, video, {
@@ -548,16 +554,23 @@ export default function CreatePropertyPage() {
           });
 
         if (uploadError) {
-          console.error('Error uploading video:', uploadError);
+          console.error('=== VIDEO UPLOAD ERROR ===');
+          console.error('Error code:', uploadError.name);
+          console.error('Error message:', uploadError.message);
+          console.error('Full error object:', JSON.stringify(uploadError, null, 2));
           throw new Error(`Failed to upload video: ${uploadError.message}`);
         }
+
+        console.log('Upload successful! Upload data:', uploadData);
 
         const { data: { publicUrl } } = supabase.storage
           .from('property-videos')
           .getPublicUrl(fileName);
 
         videoUrl = publicUrl;
-        console.log('Video uploaded successfully:', videoUrl);
+        console.log('Video uploaded successfully!');
+        console.log('Public URL:', videoUrl);
+        console.log('=== VIDEO UPLOAD COMPLETE ===');
       } else if (generatedVideoUrl) {
         console.log('Using generated video URL:', generatedVideoUrl);
         videoUrl = generatedVideoUrl;
