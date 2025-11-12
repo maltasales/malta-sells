@@ -161,25 +161,41 @@ export default function ImageCarousel({ images, title, furnishingStatus, propert
 
       {/* AI Decoration Modal */}
       {showAIDecorationModal && (
-        <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg w-full max-w-6xl max-h-[90vh] overflow-hidden flex flex-col">
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-end md:items-center justify-center p-0 md:p-4"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setShowAIDecorationModal(false);
+          }}
+        >
+          <div
+            className="bg-white w-full md:max-w-4xl md:rounded-xl rounded-t-xl max-h-[95vh] overflow-y-auto flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
             {/* Modal Header */}
-            <div className="flex items-center justify-between p-4 border-b border-gray-200">
-              <h2 className="text-xl font-semibold text-gray-900">AI Decoration</h2>
-              <button
-                onClick={() => setShowAIDecorationModal(false)}
-                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-              >
-                <X className="w-5 h-5" />
-              </button>
+            <div className="sticky top-0 bg-gradient-to-r from-purple-600 to-purple-800 text-white p-4 md:rounded-t-xl z-10">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-xl font-bold">AI Property Decoration</h2>
+                  <p className="text-sm text-purple-100 mt-0.5">
+                    Transform this unfurnished space with AI-powered interior design
+                  </p>
+                </div>
+                <button
+                  onClick={() => setShowAIDecorationModal(false)}
+                  className="p-1 hover:bg-white/20 rounded-full transition-colors"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
             </div>
 
             {/* Modal Content - iframe */}
-            <div className="flex-1 overflow-hidden">
+            <div className="flex-1 overflow-hidden" style={{ minHeight: '70vh' }}>
               <iframe
                 src={`/ai-decoration?propertyId=${propertyId}&image=${encodeURIComponent(displayImages[currentImageIndex])}`}
                 className="w-full h-full border-0"
                 title="AI Decoration"
+                style={{ minHeight: '70vh' }}
               />
             </div>
           </div>
