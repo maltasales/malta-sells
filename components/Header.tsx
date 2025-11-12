@@ -55,13 +55,6 @@ export default function Header() {
         </div>
         
         <div className="flex items-center space-x-3">
-          <button
-            onClick={() => setIsLuciaOpen(true)}
-            className="flex items-center space-x-1 text-[#d8171e] hover:text-[#B8241A] transition-colors text-sm font-medium"
-          >
-            <Mic className="w-4 h-4" />
-            <span className="hidden sm:inline">Lucia</span>
-          </button>
           <Link
             href="/search"
             data-testid="search-button"

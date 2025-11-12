@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { ChevronLeft, ChevronRight, Palette } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Palette, X } from 'lucide-react';
 
 interface ImageCarouselProps {
   images: string[];
@@ -13,6 +13,7 @@ interface ImageCarouselProps {
 export default function ImageCarousel({ images, title, furnishingStatus, propertyId }: ImageCarouselProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [showAIDecorationModal, setShowAIDecorationModal] = useState(false);
   const startXRef = useRef<number>(0);
   const isDraggingRef = useRef<boolean>(false);
 
@@ -112,20 +113,19 @@ export default function ImageCarousel({ images, title, furnishingStatus, propert
       )}
       
       {/* AI Decoration Icon for Unfurnished/Shell form properties */}
-      {(furnishingStatus === 'Unfurnished' || furnishingStatus === 'Shell form' || 
+      {(furnishingStatus === 'Unfurnished' || furnishingStatus === 'Shell form' ||
         (!furnishingStatus && propertyId && (parseInt(propertyId) % 2 === 1))) && (
         <button
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
-            const currentImage = displayImages[currentImageIndex];
-            window.open(`/ai-decoration?propertyId=${propertyId}&image=${encodeURIComponent(currentImage)}`, '_blank', 'width=1200,height=800');
+            setShowAIDecorationModal(true);
           }}
           className="absolute top-4 left-4 p-2 rounded-lg hover:scale-110 transition-all duration-200 group"
           title="AI Decoration - Visualize this space furnished"
         >
-          <img 
-            src="https://customer-assets.emergentagent.com/job_realestate-lucia/artifacts/5jadarke_25301.png" 
+          <img
+            src="https://customer-assets.emergentagent.com/job_realestate-lucia/artifacts/5jadarke_25301.png"
             alt="AI Decoration"
             className="w-8 h-8 filter brightness-0 invert drop-shadow-lg"
             style={{ filter: 'brightness(0) invert(1) drop-shadow(2px 2px 4px rgba(0,0,0,0.8))' }}
@@ -149,13 +149,40 @@ export default function ImageCarousel({ images, title, furnishingStatus, propert
               key={index}
               onClick={() => goToImage(index)}
               className={`w-2 h-2 rounded-full transition-colors ${
-                index === currentImageIndex 
-                  ? 'bg-white' 
+                index === currentImageIndex
+                  ? 'bg-white'
                   : 'bg-white/50 hover:bg-white/80'
               }`}
               aria-label={`Go to image ${index + 1}`}
             />
           ))}
+        </div>
+      )}
+
+      {/* AI Decoration Modal */}
+      {showAIDecorationModal && (
+        <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg w-full max-w-6xl max-h-[90vh] overflow-hidden flex flex-col">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between p-4 border-b border-gray-200">
+              <h2 className="text-xl font-semibold text-gray-900">AI Decoration</h2>
+              <button
+                onClick={() => setShowAIDecorationModal(false)}
+                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Modal Content - iframe */}
+            <div className="flex-1 overflow-hidden">
+              <iframe
+                src={`/ai-decoration?propertyId=${propertyId}&image=${encodeURIComponent(displayImages[currentImageIndex])}`}
+                className="w-full h-full border-0"
+                title="AI Decoration"
+              />
+            </div>
+          </div>
         </div>
       )}
     </div>
