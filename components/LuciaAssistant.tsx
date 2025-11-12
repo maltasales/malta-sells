@@ -305,189 +305,119 @@ export default function LuciaAssistant({ isOpen, onClose }: LuciaAssistantProps)
       recorderRef.current.stopRecording(async () => {
         const blob = recorderRef.current.getBlob();
         console.log('✅ Recording stopped:', blob.size, 'bytes');
-        
+
         // Stop stream
         if (streamRef.current) {
           streamRef.current.getTracks().forEach(track => track.stop());
         }
-        
-        // For now, show message that voice recording is not available
-        // TODO: Implement Whisper transcription if needed
-        setMicState('idle');
-        setMessages(prev => [...prev, {
-          id: Date.now().toString(),
-          type: 'lucia',
-          content: "Voice recording is temporarily unavailable. Please use the text input above to chat with me!",
-          timestamp: new Date()
-        }]);
+
+        setMicState('processing');
+
+        // Process audio with Whisper
+        await processAudioWithWhisper(blob);
       });
-      
-      setMicState('processing');
+
       setIsRecording(false);
     }
   };
 
-  const processTextWithLucia = async (text: string) => {
-    let retries = 0;
-    const maxRetries = 2;
-    
-    const attemptProcessing = async (): Promise<boolean> => {
-      try {
-        console.log('📤 Sending text to Lucia:', text);
-        
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 30000);
-        
-        const response = await fetch('/api/voice', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ text: text.trim() }),
-          signal: controller.signal,
-        });
-        
-        clearTimeout(timeoutId);
+  const processAudioWithWhisper = async (audioBlob: Blob) => {
+    try {
+      const formData = new FormData();
+      formData.append('audio', audioBlob, 'recording.wav');
 
-        if (!response.ok) {
-          let errorMessage = `HTTP ${response.status}`;
-          try {
-            const errorData = await response.json();
-            errorMessage = errorData.error || errorMessage;
-          } catch (jsonError) {
-            console.warn('Failed to parse error response as JSON');
-          }
-          throw new Error(errorMessage);
-        }
+      const transcriptionResponse = await fetch('/api/voice/transcribe', {
+        method: 'POST',
+        body: formData,
+      });
 
-        // Parse JSON response with better error handling
-        let data;
-        try {
-          const responseText = await response.text();
-          console.log('📥 Response size:', responseText.length, 'chars');
-          
-          if (!responseText.trim()) {
-            throw new Error('Empty response from server');
-          }
-          
-          data = JSON.parse(responseText);
-          console.log('✅ JSON parsed successfully');
-        } catch (jsonError: any) {
-          console.error('❌ JSON parsing failed:', jsonError.message);
-          throw new Error('Invalid response format. Please try again.');
-        }
-
-        const { audioBase64, text: aiResponse } = data;
-        
-        console.log('✅ Lucia response:', aiResponse);
-        console.log('✅ Processing time:', data.processingTime + 'ms');
-        
-        if (aiResponse?.trim()) {
-          // Add user message
-          setMessages(prev => [...prev, {
-            id: Date.now().toString(),
-            type: 'user',
-            content: text,
-            timestamp: new Date()
-          }]);
-
-          // Play audio from Base64 data with retry logic
-          const playSuccess = await new Promise<boolean>((resolve) => {
-            const audio = new Audio("data:audio/mp3;base64," + audioBase64);
-            
-            const playPromise = audio.play();
-            
-            if (playPromise !== undefined) {
-              playPromise
-                .then(() => {
-                  console.log('✅ Playing Lucia audio');
-                  resolve(true);
-                })
-                .catch((err) => {
-                  console.error('❌ Playback error:', err);
-                  resolve(false);
-                });
-            } else {
-              resolve(true);
-            }
-            
-            audio.onended = () => console.log('✅ Audio playback finished');
-            audio.onerror = () => {
-              console.error('❌ Audio playback error');
-              resolve(false);
-            };
-          });
-
-          // Add Lucia response
-          setMessages(prev => [...prev, {
-            id: (Date.now() + 1).toString(),
-            type: 'lucia',
-            content: aiResponse,
-            timestamp: new Date()
-          }]);
-          
-          setMicState('idle');
-          return playSuccess;
-        } else {
-          setMicState('idle');
-          setMessages(prev => [...prev, {
-            id: Date.now().toString(),
-            type: 'lucia',
-            content: "I'm sorry, I couldn't generate a response. Please try again.",
-            timestamp: new Date()
-          }]);
-          return false;
-        }
-      } catch (error: any) {
-        console.error('❌ Error:', error);
-        if (error.name === 'AbortError') {
-          throw new Error('timeout');
-        }
-        throw error;
+      if (!transcriptionResponse.ok) {
+        throw new Error('Transcription failed');
       }
-    };
-    
-    // Retry logic
-    while (retries <= maxRetries) {
-      try {
-        const success = await attemptProcessing();
-        
-        if (success || retries >= maxRetries) {
-          break;
-        }
-        
-        retries++;
-        console.log(`⚠️ Retry ${retries}/${maxRetries}...`);
-        await new Promise(r => setTimeout(r, 1000));
-        
-      } catch (error: any) {
-        retries++;
-        
-        if (retries > maxRetries) {
-          setMicState('idle');
-          
-          let errorMsg = 'Error processing voice. Please try again.';
-          if (error.message === 'timeout') {
-            errorMsg = 'Request timeout. Try speaking less.';
-          } else if (error.message) {
-            errorMsg = error.message;
-          }
-          
-          setMessages(prev => [...prev, {
-            id: Date.now().toString(),
-            type: 'lucia',
-            content: errorMsg,
-            timestamp: new Date()
-          }]);
-          break;
-        }
-        
-        await new Promise(r => setTimeout(r, 1000));
+
+      const { text: transcribedText } = await transcriptionResponse.json();
+      console.log('📝 Transcribed:', transcribedText);
+
+      if (!transcribedText || transcribedText.trim() === '') {
+        setMicState('idle');
+        setMessages(prev => [...prev, {
+          id: Date.now().toString(),
+          type: 'lucia',
+          content: "I couldn't hear that clearly. Please try again.",
+          timestamp: new Date()
+        }]);
+        return;
       }
+
+      const userMessage: Message = {
+        id: Date.now().toString(),
+        type: 'user',
+        content: transcribedText,
+        timestamp: new Date()
+      };
+      setMessages(prev => [...prev, userMessage]);
+
+      const chatResponse = await fetch('/api/voice/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: transcribedText,
+          conversationHistory: messages.slice(-10).map(msg => ({
+            role: msg.type === 'user' ? 'user' : 'assistant',
+            content: msg.content,
+          })),
+        }),
+      });
+
+      if (!chatResponse.ok) {
+        throw new Error('Chat response failed');
+      }
+
+      const { text: responseText } = await chatResponse.json();
+      console.log('💬 Lucia response:', responseText);
+
+      const ttsResponse = await fetch('/api/voice/tts', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ text: responseText }),
+      });
+
+      if (!ttsResponse.ok) {
+        throw new Error('TTS failed');
+      }
+
+      const { audioBase64 } = await ttsResponse.json();
+
+      const audio = new Audio(`data:audio/mp3;base64,${audioBase64}`);
+      audio.play();
+
+      const luciaMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        type: 'lucia',
+        content: responseText,
+        timestamp: new Date()
+      };
+      setMessages(prev => [...prev, luciaMessage]);
+
+      await saveConversation(transcribedText, responseText);
+
+      setMicState('idle');
+    } catch (error: any) {
+      console.error('❌ Voice processing error:', error);
+      setMicState('idle');
+      setMessages(prev => [...prev, {
+        id: Date.now().toString(),
+        type: 'lucia',
+        content: "I'm sorry, I encountered an error processing your voice. Please try again.",
+        timestamp: new Date()
+      }]);
     }
   };
 
-  // Text input function removed - voice-only interface
 
   const handleMicClick = () => {
     if (!isAuthenticated || micState === 'disabled') return;

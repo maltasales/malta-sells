@@ -1,15 +1,18 @@
 'use client';
 
+import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { signOut } from '@/lib/auth';
 import { useRouter } from 'next/navigation';
-import { Search, Shield } from 'lucide-react';
+import { Search, Shield, Mic } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import LuciaAssistant from './LuciaAssistant';
 
 export default function Header() {
   const { user, isAuthenticated } = useAuth();
   const router = useRouter();
+  const [isLuciaOpen, setIsLuciaOpen] = useState(false);
 
   const handleSignOut = async () => {
     try {
@@ -25,8 +28,8 @@ export default function Header() {
   };
 
   const handleDashboard = () => {
-    const dashboardRoute = user?.role === 'buyer' 
-      ? '/dashboard/buyer' 
+    const dashboardRoute = user?.role === 'buyer'
+      ? '/dashboard/buyer'
       : '/dashboard/seller';
     router.push(dashboardRoute);
   };
@@ -47,6 +50,13 @@ export default function Header() {
         </div>
         
         <div className="flex items-center space-x-3">
+          <button
+            onClick={() => setIsLuciaOpen(true)}
+            className="flex items-center space-x-1 text-[#d8171e] hover:text-[#B8241A] transition-colors text-sm font-medium"
+          >
+            <Mic className="w-4 h-4" />
+            <span className="hidden sm:inline">Lucia</span>
+          </button>
           <Link
             href="/search"
             data-testid="search-button"
@@ -97,6 +107,8 @@ export default function Header() {
           )}
         </div>
       </div>
+
+      <LuciaAssistant isOpen={isLuciaOpen} onClose={() => setIsLuciaOpen(false)} />
     </header>
   );
 }
