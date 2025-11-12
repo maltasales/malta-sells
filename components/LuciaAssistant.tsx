@@ -46,6 +46,7 @@ export default function LuciaAssistant({ isOpen, onClose }: LuciaAssistantProps)
   const streamRef = useRef<MediaStream | null>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
+  const conversationIdRef = useRef<string>(crypto.randomUUID()); // Unique ID for this conversation session
 
   // Load RecordRTC dynamically
   useEffect(() => {
@@ -75,6 +76,55 @@ export default function LuciaAssistant({ isOpen, onClose }: LuciaAssistantProps)
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  // Cleanup function - stops ALL audio and recordings when closing
+  const cleanup = () => {
+    console.log('🧹 Cleaning up Lucia Assistant...');
+
+    // Stop any playing audio immediately
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+      audioRef.current.src = '';
+      console.log('✅ Audio stopped');
+    }
+
+    // Stop recording if active
+    if (recorderRef.current && isRecording) {
+      try {
+        recorderRef.current.stopRecording(() => {
+          recorderRef.current = null;
+          console.log('✅ Recording stopped');
+        });
+      } catch (e) {
+        console.log('Recording already stopped');
+      }
+    }
+
+    // Stop ALL media stream tracks
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(track => {
+        track.stop();
+        console.log('✅ Stopped track:', track.kind);
+      });
+      streamRef.current = null;
+    }
+
+    // Reset all states
+    setIsRecording(false);
+    setMicState('idle');
+    console.log('✅ Cleanup complete');
+  };
+
+  // Run cleanup when modal closes or component unmounts
+  useEffect(() => {
+    if (!isOpen) {
+      cleanup();
+    }
+    return () => {
+      cleanup();
+    };
+  }, [isOpen]);
 
   const fetchProperties = async (query?: string) => {
     try {
@@ -175,24 +225,39 @@ export default function LuciaAssistant({ isOpen, onClose }: LuciaAssistantProps)
 
   const saveConversation = async (message: string, response: string) => {
     if (!user) return;
-    
+
     try {
-      const { error } = await supabase.from('conversations').insert([
-        {
-          user_id: user.id,
-          message,
-          response,
-          timestamp: new Date().toISOString()
-        }
-      ]);
-      
-      if (error) {
-        console.log('Error saving conversation (table may not exist):', error);
-        // Continue without throwing error since this is not critical
+      console.log('💾 Saving conversation to SUPABASE...');
+
+      // Save user message to SUPABASE conversation_history table
+      const { error: userError } = await supabase.from('conversation_history').insert({
+        user_id: user.id,
+        conversation_id: conversationIdRef.current,
+        role: 'user',
+        message: message
+      });
+
+      if (userError) {
+        console.error('❌ Error saving user message to SUPABASE:', userError);
+      } else {
+        console.log('✅ User message saved to SUPABASE');
+      }
+
+      // Save assistant response to SUPABASE conversation_history table
+      const { error: assistantError } = await supabase.from('conversation_history').insert({
+        user_id: user.id,
+        conversation_id: conversationIdRef.current,
+        role: 'assistant',
+        message: response
+      });
+
+      if (assistantError) {
+        console.error('❌ Error saving assistant message to SUPABASE:', assistantError);
+      } else {
+        console.log('✅ Assistant message saved to SUPABASE');
       }
     } catch (error) {
-      console.log('Error saving conversation:', error);
-      // Continue without throwing error since this is not critical
+      console.error('❌ Error in saveConversation:', error);
     }
   };
 
@@ -482,9 +547,12 @@ export default function LuciaAssistant({ isOpen, onClose }: LuciaAssistantProps)
   return (
     <div className="fixed inset-0 z-50 flex items-end">
       {/* Backdrop */}
-      <div 
+      <div
         className="absolute inset-0 bg-black/50 backdrop-blur-sm"
-        onClick={onClose}
+        onClick={() => {
+          cleanup();
+          onClose();
+        }}
       />
       
       {/* Bottom Sheet */}
@@ -498,7 +566,10 @@ export default function LuciaAssistant({ isOpen, onClose }: LuciaAssistantProps)
             <h2 className="text-lg font-semibold text-gray-900">Lucia – AI Assistant</h2>
           </div>
           <button
-            onClick={onClose}
+            onClick={() => {
+              cleanup();
+              onClose();
+            }}
             className="p-2 hover:bg-gray-100 rounded-full transition-colors"
           >
             <X className="w-5 h-5 text-gray-600" />
