@@ -551,11 +551,11 @@ export default function CreatePropertyPage() {
           console.error('Error uploading video:', uploadError);
           throw new Error(`Failed to upload video: ${uploadError.message}`);
         }
-        
+
         const { data: { publicUrl } } = supabase.storage
-          .from('creatomate')
+          .from('property-videos')
           .getPublicUrl(fileName);
-        
+
         videoUrl = publicUrl;
         console.log('Video uploaded successfully:', videoUrl);
       } else if (generatedVideoUrl) {
