@@ -1,6 +1,8 @@
-// Simple in-memory auth system (replace with your preferred solution later)
+// SUPABASE AUTH - Real authentication with UUIDs
+import { supabase } from './supabase';
+
 interface User {
-  id: string;
+  id: string; // UUID from Supabase Auth
   name: string;
   email: string;
   role: 'buyer' | 'seller';
@@ -16,22 +18,16 @@ interface AuthState {
   isAuthenticated: boolean;
 }
 
-// In-memory storage (replace with localStorage or your database)
+// Current user state
 let currentUser: User | null = null;
-let users: User[] = [];
 
-// Load from localStorage if available
+// Load current session from Supabase on init
 if (typeof window !== 'undefined') {
-  const savedUser = localStorage.getItem('currentUser');
-  const savedUsers = localStorage.getItem('users');
-  
-  if (savedUser) {
-    currentUser = JSON.parse(savedUser);
-  }
-  
-  if (savedUsers) {
-    users = JSON.parse(savedUsers);
-  }
+  supabase.auth.getSession().then(({ data: { session } }) => {
+    if (session?.user) {
+      loadUserProfile(session.user.id);
+    }
+  });
 }
 
 export interface SignUpData {
@@ -46,121 +42,141 @@ export interface SignInData {
   password: string;
 }
 
-export async function signUp(data: SignUpData): Promise<{ user: User }> {
-  // Import Supabase to save profile immediately
-  const { supabase } = await import('./supabase');
-  
-  // Check if user already exists
-  const existingUser = users.find(u => u.email === data.email);
-  if (existingUser) {
-    throw new Error('User with this email already exists');
-  }
-
-  // Create new user
-  const newUser: User = {
-    id: Math.random().toString(36).substr(2, 9),
-    name: data.full_name,
-    email: data.email,
-    role: data.role,
-    createdAt: new Date().toISOString(),
-    // Assign Free plan to new sellers, no plan for buyers
-    plan_id: data.role === 'seller' ? 'free' : undefined,
-    verification_prompt_shown: false,
-  };
-
-  // CRITICAL: Save profile to Supabase IMMEDIATELY so it shows on listings
+// Helper to load user profile from Supabase
+async function loadUserProfile(userId: string): Promise<User | null> {
   try {
-    console.log('🔥 CREATING REAL PROFILE in Supabase for:', newUser.name, newUser.id);
-    
-    // First check if profile already exists
-    const { data: existingProfile } = await supabase
+    const { data: profile, error } = await supabase
       .from('profiles')
-      .select('id')
-      .eq('id', newUser.id)
+      .select('*')
+      .eq('id', userId)
       .single();
 
-    if (existingProfile) {
-      console.log('Profile already exists, updating with new data');
-      const { data: updatedProfile, error: updateError } = await supabase
-        .from('profiles')
-        .update({
-          full_name: data.full_name,
-          role: data.role,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', newUser.id)
-        .select()
-        .single();
+    if (error || !profile) {
+      console.error('Failed to load profile from SUPABASE:', error);
+      return null;
+    }
 
-      if (updateError) {
-        console.error('❌ Failed to update profile:', updateError);
-        throw new Error('Failed to save user profile');
+    const user: User = {
+      id: profile.id,
+      name: profile.full_name || profile.email || 'User',
+      email: profile.email || '',
+      role: profile.role || 'buyer',
+      createdAt: profile.created_at,
+      avatar_url: profile.avatar_url,
+      banner_url: profile.banner_url,
+      plan_id: profile.plan_id || 'free',
+      verification_prompt_shown: profile.verification_prompt_shown || false,
+    };
+
+    currentUser = user;
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('currentUser', JSON.stringify(user));
+    }
+
+    notifyAuthListeners();
+    return user;
+  } catch (error) {
+    console.error('Error loading profile:', error);
+    return null;
+  }
+}
+
+export async function signUp(data: SignUpData): Promise<{ user: User }> {
+  console.log('🔥 Signing up with SUPABASE AUTH...');
+
+  // Sign up with Supabase Auth - this creates a UUID user
+  const { data: authData, error: authError } = await supabase.auth.signUp({
+    email: data.email,
+    password: data.password,
+    options: {
+      data: {
+        full_name: data.full_name,
+        role: data.role,
       }
-      console.log('✅ Profile updated successfully:', updatedProfile);
+    }
+  });
+
+  if (authError || !authData.user) {
+    console.error('❌ Supabase auth signup failed:', authError);
+    throw new Error(authError?.message || 'Failed to create account');
+  }
+
+  console.log('✅ SUPABASE AUTH user created with UUID:', authData.user.id);
+
+  // Create profile in Supabase profiles table
+  try {
+    const { error: profileError } = await supabase
+      .from('profiles')
+      .insert({
+        id: authData.user.id, // UUID from Supabase Auth
+        full_name: data.full_name,
+        email: data.email,
+        role: data.role,
+        plan_id: data.role === 'seller' ? 'free' : null,
+        verified: false,
+        verification_prompt_shown: false,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      });
+
+    if (profileError) {
+      console.error('❌ Failed to create profile in SUPABASE:', profileError);
+      // Don't throw - auth user was created successfully
     } else {
-      // Create new profile
-      const { data: profileData, error: profileError } = await supabase
-        .from('profiles')
-        .insert({
-          id: newUser.id,
-          full_name: data.full_name,
-          role: data.role,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        })
-        .select()
-        .single();
-
-      if (profileError) {
-        console.error('❌ Failed to create profile:', profileError);
-        throw new Error('Failed to save user profile');
-      }
-      console.log('✅ REAL PROFILE created successfully:', profileData);
+      console.log('✅ Profile created in SUPABASE');
     }
   } catch (error) {
-    console.error('❌ Profile creation failed:', error);
-    console.log('User account created but profile sync may be incomplete');
-    // Don't throw error - allow user creation to continue
+    console.error('❌ Profile creation error:', error);
   }
 
-  // Store user locally
-  users.push(newUser);
-  currentUser = newUser;
-
-  // Save to localStorage
-  if (typeof window !== 'undefined') {
-    localStorage.setItem('users', JSON.stringify(users));
-    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+  // Load and return the user profile
+  const user = await loadUserProfile(authData.user.id);
+  if (!user) {
+    throw new Error('Failed to load user profile');
   }
 
-  return { user: newUser };
+  return { user };
 }
 
 export async function signIn(data: SignInData): Promise<{ user: User }> {
-  // Find user by email
-  const user = users.find(u => u.email === data.email);
-  if (!user) {
-    throw new Error('Invalid email or password');
+  console.log('🔥 Signing in with SUPABASE AUTH...');
+
+  // Sign in with Supabase Auth
+  const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+    email: data.email,
+    password: data.password,
+  });
+
+  if (authError || !authData.user) {
+    console.error('❌ Supabase auth signin failed:', authError);
+    throw new Error(authError?.message || 'Invalid email or password');
   }
 
-  // Set as current user
-  currentUser = user;
+  console.log('✅ SUPABASE AUTH signin successful, UUID:', authData.user.id);
 
-  // Save to localStorage
-  if (typeof window !== 'undefined') {
-    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+  // Load user profile from Supabase
+  const user = await loadUserProfile(authData.user.id);
+  if (!user) {
+    throw new Error('Failed to load user profile');
   }
 
   return { user };
 }
 
 export async function signOut(): Promise<void> {
+  console.log('🔥 Signing out from SUPABASE AUTH...');
+
+  // Sign out from Supabase Auth
+  await supabase.auth.signOut();
+
   currentUser = null;
-  
+
   // Remove from localStorage
   if (typeof window !== 'undefined') {
     localStorage.removeItem('currentUser');
   }
+
+  notifyAuthListeners();
 }
 
 export function getCurrentUser(): User | null {
@@ -196,18 +212,33 @@ export async function updateUserProfile(updates: Partial<User>): Promise<User> {
     throw new Error('No user is currently signed in');
   }
 
-  // Update current user
-  currentUser = { ...currentUser, ...updates };
+  console.log('🔥 Updating profile in SUPABASE...');
 
-  // Update in users array
-  const userIndex = users.findIndex(u => u.id === currentUser.id);
-  if (userIndex !== -1) {
-    users[userIndex] = currentUser;
+  // Update profile in Supabase
+  const { error } = await supabase
+    .from('profiles')
+    .update({
+      full_name: updates.name,
+      avatar_url: updates.avatar_url,
+      banner_url: updates.banner_url,
+      plan_id: updates.plan_id,
+      verification_prompt_shown: updates.verification_prompt_shown,
+      updated_at: new Date().toISOString()
+    })
+    .eq('id', currentUser.id);
+
+  if (error) {
+    console.error('❌ Failed to update profile in SUPABASE:', error);
+    throw new Error('Failed to update profile');
   }
+
+  console.log('✅ Profile updated in SUPABASE');
+
+  // Update local state
+  currentUser = { ...currentUser, ...updates };
 
   // Save to localStorage
   if (typeof window !== 'undefined') {
-    localStorage.setItem('users', JSON.stringify(users));
     localStorage.setItem('currentUser', JSON.stringify(currentUser));
   }
 
