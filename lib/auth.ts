@@ -85,10 +85,12 @@ export async function signUp(data: SignUpData): Promise<{ user: User }> {
   console.log('🔥 Signing up with SUPABASE AUTH...');
 
   // Sign up with Supabase Auth - this creates a UUID user
+  // The database trigger will automatically create the profile
   const { data: authData, error: authError } = await supabase.auth.signUp({
     email: data.email,
     password: data.password,
     options: {
+      emailRedirectTo: undefined,
       data: {
         full_name: data.full_name,
         role: data.role,
@@ -103,38 +105,16 @@ export async function signUp(data: SignUpData): Promise<{ user: User }> {
 
   console.log('✅ SUPABASE AUTH user created with UUID:', authData.user.id);
 
-  // Create profile in Supabase profiles table
-  try {
-    const { error: profileError } = await supabase
-      .from('profiles')
-      .insert({
-        id: authData.user.id, // UUID from Supabase Auth
-        full_name: data.full_name,
-        email: data.email,
-        role: data.role,
-        plan_id: data.role === 'seller' ? 'free' : null,
-        verified: false,
-        verification_prompt_shown: false,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      });
+  // Wait a moment for the trigger to create the profile
+  await new Promise(resolve => setTimeout(resolve, 500));
 
-    if (profileError) {
-      console.error('❌ Failed to create profile in SUPABASE:', profileError);
-      // Don't throw - auth user was created successfully
-    } else {
-      console.log('✅ Profile created in SUPABASE');
-    }
-  } catch (error) {
-    console.error('❌ Profile creation error:', error);
-  }
-
-  // Load and return the user profile
+  // Load and return the user profile (created by trigger)
   const user = await loadUserProfile(authData.user.id);
   if (!user) {
     throw new Error('Failed to load user profile');
   }
 
+  console.log('✅ Profile loaded from SUPABASE:', user);
   return { user };
 }
 
