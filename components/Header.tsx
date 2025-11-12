@@ -7,7 +7,11 @@ import { useRouter } from 'next/navigation';
 import { Search, Shield, Mic } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import LuciaAssistant from './LuciaAssistant';
+import dynamic from 'next/dynamic';
+
+const LuciaAssistant = dynamic(() => import('./LuciaAssistant'), {
+  ssr: false,
+});
 
 export default function Header() {
   const { user, isAuthenticated } = useAuth();

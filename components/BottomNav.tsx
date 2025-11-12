@@ -5,7 +5,11 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import { useState } from 'react';
-import LuciaAssistant from './LuciaAssistant';
+import dynamic from 'next/dynamic';
+
+const LuciaAssistant = dynamic(() => import('./LuciaAssistant'), {
+  ssr: false,
+});
 
 // Custom AI Voice Assistant Icon Component
 const VoiceAssistantIcon = ({ className }: { className?: string }) => (
