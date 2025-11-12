@@ -25,7 +25,24 @@ let currentUser: User | null = null;
 if (typeof window !== 'undefined') {
   supabase.auth.getSession().then(({ data: { session } }) => {
     if (session?.user) {
-      loadUserProfile(session.user.id);
+      loadUserProfile(session.user.id).catch(err => {
+        console.error('Failed to load user profile on init:', err);
+        supabase.auth.signOut();
+      });
+    }
+  });
+
+  // Listen to auth state changes
+  supabase.auth.onAuthStateChange(async (event, session) => {
+    console.log('Auth state changed:', event);
+    if (event === 'SIGNED_IN' && session?.user) {
+      await loadUserProfile(session.user.id);
+    } else if (event === 'SIGNED_OUT') {
+      currentUser = null;
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('currentUser');
+      }
+      notifyAuthListeners();
     }
   });
 }
@@ -45,21 +62,30 @@ export interface SignInData {
 // Helper to load user profile from Supabase
 async function loadUserProfile(userId: string): Promise<User | null> {
   try {
+    // First, get auth user data for email
+    const { data: { user: authUser }, error: authError } = await supabase.auth.getUser();
+    if (authError) {
+      throw new Error(`Failed to get auth user: ${authError.message}`);
+    }
+
     const { data: profile, error } = await supabase
       .from('profiles')
       .select('*')
       .eq('id', userId)
-      .single();
+      .maybeSingle();
 
-    if (error || !profile) {
-      console.error('Failed to load profile from SUPABASE:', error);
-      return null;
+    if (error) {
+      throw new Error(`Failed to load profile: ${error.message}`);
+    }
+
+    if (!profile) {
+      throw new Error('Profile not found in database');
     }
 
     const user: User = {
       id: profile.id,
-      name: profile.full_name || profile.email || 'User',
-      email: profile.email || '',
+      name: profile.full_name || authUser?.email || 'User',
+      email: authUser?.email || profile.email || '',
       role: profile.role || 'buyer',
       createdAt: profile.created_at,
       avatar_url: profile.avatar_url,
@@ -77,12 +103,17 @@ async function loadUserProfile(userId: string): Promise<User | null> {
     return user;
   } catch (error) {
     console.error('Error loading profile:', error);
-    return null;
+    throw error;
   }
 }
 
 export async function signUp(data: SignUpData): Promise<{ user: User }> {
   console.log('🔥 Signing up with SUPABASE AUTH...');
+
+  // Check if Supabase is available
+  if (!supabase) {
+    throw new Error('Supabase is not available. Please check your configuration.');
+  }
 
   // Sign up with Supabase Auth - this creates a UUID user
   const { data: authData, error: authError } = await supabase.auth.signUp({
@@ -98,41 +129,18 @@ export async function signUp(data: SignUpData): Promise<{ user: User }> {
 
   if (authError || !authData.user) {
     console.error('❌ Supabase auth signup failed:', authError);
-    throw new Error(authError?.message || 'Failed to create account');
+    throw new Error(authError?.message || 'Failed to create account. Supabase is unreachable.');
   }
 
   console.log('✅ SUPABASE AUTH user created with UUID:', authData.user.id);
 
-  // Create profile in Supabase profiles table
-  try {
-    const { error: profileError } = await supabase
-      .from('profiles')
-      .insert({
-        id: authData.user.id, // UUID from Supabase Auth
-        full_name: data.full_name,
-        email: data.email,
-        role: data.role,
-        plan_id: data.role === 'seller' ? 'free' : null,
-        verified: false,
-        verification_prompt_shown: false,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      });
-
-    if (profileError) {
-      console.error('❌ Failed to create profile in SUPABASE:', profileError);
-      // Don't throw - auth user was created successfully
-    } else {
-      console.log('✅ Profile created in SUPABASE');
-    }
-  } catch (error) {
-    console.error('❌ Profile creation error:', error);
-  }
+  // Wait a moment for the trigger to create the profile
+  await new Promise(resolve => setTimeout(resolve, 1000));
 
   // Load and return the user profile
   const user = await loadUserProfile(authData.user.id);
   if (!user) {
-    throw new Error('Failed to load user profile');
+    throw new Error('Failed to load user profile after signup');
   }
 
   return { user };
@@ -140,6 +148,11 @@ export async function signUp(data: SignUpData): Promise<{ user: User }> {
 
 export async function signIn(data: SignInData): Promise<{ user: User }> {
   console.log('🔥 Signing in with SUPABASE AUTH...');
+
+  // Check if Supabase is available
+  if (!supabase) {
+    throw new Error('Supabase is not available. Please check your configuration.');
+  }
 
   // Sign in with Supabase Auth
   const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
@@ -149,7 +162,7 @@ export async function signIn(data: SignInData): Promise<{ user: User }> {
 
   if (authError || !authData.user) {
     console.error('❌ Supabase auth signin failed:', authError);
-    throw new Error(authError?.message || 'Invalid email or password');
+    throw new Error(authError?.message || 'Invalid email or password. Supabase is unreachable.');
   }
 
   console.log('✅ SUPABASE AUTH signin successful, UUID:', authData.user.id);
@@ -157,7 +170,7 @@ export async function signIn(data: SignInData): Promise<{ user: User }> {
   // Load user profile from Supabase
   const user = await loadUserProfile(authData.user.id);
   if (!user) {
-    throw new Error('Failed to load user profile');
+    throw new Error('Failed to load user profile from Supabase');
   }
 
   return { user };
@@ -166,8 +179,17 @@ export async function signIn(data: SignInData): Promise<{ user: User }> {
 export async function signOut(): Promise<void> {
   console.log('🔥 Signing out from SUPABASE AUTH...');
 
+  // Check if Supabase is available
+  if (!supabase) {
+    throw new Error('Supabase is not available. Please check your configuration.');
+  }
+
   // Sign out from Supabase Auth
-  await supabase.auth.signOut();
+  const { error } = await supabase.auth.signOut();
+  if (error) {
+    console.error('Error signing out:', error);
+    throw new Error(`Failed to sign out: ${error.message}`);
+  }
 
   currentUser = null;
 
@@ -212,24 +234,32 @@ export async function updateUserProfile(updates: Partial<User>): Promise<User> {
     throw new Error('No user is currently signed in');
   }
 
+  // Check if Supabase is available
+  if (!supabase) {
+    throw new Error('Supabase is not available. Please check your configuration.');
+  }
+
   console.log('🔥 Updating profile in SUPABASE...');
+
+  const updateData: any = {
+    updated_at: new Date().toISOString()
+  };
+
+  if (updates.name !== undefined) updateData.full_name = updates.name;
+  if (updates.avatar_url !== undefined) updateData.avatar_url = updates.avatar_url;
+  if (updates.banner_url !== undefined) updateData.banner_url = updates.banner_url;
+  if (updates.plan_id !== undefined) updateData.plan_id = updates.plan_id;
+  if (updates.verification_prompt_shown !== undefined) updateData.verification_prompt_shown = updates.verification_prompt_shown;
 
   // Update profile in Supabase
   const { error } = await supabase
     .from('profiles')
-    .update({
-      full_name: updates.name,
-      avatar_url: updates.avatar_url,
-      banner_url: updates.banner_url,
-      plan_id: updates.plan_id,
-      verification_prompt_shown: updates.verification_prompt_shown,
-      updated_at: new Date().toISOString()
-    })
+    .update(updateData)
     .eq('id', currentUser.id);
 
   if (error) {
     console.error('❌ Failed to update profile in SUPABASE:', error);
-    throw new Error('Failed to update profile');
+    throw new Error(`Failed to update profile: ${error.message}`);
   }
 
   console.log('✅ Profile updated in SUPABASE');

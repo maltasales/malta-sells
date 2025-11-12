@@ -1,8 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { getCurrentUser, onAuthStateChange } from '@/lib/auth';
-import { supabase } from '@/lib/supabase';
+import { getCurrentUser, onAuthStateChange, updateUserProfile as updateProfile } from '@/lib/auth';
 
 export interface User {
   id: string;
@@ -36,36 +35,23 @@ export const useAuth = () => {
   }, []);
 
   const updateUserProfile = async (updates: Partial<User>) => {
-    if (!user) return;
-    
+    if (!user) {
+      throw new Error('No user is currently signed in');
+    }
+
     try {
-      // Update in Supabase
-      const { error } = await supabase
-        .from('profiles')
-        .update(updates)
-        .eq('id', user.id);
-
-      if (error) {
-        console.error('Error updating profile in database:', error);
-        throw error;
-      }
-
-      // Update local state
-      const updatedUser = { ...user, ...updates };
+      // Use the centralized update function from lib/auth
+      const updatedUser = await updateProfile(updates);
       setUser(updatedUser);
-      
-      // Update localStorage
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('currentUser', JSON.stringify(updatedUser));
-      }
     } catch (error) {
       console.error('Failed to update user profile:', error);
       throw error;
     }
   };
+
   return {
     user,
-    profile: user, // For compatibility with existing code
+    profile: user,
     loading,
     isAuthenticated: !!user,
     updateUserProfile,
