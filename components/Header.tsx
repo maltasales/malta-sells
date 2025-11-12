@@ -11,6 +11,7 @@ import dynamic from 'next/dynamic';
 
 const LuciaAssistant = dynamic(() => import('./LuciaAssistant'), {
   ssr: false,
+  loading: () => null,
 });
 
 export default function Header() {

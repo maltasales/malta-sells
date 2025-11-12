@@ -9,6 +9,7 @@ import dynamic from 'next/dynamic';
 
 const LuciaAssistant = dynamic(() => import('./LuciaAssistant'), {
   ssr: false,
+  loading: () => null,
 });
 
 // Custom AI Voice Assistant Icon Component
