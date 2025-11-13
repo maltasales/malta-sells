@@ -7,11 +7,14 @@
     - Users can still only update their own profiles (existing policy remains)
 */
 
-DO $$ 
+DO $$
 BEGIN
   -- Drop the restrictive policy if it exists
   DROP POLICY IF EXISTS "Users can view own profile" ON profiles;
-  
+
+  -- Drop the policy if it already exists (to allow re-running this migration)
+  DROP POLICY IF EXISTS "Anyone can view profiles" ON profiles;
+
   -- Create a new public read policy
   CREATE POLICY "Anyone can view profiles"
     ON profiles
