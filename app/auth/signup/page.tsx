@@ -35,29 +35,34 @@ export default function SignUpPage() {
   });
 
   const onSubmit = async (data: SignUpFormData) => {
-    console.log('🔥 onSubmit function triggered!', data);
-    alert('onSubmit triggered! Check console for data.');
-    
     console.log('Form submitted with data:', data);
     setIsLoading(true);
-    
+
     try {
       const { user } = await signUp(data);
       console.log('User created successfully:', user);
-      
+
       // Redirect based on role
-      const dashboardRoute = user.role === 'buyer' 
-        ? '/dashboard/buyer' 
+      const dashboardRoute = user.role === 'buyer'
+        ? '/dashboard/buyer'
         : '/dashboard/seller';
-      
+
       console.log('Redirecting to:', dashboardRoute);
       router.push(dashboardRoute);
-      
+
     } catch (error: any) {
       console.error('Signup error:', error);
-      setError('root', {
-        message: error.message || 'An error occurred during signup',
-      });
+
+      // Handle email confirmation requirement
+      if (error.message === 'CONFIRMATION_REQUIRED') {
+        setError('root', {
+          message: 'Account created! Please check your email to confirm your account before signing in.',
+        });
+      } else {
+        setError('root', {
+          message: error.message || 'An error occurred during signup',
+        });
+      }
     } finally {
       setIsLoading(false);
     }

@@ -120,6 +120,7 @@ export async function signUp(data: SignUpData): Promise<{ user: User }> {
     email: data.email,
     password: data.password,
     options: {
+      emailRedirectTo: typeof window !== 'undefined' ? `${window.location.origin}/auth/callback` : undefined,
       data: {
         full_name: data.full_name,
         role: data.role,
@@ -127,12 +128,23 @@ export async function signUp(data: SignUpData): Promise<{ user: User }> {
     }
   });
 
-  if (authError || !authData.user) {
+  if (authError) {
     console.error('❌ Supabase auth signup failed:', authError);
-    throw new Error(authError?.message || 'Failed to create account. Supabase is unreachable.');
+    throw new Error(authError.message || 'Failed to create account.');
+  }
+
+  if (!authData.user) {
+    throw new Error('Failed to create account. Please try again.');
   }
 
   console.log('✅ SUPABASE AUTH user created with UUID:', authData.user.id);
+  console.log('Session:', authData.session ? 'Active' : 'Pending confirmation');
+
+  // If email confirmation is required, the session will be null
+  if (!authData.session) {
+    console.log('⏳ Email confirmation required');
+    throw new Error('CONFIRMATION_REQUIRED');
+  }
 
   // Wait a moment for the trigger to create the profile
   await new Promise(resolve => setTimeout(resolve, 1000));
